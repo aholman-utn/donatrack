@@ -1,0 +1,61 @@
+package services;
+
+import domain.persona.Persona;
+import domain.notificacion.Notificacion;
+import domain.contacto.MedioDeContacto;
+import domain.ubicacion.Direccion;
+
+import java.util.List;
+
+public class PersonaService {
+
+    // Constructor (Eventualmente inyectarías un repositorio acá)
+    public PersonaService() {
+    }
+
+    public void create(Persona persona) {
+        // TODO: Lógica para persistir la persona
+    }
+
+    public List<Persona> getAll() {
+        // TODO: Lógica para devolver todas las personas
+        return null;
+    }
+
+    public Persona update(Persona persona) {
+        // TODO: Lógica para actualizar una persona
+        return persona;
+    }
+
+    public void delete(Persona persona) {
+        // TODO: Lógica para eliminar la persona
+    }
+
+    public List<Notificacion> getNotificaciones(Persona persona) {
+        // TODO: Retornar las notificaciones
+        // return persona.getNotificaciones();
+        return null;
+    }
+    
+    public void addNotificacion(Persona persona, Notificacion notificacion) {
+        // TODO: Lógica para asociarle una nueva notificación
+    }
+
+    public void updateDireccion(Persona persona, Direccion nuevaDireccion) {
+        // TODO: Lógica para actualizar la dirección
+    }
+
+    public void addMedioDeContacto(Persona persona, MedioDeContacto medio) {
+        // TODO: Lógica para agregar un medio de contacto a la lista
+    }
+
+    public void removeMedioDeContacto(Persona persona, MedioDeContacto medio) {
+        // TODO: Lógica para quitar un medio de contacto
+    }
+
+    public void setMedioPredeterminado(Persona persona, MedioDeContacto medio) {
+        // TODO: Lógica para definir el medio predeterminado
+    }
+
+}
+

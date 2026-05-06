@@ -1,5 +1,10 @@
 package domain.ubicacion;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Direccion {
     private String calle1;
     private String calle2;
