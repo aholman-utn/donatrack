@@ -1,6 +1,6 @@
-package com.tp.donatrack.domain.contacto;
+package domain.contacto;
 
-import com.tp.donatrack.domain.notificacion.Notificacion;
+import domain.notificacion.Notificacion;
 
 public class NotificadorEmail implements MedioDeContacto {
     private String correo;

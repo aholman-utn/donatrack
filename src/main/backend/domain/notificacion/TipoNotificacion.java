@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.notificacion;
+package domain.notificacion;
 
 public enum TipoNotificacion {
     BIENVENIDA,

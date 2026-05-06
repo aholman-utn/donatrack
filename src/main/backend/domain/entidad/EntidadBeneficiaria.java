@@ -1,6 +1,6 @@
-package com.tp.donatrack.domain.entidad;
+package domain.entidad;
 
-import com.tp.donatrack.domain.persona.Persona;
+import domain.persona.Persona;
 
 public class EntidadBeneficiaria {
     private Persona persona;

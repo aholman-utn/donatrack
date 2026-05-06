@@ -1,6 +1,6 @@
-package com.tp.donatrack.domain.persona;
+package domain.persona;
 
-import com.tp.donatrack.domain.entidad.TipoOrganizacion;
+import domain.entidad.TipoOrganizacion;
 import java.util.List;
 
 public class PersonaJuridica extends Persona {

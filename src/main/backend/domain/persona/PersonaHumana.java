@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.persona;
+package domain.persona;
 
 import java.util.Date;
 

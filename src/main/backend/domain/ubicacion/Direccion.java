@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.ubicacion;
+package domain.ubicacion;
 
 public class Direccion {
     private String calle1;

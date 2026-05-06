@@ -1,8 +1,8 @@
-package com.tp.donatrack.domain.persona;
+package domain.persona;
 
-import com.tp.donatrack.domain.ubicacion.Direccion;
-import com.tp.donatrack.domain.notificacion.Notificacion;
-import com.tp.donatrack.domain.contacto.MedioDeContacto;
+import domain.ubicacion.Direccion;
+import domain.notificacion.Notificacion;
+import domain.contacto.MedioDeContacto;
 import java.util.List;
 
 public abstract class Persona {

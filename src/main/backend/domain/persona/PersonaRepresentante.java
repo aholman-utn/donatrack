@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.persona;
+package domain.persona;
 
 public class PersonaRepresentante {
     private String nombre;

@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.entidad;
+package domain.entidad;
 
 public enum TipoOrganizacion {
     GUBERNAMENTAL,
