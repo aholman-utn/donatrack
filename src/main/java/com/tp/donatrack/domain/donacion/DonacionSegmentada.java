@@ -32,7 +32,6 @@ public class DonacionSegmentada {
 
     
     public void donar(EntidadBeneficiaria entidad){
-        //TO DO: Adjudicar donacion a entidad Beneficiaria
-        //entidad.implementarDonacion(this);
+        entidad.implementarDonacion(this);
     }
 }

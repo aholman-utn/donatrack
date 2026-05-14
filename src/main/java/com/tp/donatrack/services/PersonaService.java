@@ -1,9 +1,9 @@
 package com.tp.donatrack.services;
 
-import domain.persona.Persona;
-import domain.notificacion.Notificacion;
-import domain.contacto.MedioDeContacto;
-import domain.ubicacion.Direccion;
+import com.tp.donatrack.domain.persona.Persona;
+import com.tp.donatrack.domain.notificacion.Notificacion;
+import com.tp.donatrack.domain.contacto.MedioDeContacto;
+import com.tp.donatrack.domain.ubicacion.Direccion;
 
 import java.util.List;
 
@@ -58,4 +58,3 @@ public class PersonaService {
     }
 
 }
-

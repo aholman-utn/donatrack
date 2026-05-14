@@ -11,39 +11,112 @@
 
 # Donatrack
 
-Este documento proporciona las instrucciones necesarias para compilar el proyecto, configurar el entorno local y ejecutar la suite de pruebas.
-
-## ⚙️ Requisitos Previos
-
-Asegurate de tener instalados los siguientes componentes en tu entorno de desarrollo:
-* **Java** (JDK 17 o superior recomendado)
-* **Maven** (3.8.x o superior)
+Sistema de gestión de donaciones desarrollado con Spring Boot.
 
 ---
 
-## 🛠️ Primeros Pasos
+## ⚙️ Requisitos Previos
 
-Para inicializar el proyecto, descargar las dependencias necesarias y compilar el código fuente por primera vez (omitiendo la ejecución de pruebas), ejecuta el siguiente comando:
+- **Java JDK 21** (Amazon Corretto 21 o similar)
+- **Maven 3.9+** (incluido via Maven Wrapper en el proyecto)
+
+---
+
+## 🛠️ Configuración del entorno
+
+### 1. Verificar que tenés un JDK 21 instalado
 
 ```bash
-mvn clean install -DskipTests
+# Verificar si javac está disponible
+javac -version
 ```
 
-# 🧪 Testing
+Si `javac` no se encuentra, necesitás configurar `JAVA_HOME` apuntando a un JDK 21. En este proyecto usamos Corretto 21:
 
-El proyecto utiliza JUnit 5 junto con maven-surefire-junit5-tree-reporter. Esto reemplaza la salida estándar de Maven por un formato de árbol mucho más legible en la consola, utilizando los nombres descriptivos definidos en @DisplayName.
-
-Para correr todas las pruebas unitarias y de integración del proyecto:
 ```bash
-mvn clean test
+export JAVA_HOME=~/.jdks/corretto-21.0.9
+export PATH=$JAVA_HOME/bin:$PATH
 ```
 
-Ejecutar una clase específica
+> **Tip:** Agregá esas líneas a tu `~/.bashrc` o `~/.zshrc` para que sea permanente.
+
+### 2. Verificar la configuración
+
 ```bash
-mvn test -Dtest=DonacionTest
+java -version   # Debería mostrar openjdk 21.x.x
+javac -version  # Debería mostrar javac 21.x.x
 ```
 
-Ejecutar un método específico
+---
+
+## � Compilar el proyecto
+
+El proyecto incluye un Maven Wrapper (`mvnw`), así que no necesitás instalar Maven globalmente.
+
 ```bash
-mvn test -Dtest=DonacionTest#testSegmentarDonacion
+# Compilar sin ejecutar tests
+./mvnw clean compile
+
+# Compilar e instalar en el repositorio local (sin tests)
+./mvnw clean install -DskipTests
 ```
+
+---
+
+## 🧪 Ejecutar los tests
+
+El proyecto usa **JUnit 5** con `maven-surefire-junit5-tree-reporter` para una salida en formato de árbol legible.
+
+### Correr todos los tests
+
+```bash
+./mvnw test
+```
+
+### Correr una clase de test específica
+
+```bash
+./mvnw test -Dtest=DonacionTest
+```
+
+### Correr un método de test específico
+
+```bash
+./mvnw test -Dtest=DonacionTest#testSegmentarDonacion
+```
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+src/
+├── main/
+│   ├── java/com/tp/donatrack/
+│   │   ├── DonatrackApplication.java        # Clase principal
+│   │   ├── controllers/                     # Controladores REST
+│   │   ├── domain/                          # Modelo de dominio
+│   │   │   ├── bien/                        # Bienes (duraderos, perecederos)
+│   │   │   ├── contacto/                    # Medios de contacto
+│   │   │   ├── donacion/                    # Donaciones y segmentación
+│   │   │   ├── entidad/                     # Entidades beneficiarias, donantes
+│   │   │   ├── notificacion/                # Notificaciones
+│   │   │   ├── persona/                     # Personas (humana, jurídica)
+│   │   │   └── ubicacion/                   # Ubicaciones
+│   │   ├── repositories/                    # Repositorios
+│   │   └── services/                        # Servicios de negocio
+│   └── resources/
+│       └── application.yaml                 # Configuración de la aplicación
+└── test/
+    └── java/com/tp/donatrack/               # Tests unitarios
+```
+
+---
+
+## 🔧 Tecnologías
+
+- **Java 21**
+- **Spring Boot 3.4.5**
+- **Lombok** (generación de getters/setters/constructores)
+- **JUnit 5** (testing)
+- **Maven** (gestión de dependencias y build)
