@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Importación CSV</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>⚙️ DonaTrack Admin</h2>
+            <nav>
+                <a href="admin-dashboard.html">📊 Dashboard</a>
+                <a href="admin-donantes.html">👥 Donantes</a>
+                <a href="admin-donaciones.html">📦 Donaciones</a>
+                <a href="admin-importar.html" class="active">📄 Importar CSV</a>
+                <a href="#">🏫 Entidades</a>
+                <a href="#">🚚 Camiones</a>
+                <a href="#">🏆 Rankings</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <h1>Importación Masiva de Donantes</h1>
+            <p class="subtitle">Cargá un archivo CSV para importar donantes en forma masiva</p>
+
+            <div class="upload-section">
+                <div class="upload-zone">
+                    <div class="icon">📄</div>
+                    <p><strong>Arrastrá tu archivo CSV aquí</strong></p>
+                    <p>o hacé clic para seleccionar</p>
+                    <p class="format">Formato: .csv | Máximo: 50MB | Hasta 20.000+ filas</p>
+                </div>
+                <button class="btn btn-primary">Iniciar Importación</button>
+
+                <div class="format-info">
+                    <h4>Formato esperado del CSV:</h4>
+                    <p><code>TipoPersona, TipoDoc, Documento, Nombre/RazónSocial, Email, Teléfono</code></p>
+                    <p style="margin-top:0.5rem;font-size:0.85rem;color:#666;">
+                        Si el email ya existe en el sistema, se actualizan los datos. Si no existe, se crea el usuario y se envían credenciales.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Resultado de importación -->
+            <div class="result">
+                <h3>✓ Resultado de la Importación</h3>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;">20.000 / 20.000 procesados</div>
+                    </div>
+                </div>
+
+                <div class="result-stats">
+                    <div class="result-stat total"><div class="num">20.000</div><div class="lbl">Total procesados</div></div>
+                    <div class="result-stat created"><div class="num">18.450</div><div class="lbl">Creados</div></div>
+                    <div class="result-stat updated"><div class="num">1.520</div><div class="lbl">Actualizados</div></div>
+                    <div class="result-stat errors"><div class="num">30</div><div class="lbl">Errores</div></div>
+                </div>
+
+                <p style="color:#666;font-size:0.9rem;">Se enviaron credenciales de acceso a los 18.450 nuevos usuarios por correo electrónico.</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

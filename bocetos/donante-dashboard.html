@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Panel Donante</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>💚 DonaTrack</h2>
+            <nav>
+                <a href="donante-dashboard.html" class="active">📊 Dashboard</a>
+                <a href="donante-donaciones.html">📦 Mis Donaciones</a>
+                <a href="donante-entidades.html">🏫 Entidades</a>
+                <a href="#">🏆 Incentivos</a>
+                <a href="#">🗺️ Seguimiento</a>
+                <a href="#">🔔 Notificaciones</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="user-info">👤 Ana Pérez | <a href="#">Mi Perfil</a></div>
+            <h1>Bienvenida, Ana</h1>
+            <p class="subtitle">Resumen de tu actividad en DonaTrack</p>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number">12</div>
+                    <div class="label">Donaciones realizadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">8</div>
+                    <div class="label">Entregadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">3</div>
+                    <div class="label">En tránsito</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h3 style="margin-bottom:1rem;">Últimas donaciones</h3>
+                <table>
+                    <thead>
+                        <tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>12/05/2026</td><td>50 camperas de abrigo</td><td>Vestimenta</td><td><span class="badge badge-yellow">En tránsito</span></td></tr>
+                        <tr><td>08/05/2026</td><td>100 paquetes de fideos</td><td>Alimentos</td><td><span class="badge badge-green">Entregada</span></td></tr>
+                        <tr><td>01/05/2026</td><td>6 sillas + 1 mesa</td><td>Mobiliario</td><td><span class="badge badge-green">Entregada</span></td></tr>
+                        <tr><td>25/04/2026</td><td>20 frazadas</td><td>Abrigo</td><td><span class="badge badge-blue">Asignada</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

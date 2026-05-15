@@ -4,7 +4,7 @@
 - Ignacio durandez 208.966-0
 - Eduardo Gaidano 213.723-9
 - Lautaro Corfield 175.519-5
-- Anabella Muñoz Holmsn 215.594-1
+- Anabella Muñoz Holman 215.594-1
 - German Fabrizio Gomez 203.684-8
 - Lucas Pangaro 164.142-6
 
@@ -110,6 +110,39 @@ src/
 └── test/
     └── java/com/tp/donatrack/               # Tests unitarios
 ```
+
+---
+
+## 🎨 Bocetos de Interfaz de Usuario
+
+Los bocetos de las pantallas del sistema se encuentran en la carpeta `bocetos/`. Son archivos HTML estáticos que se abren directamente en el navegador sin necesidad de levantar ningún servidor.
+
+### Cómo acceder
+
+```bash
+# Abrir la landing page (índice de todos los bocetos)
+xdg-open bocetos/index.html
+```
+
+O simplemente hacé doble clic en `bocetos/index.html` desde el explorador de archivos.
+
+### Pantallas disponibles
+
+| Rol | Pantalla | Archivo |
+|-----|----------|---------|
+| Público | Landing Page | `bocetos/index.html` |
+| Público | Inicio de Sesión | `bocetos/login.html` |
+| Público | Registro | `bocetos/registro.html` |
+| Donante | Dashboard | `bocetos/donante-dashboard.html` |
+| Donante | Mis Donaciones | `bocetos/donante-donaciones.html` |
+| Donante | Entidades Beneficiarias | `bocetos/donante-entidades.html` |
+| Entidad | Dashboard | `bocetos/entidad-dashboard.html` |
+| Entidad | Gestión de Necesidades | `bocetos/entidad-necesidades.html` |
+| Entidad | Donaciones Asignadas | `bocetos/entidad-donaciones.html` |
+| Admin | Dashboard | `bocetos/admin-dashboard.html` |
+| Admin | Gestión de Donantes | `bocetos/admin-donantes.html` |
+| Admin | Registro de Donaciones | `bocetos/admin-donaciones.html` |
+| Admin | Importación CSV | `bocetos/admin-importar.html` |
 
 ---
 

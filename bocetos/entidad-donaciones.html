@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Donaciones Asignadas</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>💚 DonaTrack</h2>
+            <nav>
+                <a href="entidad-dashboard.html">📊 Dashboard</a>
+                <a href="entidad-necesidades.html">📋 Necesidades</a>
+                <a href="entidad-donaciones.html" class="active">📦 Donaciones</a>
+                <a href="#">🗺️ Seguimiento</a>
+                <a href="#">🔔 Notificaciones</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <h1>Donaciones Asignadas</h1>
+
+            <!-- Modal confirmar recepción -->
+            <div class="confirm-modal">
+                <h3>✓ Confirmar Recepción de Donación</h3>
+                <p style="margin-bottom:1rem;color:#666;">Donación: 20 sillas de oficina - Arcos Plateados S.A.</p>
+                <div class="photo-upload">
+                    📷 Arrastrá fotos de la donación recibida aquí<br>
+                    <small>o hacé clic para seleccionar archivos</small>
+                </div>
+                <button class="btn btn-confirm">Confirmar Recepción</button>
+            </div>
+
+            <!-- Lista de donaciones -->
+            <div class="donation-card">
+                <div class="donation-info">
+                    <h3>50 camperas de abrigo</h3>
+                    <p>Donante: Ana Pérez | Categoría: Vestimenta</p>
+                    <p>Asignada: 12/05/2026</p>
+                </div>
+                <div class="donation-actions">
+                    <span class="badge badge-yellow">En tránsito</span>
+                    <button class="btn btn-track">🗺️ Seguir</button>
+                </div>
+            </div>
+
+            <div class="donation-card">
+                <div class="donation-info">
+                    <h3>20 sillas de oficina</h3>
+                    <p>Donante: Arcos Plateados S.A. | Categoría: Mobiliario</p>
+                    <p>Asignada: 10/05/2026</p>
+                </div>
+                <div class="donation-actions">
+                    <span class="badge badge-blue">Llegó</span>
+                    <button class="btn btn-confirm">✓ Confirmar</button>
+                </div>
+            </div>
+
+            <div class="donation-card">
+                <div class="donation-info">
+                    <h3>100 paquetes de fideos</h3>
+                    <p>Donante: Pastas del Sur | Categoría: Alimentos</p>
+                    <p>Recibida: 08/05/2026</p>
+                </div>
+                <div class="donation-actions">
+                    <span class="badge badge-green">Recibida ✓</span>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
