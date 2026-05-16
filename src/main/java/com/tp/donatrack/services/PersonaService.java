@@ -2,7 +2,7 @@ package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.notificacion.Notificacion;
-import com.tp.donatrack.domain.contacto.MedioDeContacto;
+import com.tp.donatrack.domain.contacto.Notificador;
 import com.tp.donatrack.domain.ubicacion.Direccion;
 
 import java.util.List;
@@ -45,15 +45,15 @@ public class PersonaService {
         // TODO: Lógica para actualizar la dirección
     }
 
-    public void addMedioDeContacto(Persona persona, MedioDeContacto medio) {
+    public void addMedioDeContacto(Persona persona, Notificador medio) {
         // TODO: Lógica para agregar un medio de contacto a la lista
     }
 
-    public void removeMedioDeContacto(Persona persona, MedioDeContacto medio) {
+    public void removeMedioDeContacto(Persona persona, Notificador medio) {
         // TODO: Lógica para quitar un medio de contacto
     }
 
-    public void setMedioPredeterminado(Persona persona, MedioDeContacto medio) {
+    public void setMedioPredeterminado(Persona persona, Notificador medio) {
         // TODO: Lógica para definir el medio predeterminado
     }
 

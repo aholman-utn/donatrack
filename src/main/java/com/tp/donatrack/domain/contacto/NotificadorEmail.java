@@ -7,7 +7,7 @@ import com.tp.donatrack.domain.notificacion.Notificacion;
 
 @Getter
 @Setter
-public class NotificadorEmail implements MedioDeContacto {
+public class NotificadorEmail implements Notificador {
     private String correo;
 
     @Override

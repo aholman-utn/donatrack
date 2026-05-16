@@ -7,7 +7,7 @@ import com.tp.donatrack.domain.notificacion.Notificacion;
 
 @Getter
 @Setter
-public class NotificadorTelefono implements MedioDeContacto {
+public class NotificadorTelefono implements Notificador {
     private String telefono;
     private String caracteristica;
 

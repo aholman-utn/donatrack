@@ -7,7 +7,7 @@ import com.tp.donatrack.domain.notificacion.Notificacion;
 
 @Getter
 @Setter
-public class NotificadorWhatsApp implements MedioDeContacto {
+public class NotificadorWhatsApp implements Notificador {
     private String telefono;
     private String caracteristica;
 
