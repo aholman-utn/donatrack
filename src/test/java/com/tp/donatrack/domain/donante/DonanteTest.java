@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.entidad;
+package com.tp.donatrack.domain.donante;
 
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import org.junit.jupiter.api.Assertions;

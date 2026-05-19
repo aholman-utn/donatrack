@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.entidad;
+package com.tp.donatrack.domain.donante;
 
 import lombok.Getter;
 import lombok.Setter;

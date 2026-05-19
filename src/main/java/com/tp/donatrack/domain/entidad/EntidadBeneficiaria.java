@@ -3,58 +3,50 @@ package com.tp.donatrack.domain.entidad;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tp.donatrack.domain.bien.Bien;
-import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.necesidad.NecesidadMaterial;
-import com.tp.donatrack.domain.persona.Persona;
 
+import com.tp.donatrack.domain.persona.PersonaJuridica;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class EntidadBeneficiaria {
+    private PersonaJuridica datosDeEntidad;
+    private List<NecesidadMaterial> nececidades = new ArrayList<>();
 
-    public record Necesidad(Integer cantidad, SubCategoria subCategoria, List<Bien> bienes) {}
-
-    private Persona persona;
-    private List<Necesidad> necesidades = new ArrayList<>();
-    private List<NecesidadMaterial> necesidadesMateriales = new ArrayList<>();
+    private List<NecesidadMaterial> necesidadesActivas() {
+        return nececidades.stream().filter(NecesidadMaterial::activo).toList();
+    }
 
     public void agregarNecesidad(NecesidadMaterial necesidad) {
-        this.necesidadesMateriales.add(necesidad);
+        this.nececidades.add(necesidad);
     }
 
     public void removerNecesidad(NecesidadMaterial necesidad) {
-        this.necesidadesMateriales.remove(necesidad);
+        this.nececidades.remove(necesidad);
     }
 
-    public int getCantNecesidadesMateriales() {
-        return this.necesidadesMateriales.size();
+    public int getCantNecesidades() {
+        return this.nececidades.size();
     }
 
-    public void implementarDonacion(Donacion donacion) {
-        for (DonacionSegmentada segmentada : donacion.getDonacionesSegmentadas()) {
-            implementarDonacion(segmentada);
-        }
+    public int getCantNececidadesActivas() {
+        return this.necesidadesActivas().size();
     }
 
     public void implementarDonacion(DonacionSegmentada donacion) {
-        Necesidad nuevaNecesidad = new Necesidad(
-            donacion.getCantidad(),
-            donacion.getSubCategoria(),
-            donacion.getBienes()
-        );
-
-        if (this.necesidades.contains(nuevaNecesidad)) {
-            this.necesidades.remove(nuevaNecesidad);
-        } else {
+        List<NecesidadMaterial> necesidadesActivas = this.necesidadesActivas();
+        if (necesidadesActivas.isEmpty()) {
             throw new RuntimeException("No existe esa necesidad en la lista de requerimientos");
+        } else {
+            for (NecesidadMaterial necesidad : necesidadesActivas) {
+                if (necesidad.getSubCategoria().equals(donacion.getSubCategoria())) {
+                    necesidad.recibirDonacion(donacion);
+                    break;
+                }
+            }
         }
-    }
-
-    public Integer getCantNecesidades() {
-        return this.necesidades.size();
     }
 }

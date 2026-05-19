@@ -7,11 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.tp.donatrack.domain.bien.BienDuradero;
-import com.tp.donatrack.domain.entidad.Categoria;
-import com.tp.donatrack.domain.entidad.EstadoBien;
-import com.tp.donatrack.domain.entidad.SubCategoria;
-import com.tp.donatrack.domain.entidad.Unidad;
+import com.tp.donatrack.domain.bien.Categoria;
+import com.tp.donatrack.domain.bien.SubCategoria;
+import com.tp.donatrack.domain.bien.Unidad;
 
 class NecesidadExtraordinariaTest {
 
@@ -29,33 +27,21 @@ class NecesidadExtraordinariaTest {
     @DisplayName("Debe crear una necesidad extraordinaria con su causa")
     void crearNecesidadExtraordinariaConCausa() {
         assertEquals("Terremoto", necesidad.getCausa());
-        assertEquals(5, necesidad.getCantidad());
+        assertEquals(5, necesidad.getCantidadObjetivo());
         assertEquals(subCategoria, necesidad.getSubCategoria());
-    }
-
-    @Test
-    @DisplayName("Las adeudadas deben ser igual a la cantidad faltante")
-    void adeudadasIgualACantidadFaltante() {
-        assertEquals(5, necesidad.adeudadas());
     }
 
     @Test
     @DisplayName("Al agregar bienes, las adeudadas deben disminuir")
     void adeudadasDisminuyenAlAgregarBienes() {
-        BienDuradero bien = new BienDuradero("Arroz", "Arroz blanco", "arroz.png", subCategoria, EstadoBien.NUEVO);
-        necesidad.agregarBien(bien);
-
+        necesidad.recibirBienes(1);
         assertEquals(4, necesidad.adeudadas());
     }
 
     @Test
     @DisplayName("Al satisfacer la necesidad, las adeudadas deben ser 0")
     void adeudadasCeroAlSatisfacer() {
-        for (int i = 0; i < 5; i++) {
-            BienDuradero bien = new BienDuradero("Bien " + i, "Desc", "img.png", subCategoria, EstadoBien.NUEVO);
-            necesidad.agregarBien(bien);
-        }
-
+        necesidad.recibirBienes(5);
         assertEquals(0, necesidad.adeudadas());
         assertEquals(EstadoNecesidad.SATISFECHO, necesidad.getEstado());
     }

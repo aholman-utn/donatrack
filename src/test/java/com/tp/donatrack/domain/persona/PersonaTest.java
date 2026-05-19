@@ -1,6 +1,5 @@
-package test;
+package com.tp.donatrack.domain.persona;
 
-import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.ubicacion.Direccion;
 import org.junit.jupiter.api.Test;
 

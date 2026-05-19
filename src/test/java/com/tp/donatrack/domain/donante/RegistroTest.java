@@ -1,6 +1,7 @@
-package com.tp.donatrack.domain.entidad;
+package com.tp.donatrack.domain.donante;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

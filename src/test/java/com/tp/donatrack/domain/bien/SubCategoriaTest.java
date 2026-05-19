@@ -1,8 +1,4 @@
-package com.tp.donatrack;
-
-import com.tp.donatrack.domain.entidad.SubCategoria;
-import com.tp.donatrack.domain.entidad.Categoria;
-import com.tp.donatrack.domain.entidad.Unidad;
+package com.tp.donatrack.domain.bien;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;

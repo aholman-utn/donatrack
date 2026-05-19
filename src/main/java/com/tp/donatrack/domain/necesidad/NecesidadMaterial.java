@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.tp.donatrack.domain.bien.Bien;
-import com.tp.donatrack.domain.entidad.SubCategoria;
+import com.tp.donatrack.domain.bien.SubCategoria;
 
+import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,36 +14,42 @@ import lombok.Setter;
 @Setter
 public abstract class NecesidadMaterial {
 
-    private List<Bien> bienes = new ArrayList<>();
+    private List<DonacionSegmentada> donaciones = new ArrayList<>();
     private SubCategoria subCategoria;
     private Date fechaDelPedido;
-    private int cantidad;
+    private int cantidadObjetivo;
+    private int cantidadRecibida = 0;
     private EstadoNecesidad estado;
 
-    public NecesidadMaterial(SubCategoria subCategoria, int cantidad, Date fechaDelPedido) {
+    public NecesidadMaterial(SubCategoria subCategoria, int cantidadObjetivo, Date fechaDelPedido) {
         this.subCategoria = subCategoria;
-        this.cantidad = cantidad;
+        this.cantidadObjetivo = cantidadObjetivo;
         this.fechaDelPedido = fechaDelPedido;
-        this.estado = EstadoNecesidad.INSATISFECHO;
+        this.estado = EstadoNecesidad.ACTIVO;
+    }
+
+    public boolean activo() {
+        return this.estado == EstadoNecesidad.ACTIVO;
     }
 
     public int cantidadFaltanteDelPedido() {
-        int bienesRecibidos = bienes.size();
-        int faltante = cantidad - bienesRecibidos;
-        return Math.max(faltante, 0);
+        return Math.max(cantidadObjetivo - cantidadRecibida, 0);
     }
 
-    public void agregarBien(Bien bien) {
-        this.bienes.add(bien);
-        actualizarEstado();
+    public void recibirDonacion(DonacionSegmentada donacion) {
+        this.donaciones.add(donacion);
+        recibirBienes(donacion.getCantidad());
     }
 
-    private void actualizarEstado() {
-        int faltante = cantidadFaltanteDelPedido();
-        if (faltante == 0) {
+    public void recibirBienes(int cantidadRecibida) {
+        this.cantidadRecibida += cantidadRecibida;
+        if (cantidadFaltanteDelPedido() == 0)
             this.estado = EstadoNecesidad.SATISFECHO;
-        } else if (faltante < cantidad) {
-            this.estado = EstadoNecesidad.PARCIALMENTE_SATISFECHO;
+    }
+
+    public void finalizarNecesidad() {
+        if (cantidadFaltanteDelPedido() == 0) {
+            this.estado = EstadoNecesidad.SATISFECHO;
         } else {
             this.estado = EstadoNecesidad.INSATISFECHO;
         }

@@ -1,13 +1,8 @@
 package com.tp.donatrack.domain.bien;
 
-import com.tp.donatrack.domain.entidad.Categoria;
-import com.tp.donatrack.domain.entidad.SubCategoria;
-import com.tp.donatrack.domain.entidad.Unidad;
-import com.tp.donatrack.domain.entidad.EstadoBien;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
 
 public class BienDuraderoTest {
 

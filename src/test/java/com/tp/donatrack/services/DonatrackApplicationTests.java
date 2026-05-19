@@ -1,4 +1,4 @@
-package com.tp.donatrack;
+package com.tp.donatrack.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
