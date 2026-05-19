@@ -23,5 +23,5 @@ public class BienDuradero extends Bien {
         this.foto = foto;
         this.subCategoria = subCategoria;
         this.estado = estado;
-    }
+    };
 }

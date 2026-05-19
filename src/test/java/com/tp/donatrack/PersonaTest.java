@@ -1,4 +1,4 @@
-package test;
+package com.tp.donatrack;
 
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.ubicacion.Direccion;

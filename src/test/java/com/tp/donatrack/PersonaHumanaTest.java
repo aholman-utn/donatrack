@@ -1,7 +1,10 @@
-package com.tp.donatrack.domain.persona;
+package com.tp.donatrack;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import com.tp.donatrack.domain.persona.PersonaHumana;
+
 import java.util.Date;
 import java.util.Calendar;
 
@@ -16,18 +19,17 @@ public class PersonaHumanaTest {
         int edad = 25;
         Date fechaNac = new Calendar.Builder().setDate(2000, 0, 1).build().getTime();
 
-        PersonaHumana persona = new PersonaHumana(
-            nombre, 
-            genero, 
-            apellido, 
-            fechaNac, 
-            edad, 
-            nroDocumento
-        );
+        PersonaHumana persona = PersonaHumana.builder()
+            .nombre(nombre)
+            .genero(genero)
+            .apellido(apellido)
+            .edad(edad)
+            .nroDocumento(String.valueOf(nroDocumento)) // Convertimos el int del test a String
+            .build();
 
         Assertions.assertEquals(nombre, persona.getNombre());
         Assertions.assertEquals(apellido, persona.getApellido());
-        Assertions.assertEquals(nroDocumento, persona.getNroDocumento());
+        Assertions.assertEquals(String.valueOf(nroDocumento), persona.getNroDocumento());
     }
 
     @Test
