@@ -9,7 +9,6 @@ import java.util.List;
 
 public class PersonaService {
 
-    // Constructor (Eventualmente inyectarías un repositorio acá)
     public PersonaService() {
     }
 
@@ -36,7 +35,7 @@ public class PersonaService {
         // return persona.getNotificaciones();
         return null;
     }
-    
+
     public void addNotificacion(Persona persona, Notificacion notificacion) {
         // TODO: Lógica para asociarle una nueva notificación
     }
