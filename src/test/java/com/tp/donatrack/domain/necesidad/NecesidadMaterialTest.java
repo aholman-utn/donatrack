@@ -3,21 +3,19 @@ package com.tp.donatrack.domain.necesidad;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.tp.donatrack.domain.bien.*;
+import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.tp.donatrack.domain.bien.BienDuradero;
-import com.tp.donatrack.domain.entidad.Categoria;
-import com.tp.donatrack.domain.entidad.EstadoBien;
-import com.tp.donatrack.domain.entidad.SubCategoria;
-import com.tp.donatrack.domain.entidad.Unidad;
 
 class NecesidadMaterialTest {
 
     private NecesidadExtraordinaria necesidad;
     private SubCategoria subCategoria;
     private Categoria categoria;
+    private DonacionSegmentada donacion;
 
     @BeforeEach
     void setUp() {
@@ -27,9 +25,9 @@ class NecesidadMaterialTest {
     }
 
     @Test
-    @DisplayName("Una necesidad nueva debe tener estado INSATISFECHO")
+    @DisplayName("Una necesidad nueva debe tener estado ACTIVO")
     void necesidadNuevaDebeEstarInsatisfecha() {
-        assertEquals(EstadoNecesidad.INSATISFECHO, necesidad.getEstado());
+        assertEquals(EstadoNecesidad.ACTIVO, necesidad.getEstado());
     }
 
     @Test
@@ -39,31 +37,26 @@ class NecesidadMaterialTest {
     }
 
     @Test
-    @DisplayName("Al agregar un bien, la cantidad faltante debe disminuir")
+    @DisplayName("Al agregar una donacion, la cantidad faltante debe disminuir")
     void alAgregarBienDisminuyeFaltante() {
-        BienDuradero silla = new BienDuradero("Silla", "Silla de madera", "silla.png", subCategoria, EstadoBien.NUEVO);
-        necesidad.agregarBien(silla);
-
+        donacion = new DonacionSegmentada(1, subCategoria, true, null);
+        necesidad.recibirDonacion(donacion);
         assertEquals(2, necesidad.cantidadFaltanteDelPedido());
     }
 
     @Test
-    @DisplayName("Al agregar un bien parcialmente, el estado debe ser PARCIALMENTE_SATISFECHO")
+    @DisplayName("Al agregar una donacion parcialmente, el estado debe ser ACTIVO")
     void estadoParcialmenteSatisfecho() {
-        BienDuradero silla = new BienDuradero("Silla", "Silla de madera", "silla.png", subCategoria, EstadoBien.NUEVO);
-        necesidad.agregarBien(silla);
-
-        assertEquals(EstadoNecesidad.PARCIALMENTE_SATISFECHO, necesidad.getEstado());
+        donacion = new DonacionSegmentada(1, subCategoria, true, null);
+        necesidad.recibirDonacion(donacion);
+        assertEquals(EstadoNecesidad.ACTIVO, necesidad.getEstado());
     }
 
     @Test
     @DisplayName("Al completar todos los bienes, el estado debe ser SATISFECHO")
     void estadoSatisfechoAlCompletarBienes() {
-        for (int i = 0; i < 3; i++) {
-            BienDuradero silla = new BienDuradero("Silla " + i, "Silla de madera", "silla.png", subCategoria, EstadoBien.NUEVO);
-            necesidad.agregarBien(silla);
-        }
-
+        donacion = new DonacionSegmentada(3, subCategoria, true, null);
+        necesidad.recibirDonacion(donacion);
         assertEquals(EstadoNecesidad.SATISFECHO, necesidad.getEstado());
         assertEquals(0, necesidad.cantidadFaltanteDelPedido());
     }
@@ -71,11 +64,8 @@ class NecesidadMaterialTest {
     @Test
     @DisplayName("La cantidad faltante nunca debe ser negativa")
     void cantidadFaltanteNuncaNegativa() {
-        for (int i = 0; i < 5; i++) {
-            BienDuradero silla = new BienDuradero("Silla " + i, "Silla", "silla.png", subCategoria, EstadoBien.NUEVO);
-            necesidad.agregarBien(silla);
-        }
-
+        donacion = new DonacionSegmentada(5, subCategoria, true, null);
+        necesidad.recibirDonacion(donacion);
         assertEquals(0, necesidad.cantidadFaltanteDelPedido());
     }
 }

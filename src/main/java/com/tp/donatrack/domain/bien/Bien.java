@@ -1,7 +1,5 @@
 package com.tp.donatrack.domain.bien;
 
-import com.tp.donatrack.domain.entidad.SubCategoria;
-
 import lombok.Getter;
 import lombok.Setter;
 

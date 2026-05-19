@@ -99,7 +99,9 @@ src/
 │   │   │   ├── bien/                        # Bienes (duraderos, perecederos)
 │   │   │   ├── contacto/                    # Medios de contacto
 │   │   │   ├── donacion/                    # Donaciones y segmentación
-│   │   │   ├── entidad/                     # Entidades beneficiarias, donantes
+│   │   │   ├── donante/                     # Donantes
+│   │   │   ├── entidad/                     # Entidades beneficiarias
+│   │   │   ├── necesidad/                   # Necesidades
 │   │   │   ├── notificacion/                # Notificaciones
 │   │   │   ├── persona/                     # Personas (humana, jurídica)
 │   │   │   └── ubicacion/                   # Ubicaciones
@@ -128,21 +130,21 @@ O simplemente hacé doble clic en `bocetos/index.html` desde el explorador de ar
 
 ### Pantallas disponibles
 
-| Rol | Pantalla | Archivo |
-|-----|----------|---------|
-| Público | Landing Page | `bocetos/index.html` |
-| Público | Inicio de Sesión | `bocetos/login.html` |
-| Público | Registro | `bocetos/registro.html` |
-| Donante | Dashboard | `bocetos/donante-dashboard.html` |
-| Donante | Mis Donaciones | `bocetos/donante-donaciones.html` |
-| Donante | Entidades Beneficiarias | `bocetos/donante-entidades.html` |
-| Entidad | Dashboard | `bocetos/entidad-dashboard.html` |
-| Entidad | Gestión de Necesidades | `bocetos/entidad-necesidades.html` |
-| Entidad | Donaciones Asignadas | `bocetos/entidad-donaciones.html` |
-| Admin | Dashboard | `bocetos/admin-dashboard.html` |
-| Admin | Gestión de Donantes | `bocetos/admin-donantes.html` |
-| Admin | Registro de Donaciones | `bocetos/admin-donaciones.html` |
-| Admin | Importación CSV | `bocetos/admin-importar.html` |
+| Rol     | Pantalla                | Archivo                            |
+|---------|-------------------------|------------------------------------|
+| Público | Landing Page            | `bocetos/index.html`               |
+| Público | Inicio de Sesión        | `bocetos/login.html`               |
+| Público | Registro                | `bocetos/registro.html`            |
+| Donante | Dashboard               | `bocetos/donante-dashboard.html`   |
+| Donante | Mis Donaciones          | `bocetos/donante-donaciones.html`  |
+| Donante | Entidades Beneficiarias | `bocetos/donante-entidades.html`   |
+| Entidad | Dashboard               | `bocetos/entidad-dashboard.html`   |
+| Entidad | Gestión de Necesidades  | `bocetos/entidad-necesidades.html` |
+| Entidad | Donaciones Asignadas    | `bocetos/entidad-donaciones.html`  |
+| Admin   | Dashboard               | `bocetos/admin-dashboard.html`     |
+| Admin   | Gestión de Donantes     | `bocetos/admin-donantes.html`      |
+| Admin   | Registro de Donaciones  | `bocetos/admin-donaciones.html`    |
+| Admin   | Importación CSV         | `bocetos/admin-importar.html`      |
 
 ---
 

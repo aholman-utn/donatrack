@@ -1,5 +1,4 @@
 package com.tp.donatrack.domain.bien;
-import com.tp.donatrack.domain.entidad.SubCategoria;
 
 import java.util.Date;
 import lombok.Getter;

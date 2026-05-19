@@ -1,7 +1,5 @@
 package com.tp.donatrack.domain.persona;
 
-import com.tp.donatrack.domain.entidad.TipoOrganizacion;
-
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;

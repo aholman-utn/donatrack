@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.entidad;
+package com.tp.donatrack.domain.bien;
 
 public enum EstadoBien {
     NUEVO,

@@ -1,12 +1,12 @@
+package com.tp.donatrack.domain.donacion;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.tp.donatrack.domain.donacion.Donacion;
-import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.bien.Bien;
-import com.tp.donatrack.domain.entidad.Donante;
-import com.tp.donatrack.domain.entidad.SubCategoria;
+import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.domain.bien.SubCategoria;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

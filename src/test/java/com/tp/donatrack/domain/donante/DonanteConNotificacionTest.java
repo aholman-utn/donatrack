@@ -1,11 +1,9 @@
-package com.tp.donatrack;
+package com.tp.donatrack.domain.donante;
 
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.tp.donatrack.domain.entidad.Donante;
-import com.tp.donatrack.domain.entidad.RegistroDonante;
 
 public class DonanteConNotificacionTest {
 

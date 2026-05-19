@@ -1,8 +1,6 @@
 package com.tp.donatrack.domain.donacion;
 
-import com.tp.donatrack.domain.persona.Persona;
-import com.tp.donatrack.domain.entidad.Donante;
-import com.tp.donatrack.domain.entidad.SubCategoria;
+import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.bien.Bien;
 
