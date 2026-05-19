@@ -11,8 +11,11 @@ public class DonanteRepository {
 
     //por ahora, en memoria
     private List<Donante> donantes;
+    private Integer id;
+    
     public DonanteRepository() {
         this.donantes = new ArrayList<>();
+        this.id = this.donantes.size() + 1;
     }
 
     //TODO: este seria el repo
