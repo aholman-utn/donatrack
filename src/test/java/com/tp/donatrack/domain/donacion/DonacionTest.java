@@ -20,6 +20,9 @@ class DonacionTest {
     private Donante donanteMock;
     private SubCategoria perecederos;
     private SubCategoria duraderos;
+    private Bien manzana;
+    private Bien leche;
+    private Bien silla;
 
     @BeforeEach
     void setUp() {
@@ -27,33 +30,32 @@ class DonacionTest {
         perecederos = mock(SubCategoria.class);
         duraderos = mock(SubCategoria.class);
 
+        manzana = crearBienMock(perecederos);
+        leche = crearBienMock(perecederos);
+        silla = crearBienMock(duraderos);
+
+        List<Bien> bienesEntrantes = Arrays.asList(manzana, leche, silla);
+
         donacion = new Donacion(
             donanteMock, 
             "Donación de campaña invernal", 
-            new Date()
+            new Date(),
+            bienesEntrantes
         );
     }
 
     @Test
     @DisplayName("Debería segmentar bienes perecederos y duraderos en segmentos separados")
     void testSegmentarDonacion() {
-        Bien manzana = crearBienMock(perecederos);
-        Bien leche = crearBienMock(perecederos);
-        Bien silla = crearBienMock(duraderos);
-
-        List<Bien> bienesEntrantes = Arrays.asList(manzana, leche, silla);
-
-        donacion.segmentar(bienesEntrantes);
-
         List<DonacionSegmentada> resultados = donacion.getDonacionesSegmentadas();
 
         assertThat(resultados).hasSize(2);
 
-        DonacionSegmentada segPerecederos = buscarPorSubcategoria(resultados, perecederos);
+        DonacionSegmentada segPerecederos = donacion.buscarPorSubcategoria(perecederos).get();
         assertThat(segPerecederos.getCantidad()).isEqualTo(2);
         assertThat(segPerecederos.getBienes()).containsExactlyInAnyOrder(manzana, leche);
 
-        DonacionSegmentada segDuraderos = buscarPorSubcategoria(resultados, duraderos);
+        DonacionSegmentada segDuraderos = donacion.buscarPorSubcategoria(duraderos).get();
         assertThat(segDuraderos.getCantidad()).isEqualTo(1);
         assertThat(segDuraderos.getBienes()).contains(silla);
         
@@ -71,12 +73,5 @@ class DonacionTest {
         Bien bien = mock(Bien.class);
         when(bien.getSubCategoria()).thenReturn(sub);
         return bien;
-    }
-
-    private DonacionSegmentada buscarPorSubcategoria(List<DonacionSegmentada> lista, SubCategoria sub) {
-        return lista.stream()
-                .filter(s -> s.getSubCategoria().equals(sub))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("No se encontró el segmento para la subcategoría"));
     }
 }

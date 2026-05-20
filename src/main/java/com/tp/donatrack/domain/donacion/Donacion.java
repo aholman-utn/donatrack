@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,19 +24,24 @@ public class Donacion {
     public Donacion(
         Donante donante, 
         String descripcion, 
-        Date fechaIngreso
+        Date fechaIngreso,
+        List<Bien> bienes
     ) {
+        if (bienes == null || bienes.isEmpty()) {
+            throw new IllegalArgumentException("Una donación no puede crearse sin bienes.");
+        }
+
         this.donante = donante;
         this.descripcion = descripcion;
         this.fechaIngreso = fechaIngreso;
+        this.donacionesSegmentadas = this.segmentar(bienes);
     }
 
-    public void segmentar(List<Bien> bienes) {
-        if (bienes == null || bienes.isEmpty()) return;
-        
+    private List<DonacionSegmentada> segmentar(List<Bien> bienes) {       
         Map<SubCategoria, List<Bien>> agrupados = bienes.stream()
             .collect(Collectors.groupingBy(Bien::getSubCategoria));
 
+        List<DonacionSegmentada> segmentos = new ArrayList<>();
         agrupados.forEach((subCat, listaDeBienes) -> {
             int cantidad = listaDeBienes.size();
             
@@ -46,7 +52,15 @@ public class Donacion {
                 listaDeBienes
             );
 
-            this.donacionesSegmentadas.add(nuevaDonacion);
+            segmentos.add(nuevaDonacion);
         });
+
+        return segmentos;
+    }
+
+    public Optional<DonacionSegmentada> buscarPorSubcategoria(SubCategoria sub) {
+        return this.donacionesSegmentadas.stream()
+                .filter(s -> s.getSubCategoria().equals(sub))
+                .findFirst();
     }
 }
