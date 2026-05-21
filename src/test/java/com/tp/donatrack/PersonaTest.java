@@ -18,14 +18,14 @@ public class PersonaTest {
         PersonaHumana persona = new PersonaHumana();
         persona.setNombre("Lucas");
         persona.setApellido("Perez");
-        persona.setDireccion(direccion); 
+        persona.setDireccion(direccion);
 
         assertNotNull(persona.getDireccion(), "La dirección no debería ser nula");
         assertEquals("Lucas", persona.getNombre());
         assertEquals("una calle falsa", persona.getDireccion().getCalle1());
         assertEquals(123, persona.getDireccion().getAltura());
-        
-        System.out.println("Test exitoso: Persona creada con nombre " + persona.getNombre() + 
-                           " viviendo en " + persona.getDireccion().getCalle1() + " " + persona.getDireccion().getAltura());
+
+        System.out.println("Test exitoso: Persona creada con nombre " + persona.getNombre() +
+                " viviendo en " + persona.getDireccion().getCalle1() + " " + persona.getDireccion().getAltura());
     }
 }
