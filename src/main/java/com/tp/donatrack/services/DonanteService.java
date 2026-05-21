@@ -14,10 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 @Service
 public class DonanteService {
 
@@ -86,46 +82,49 @@ public class DonanteService {
             throw new IllegalArgumentException("Línea inválida: " + linea);
         }
 
-        String tipoPersona = partes[0];
-        String tipoDoc = partes[1];
-        String documento = partes[2];
-        String nombre = partes[3];
-        String email = partes[4];
-        String telefono = partes[5];
+        String tipoPersona = partes[0].trim();
+        String documento = partes[2].trim();
+        String nombre = partes[3].trim();
+        String email = partes[4].trim();
+        String telefono = partes[5].trim();
 
         Donante existe = buscarDonante(email);
-        if(existe== null){
+        Persona persona = crearPersona(tipoPersona, documento, nombre, email, telefono);
+
+        if(existe == null){
             Donante donante = new Donante();
-            Persona persona;
-            if (tipoPersona.equals(TipoPersona.HUMANA.name())) {
-
-                String[] nombreSplit = nombre.split(" ", 2);
-
-                String nombre_persona= nombreSplit[0];
-                String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
-                String documentoLimpio = documento.replaceAll("[^0-9]", "");
-                String genero = "Sin especificar";
-                Integer edad = 0;
-                persona = new PersonaHumana(nombre_persona, genero, apellido, edad, documentoLimpio);
-                persona.agregarMedioDeContacto("email",email);
-                persona.agregarMedioDeContacto("telefono",telefono);
-
-            }
-            else {
-                PersonaJuridica pj = new PersonaJuridica();
-                pj.agregarMedioDeContacto("email",email);
-                pj.agregarMedioDeContacto("telefono", telefono);
-                pj.setRazonSocial(nombre);
-                TipoOrganizacion tipo = detectarTipo(nombre);
-                pj.setTipo(tipo);
-                pj.setRubro("Sin especificar");
-                persona = pj;
-            }
-
             donante.setPersona(persona);
             this.darDeAlta(donante);
+        } else {
+            existe.setPersona(persona);
         }
 
+    }
+
+    private Persona crearPersona(String tipoPersona, String documento, String nombre, String email, String telefono) {
+        Persona persona;
+
+        if (tipoPersona.equals(TipoPersona.HUMANA.name())) {
+            String[] nombreSplit = nombre.split(" ", 2);
+
+            String nombrePersona = nombreSplit[0];
+            String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
+            String documentoLimpio = documento.replaceAll("[^0-9]", "");
+            String genero = "Sin especificar";
+            Integer edad = 0;
+            persona = new PersonaHumana(nombrePersona, genero, apellido, edad, documentoLimpio);
+        } else {
+            PersonaJuridica pj = new PersonaJuridica();
+            pj.setRazonSocial(nombre);
+            TipoOrganizacion tipo = detectarTipo(nombre);
+            pj.setTipo(tipo);
+            pj.setRubro("Sin especificar");
+            persona = pj;
+        }
+
+        persona.agregarMedioDeContacto("email", email);
+        persona.agregarMedioDeContacto("telefono", telefono);
+        return persona;
     }
 
     public TipoOrganizacion detectarTipo(String razonSocial){
