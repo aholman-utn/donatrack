@@ -2,6 +2,9 @@ package com.tp.donatrack.services;
 
 import com.tp.donatrack.ImportacionResponseDTO;
 import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.domain.notificacion.Notificacion;
+import com.tp.donatrack.domain.notificacion.TipoNotificacion;
+import com.tp.donatrack.domain.notificador.TipoNotificador;
 import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.repositories.DonanteRepository;
 import org.springframework.stereotype.Service;
@@ -9,18 +12,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.SecureRandom;
+import java.util.*;
 
 @Service
 public class DonanteService {
 
     private DonanteRepository donanteRepository;
+    private NotificacionService notifService;
 
-    public DonanteService(DonanteRepository donanteRepository) {
+    public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService) {
         this.donanteRepository = donanteRepository;
+        this.notifService = notifService;
     }
 
     public ImportacionResponseDTO importarCSV(MultipartFile archivo) {
@@ -54,6 +57,21 @@ public class DonanteService {
         } catch (Exception e) {
             return new ImportacionResponseDTO(false, "Error al importar el CSV" + " " + e.getMessage());
         }
+    }
+
+    private String generarPassword() {
+        String[] palabras = {"luna", "rio", "mate", "sol", "verde", "auto", "nube", "casa", "mar", "flor"};
+        SecureRandom random = new SecureRandom();
+
+        String palabra = palabras[random.nextInt(palabras.length)];
+        int numero = random.nextInt(90) + 10; // 10 a 99
+
+        // opcional: primera letra mayúscula a veces
+        if (random.nextBoolean()) {
+            palabra = palabra.substring(0, 1).toUpperCase() + palabra.substring(1);
+        }
+
+        return palabra + numero;
     }
 
     private void procesarArchivo(BufferedReader br) throws Exception {
@@ -120,8 +138,23 @@ public class DonanteService {
 
             donante.setPersona(persona);
             this.darDeAlta(donante);
-        }
+            //Notifico
+            Notificacion notif_credenciales = new Notificacion();
+            notif_credenciales.setTipo(TipoNotificacion.BIENVENIDA);
+            String password = this.generarPassword();
+            notif_credenciales.setAsunto("Credenciales de acceso");
+            notif_credenciales.setCuerpo(
+                    "Bienvenido a DonaTrack\n" +
+                            "Tus credenciales de acceso son:\n" +
+                            "Email: " + email + "\n" +
+                            "Password: " + password
+            );
+            notif_credenciales.setFecha(new Date());
+            this.notifService.notificar(notif_credenciales, TipoNotificador.EMAIL, email);
+        } else {
+            //actualizar los campos
 
+        }
     }
 
     public TipoOrganizacion detectarTipo(String razonSocial){
