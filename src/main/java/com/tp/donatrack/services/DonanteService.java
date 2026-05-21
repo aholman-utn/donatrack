@@ -1,13 +1,18 @@
 package com.tp.donatrack.services;
 
 import com.tp.donatrack.ImportacionResponseDTO;
+import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.repositories.DonanteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class DonanteService {
@@ -41,10 +46,13 @@ public class DonanteService {
 
             String mensaje = "Importados " + total + " registros exitosamente";
 
-            return new ImportacionResponseDTO(true, mensaje);
+            ImportacionResponseDTO response = new ImportacionResponseDTO(true, mensaje);
+            response.setData(this.donanteRepository.findAll());
+
+            return response;
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al importar CSV", e);
+            return new ImportacionResponseDTO(false, "Error al importar el CSV" + " " + e.getMessage());
         }
     }
 
@@ -58,6 +66,10 @@ public class DonanteService {
         while ((linea = br.readLine()) != null) {
             procesarLinea(linea);
         }
+    }
+
+    private Donante darDeAlta(Donante donante){
+        return this.donanteRepository.darDeAlta(donante);
     }
 
     private void procesarLinea(String linea) {
@@ -77,13 +89,66 @@ public class DonanteService {
         String email = partes[4];
         String telefono = partes[5];
 
-        System.out.println(
-                tipoPersona + " | " +
-                        tipoDoc + " | " +
-                        documento + " | " +
-                        nombre + " | " +
-                        email + " | " +
-                        telefono
-        );
+        Donante existe = buscarDonante(email);
+        if(existe== null){
+            Donante donante = new Donante();
+            Persona persona;
+            if (tipoPersona.equals(TipoPersona.HUMANA.name())) {
+
+                String[] nombreSplit = nombre.split(" ", 2);
+
+                String nombre_persona= nombreSplit[0];
+                String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
+                String documentoLimpio = documento.replaceAll("[^0-9]", "");
+                String genero = "Sin especificar";
+                Integer edad = 0;
+                persona = new PersonaHumana(nombre_persona, genero, apellido, null, edad, Integer.parseInt(documentoLimpio));
+                persona.agregarMedioDeContacto("email",email);
+                persona.agregarMedioDeContacto("telefono",telefono);
+
+            }
+            else {
+                PersonaJuridica pj = new PersonaJuridica();
+                pj.agregarMedioDeContacto("email",email);
+                pj.agregarMedioDeContacto("telefono", telefono);
+                pj.setRazonSocial(nombre);
+                TipoOrganizacion tipo = detectarTipo(nombre);
+                pj.setTipo(tipo);
+                pj.setRubro("Sin especificar");
+                persona = pj;
+            }
+
+            donante.setPersona(persona);
+            this.darDeAlta(donante);
+        }
+
+    }
+
+    public TipoOrganizacion detectarTipo(String razonSocial){
+
+        String n = razonSocial.toLowerCase();
+
+        if (n.contains("s.a") || n.contains("s.a.") ||
+                n.contains("s.r.l") || n.contains("s.r.l.") ||
+                n.contains("srl") || n.contains("sa") || n.contains("sas")) {
+            return TipoOrganizacion.EMPRESA;
+        }
+
+        if (n.contains("ong")) {
+            return TipoOrganizacion.ONG;
+        }
+
+        if (n.contains("ministerio") ||
+                n.contains("municipalidad") ||
+                n.contains("gobierno")) {
+            return TipoOrganizacion.GUBERNAMENTAL;
+        }
+
+        return TipoOrganizacion.INSTITUCION;
+
+    }
+
+    public Donante buscarDonante(String email){
+        return this.donanteRepository.buscarDonante(email);
     }
 }

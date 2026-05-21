@@ -8,6 +8,6 @@ import com.tp.donatrack.domain.persona.Persona;
 @Getter
 @Setter
 public class Donante {
-    private int id;
+    private Integer id;
     private Persona persona;
 }
