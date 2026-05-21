@@ -79,4 +79,18 @@ public class DonacionSegmentadaTest {
         assertTrue(cantNecesidadesDespues < cantNecesidadesAntes, 
             "La cantidad de necesidades activas debería haber disminuido tras la donación");
     }
+
+    @Test
+    void testFlujoDeEstadosDeLaDonacionSegmentada() {
+        List<DonacionSegmentada> donacionesSegmentadas = donacion.getDonacionesSegmentadas();
+        DonacionSegmentada donacionSegmentada = donacionesSegmentadas.get(0);
+
+        assertEquals(EstadoDonacionSegmentada.PENDIENTE, donacionSegmentada.getEstado(),
+            "La donación segmentada debería iniciar en estado PENDIENTE");
+
+        donacionSegmentada.donar(unaEntidadBeneficiaria);
+
+        assertEquals(EstadoDonacionSegmentada.ADJUDICADA, donacionSegmentada.getEstado(),
+            "El estado debería cambiar a ADJUDICADA luego de ser procesada por la entidad");
+    }
 }

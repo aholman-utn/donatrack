@@ -15,6 +15,7 @@ public class DonacionSegmentada {
     private SubCategoria subCategoria;
     private Boolean disponible;
     private List<Bien> bienes;
+    public EstadoDonacionSegmentada estado;
 
     public DonacionSegmentada(
         int cantidad, 
@@ -26,10 +27,15 @@ public class DonacionSegmentada {
         this.subCategoria = subCategoria;
         this.disponible = disponible;
         this.bienes = bienes;
+        this.estado = EstadoDonacionSegmentada.PENDIENTE;
     }
-
     
     public void donar(EntidadBeneficiaria entidad){
-        entidad.implementarDonacion(this);
+        try {
+            entidad.implementarDonacion(this);
+            this.setEstado(EstadoDonacionSegmentada.ADJUDICADA);            
+        } catch (RuntimeException e) {
+            System.err.println("Error al procesar la donación: " + e.getMessage());         
+        }
     }
 }

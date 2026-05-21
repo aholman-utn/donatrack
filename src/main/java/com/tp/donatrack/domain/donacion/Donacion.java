@@ -58,6 +58,13 @@ public class Donacion {
         return segmentos;
     }
 
+    public EstadoDonacion getEstado() {
+        boolean todasAdjudicadas = this.donacionesSegmentadas.stream()
+                .allMatch(s -> s.getEstado() == EstadoDonacionSegmentada.ADJUDICADA); 
+        
+        return todasAdjudicadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
+    }
+
     public Optional<DonacionSegmentada> buscarPorSubcategoria(SubCategoria sub) {
         return this.donacionesSegmentadas.stream()
                 .filter(s -> s.getSubCategoria().equals(sub))

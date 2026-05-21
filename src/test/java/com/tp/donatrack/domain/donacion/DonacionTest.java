@@ -69,6 +69,33 @@ class DonacionTest {
         assertThat(donacion.getFechaIngreso()).isBeforeOrEqualTo(new Date());
     }
 
+    @Test
+    @DisplayName("Debería retornar PENDIENTE como estado inicial cuando se crea la donación")
+    void testEstadoInicialEsPendiente() {
+        assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.PENDIENTE);
+    }
+
+    @Test
+    @DisplayName("Debería seguir retornando PENDIENTE si solo algunos segmentos fueron adjudicados")
+    void testEstadoCuandoSeAdjudicaParcialmente() {
+        DonacionSegmentada segPerecederos = donacion.buscarPorSubcategoria(perecederos).get();
+        segPerecederos.setEstado(EstadoDonacionSegmentada.ADJUDICADA);
+
+        assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.PENDIENTE);
+    }
+
+    @Test
+    @DisplayName("Debería cambiar el estado a ADJUDICADA cuando todos los segmentos individuales estén adjudicados")
+    void testEstadoCuandoSeAdjudicanTodosLosSegmentos() {
+        List<DonacionSegmentada> todosLosSegmentos = donacion.getDonacionesSegmentadas();
+
+        for (DonacionSegmentada segmento : todosLosSegmentos) {
+            segmento.setEstado(EstadoDonacionSegmentada.ADJUDICADA);
+        }
+
+        assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.ADJUDICADA);
+    }
+
     private Bien crearBienMock(SubCategoria sub) {
         Bien bien = mock(Bien.class);
         when(bien.getSubCategoria()).thenReturn(sub);
