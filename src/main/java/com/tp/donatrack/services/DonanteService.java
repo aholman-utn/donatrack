@@ -87,7 +87,24 @@ public class DonanteService {
     }
 
     private Donante darDeAlta(Donante donante){
-        return this.donanteRepository.darDeAlta(donante);
+        Donante nuevo_donante = this.donanteRepository.darDeAlta(donante);
+        if(nuevo_donante!= null) {
+            //Notifico
+            Notificacion notif_bienvenida = new Notificacion();
+            notif_bienvenida.setTipo(TipoNotificacion.BIENVENIDA);
+            String email = donante.getPersona().getMedioDeContacto().get("email").getFirst();
+            String password = this.generarPassword();
+            notif_bienvenida.setTitulo("Bienvenido a DonaTrack");
+            notif_bienvenida.setAsunto("Registro exitoso");
+            notif_bienvenida.setCuerpo(
+                    "¡Bienvenido a DonaTrack! Gracias por sumarte como donante. A continuación, te compartiremos las credenciales de acceso para iniciar sesion:\n" +
+                            "Email: " + donante.getPersona().getMedioDeContacto().get("email").get(0) + "\n" +
+                            "Password: " + password
+            );
+            notif_bienvenida.setFecha(new Date());
+            this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
+        }
+        return nuevo_donante;
     }
 
     private void procesarLinea(String linea) {
@@ -138,19 +155,7 @@ public class DonanteService {
 
             donante.setPersona(persona);
             this.darDeAlta(donante);
-            //Notifico
-            Notificacion notif_credenciales = new Notificacion();
-            notif_credenciales.setTipo(TipoNotificacion.BIENVENIDA);
-            String password = this.generarPassword();
-            notif_credenciales.setAsunto("Credenciales de acceso");
-            notif_credenciales.setCuerpo(
-                    "Bienvenido a DonaTrack\n" +
-                            "Tus credenciales de acceso son:\n" +
-                            "Email: " + email + "\n" +
-                            "Password: " + password
-            );
-            notif_credenciales.setFecha(new Date());
-            this.notifService.notificar(notif_credenciales, TipoNotificador.EMAIL, email);
+
         } else {
             //actualizar los campos
 
