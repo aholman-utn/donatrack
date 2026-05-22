@@ -156,3 +156,146 @@ O simplemente hacé doble clic en `bocetos/index.html` desde el explorador de ar
 - **Lombok** (generación de getters/setters/constructores)
 - **JUnit 5** (testing)
 - **Maven** (gestión de dependencias y build)
+
+## API disponible
+
+### Importar donantes por CSV
+
+```http
+POST /donantes/importar
+Content-Type: multipart/form-data
+```
+
+Parametro:
+
+| Campo | Tipo | Descripcion |
+| --- | --- | --- |
+| `file` | CSV | Archivo con donantes a importar |
+
+Ejemplo:
+
+```powershell
+curl.exe -X POST http://localhost:8080/donantes/importar `
+  -F "file=@C:\ruta\a\donantes.csv"
+```
+
+### Formato esperado del CSV
+
+El importador saltea la primera linea como cabecera y procesa las filas siguientes:
+
+```csv
+tipoPersona,tipoDoc,documento,nombre,email,telefono
+HUMANA,DNI,12345678,Juan Perez,juan@example.com,111
+JURIDICA,CUIT,30-12345678-9,ONG Donar,contacto@ong.org,222
+```
+
+Columnas:
+
+| Columna | Uso actual |
+| --- | --- |
+| `tipoPersona` | `HUMANA` crea una `PersonaHumana`; otro valor crea una `PersonaJuridica`. |
+| `tipoDoc` | Se lee desde el CSV, pero actualmente no se persiste. |
+| `documento` | Para persona humana se limpian caracteres no numericos y se guarda como numero de documento. |
+| `nombre` | Nombre completo o razon social. |
+| `email` | Medio de contacto y clave usada para buscar donantes existentes. |
+| `telefono` | Medio de contacto telefonico. |
+
+Al crear un donante nuevo desde CSV, el servicio genera una password temporal y envia una notificacion de bienvenida usando el `NotificacionService`.
+
+Nota: en esta branch el servicio ya busca si existe un donante por email; la rama de actualizacion del donante existente esta indicada en el codigo como pendiente.
+
+## Modelo de dominio
+
+### Donantes y personas
+
+- `domain/donante/Donante`: entidad que vincula el registro de donante con una `Persona`.
+- `domain/persona/Persona`: clase base abstracta con notificaciones, direccion y medios de contacto.
+- `PersonaHumana`: representa personas fisicas.
+- `PersonaJuridica`: representa organizaciones con tipo, razon social y rubro.
+- `TipoPersona`: enum para distinguir tipos de persona.
+- `TipoOrganizacion`: enum para clasificar organizaciones como gubernamental, ONG, empresa o institucion.
+
+### Bienes
+
+- `Bien`: clase abstracta con nombre, descripcion, foto y subcategoria.
+- `BienDuradero`: segmenta por `EstadoBien`.
+- `BienPerecedero`: segmenta por fecha de vencimiento.
+- `ClaveAgrupacion`: record que agrupa por subcategoria y criterio de segmentacion.
+- `Categoria`, `SubCategoria` y `Unidad`: clasifican los bienes.
+
+### Donaciones
+
+- `Donacion`: recibe una lista de bienes y genera automaticamente sus `DonacionSegmentada`.
+- `DonacionSegmentada`: agrupa bienes compatibles y puede adjudicarse a una entidad beneficiaria.
+- `EstadoDonacion`: indica si la donacion general esta pendiente o adjudicada.
+- `EstadoDonacionSegmentada`: indica el estado de cada segmento.
+
+La segmentacion actual agrupa bienes por:
+
+```text
+subcategoria + criterio propio del bien
+```
+
+Ejemplos:
+
+- Bien duradero: subcategoria + estado.
+- Bien perecedero: subcategoria + fecha de vencimiento.
+
+### Entidades beneficiarias y necesidades
+
+- `EntidadBeneficiaria`: recibe donaciones segmentadas y administra necesidades.
+- `NecesidadMaterial`: base para necesidades.
+- `NecesidadRecurrente`: necesidad con periodo.
+- `NecesidadExtraordinaria`: necesidad con causa puntual.
+- `EstadoNecesidad`: estado de satisfaccion de la necesidad.
+
+### Notificaciones
+
+- `Notificacion`: mensaje con asunto, cuerpo, fecha y tipo.
+- `TipoNotificacion`: clasifica la notificacion.
+- `iNotificador`: interfaz strategy para enviar notificaciones.
+- `NotificadorEmail`, `NotificadorTelefono`, `NotificadorWhatsApp`: implementaciones concretas.
+- `TipoNotificador`: enum para seleccionar el canal.
+- `NotificacionService`: resuelve el notificador por tipo y envia la notificacion.
+
+## Estructura del proyecto
+
+```text
+src/main/java/com/tp/donatrack
+|-- DonatrackApplication.java
+|-- ImportacionResponseDTO.java
+|-- controllers
+|   `-- DonanteController.java
+|-- repositories
+|   `-- DonanteRepository.java
+|-- services
+|   |-- DonanteService.java
+|   |-- DonacionService.java
+|   |-- NotificacionService.java
+|   `-- PersonaService.java
+`-- domain
+    |-- bien
+    |-- donacion
+    |-- donante
+    |-- entidad
+    |-- necesidad
+    |-- notificacion
+    |-- notificador
+    |-- persona
+    `-- ubicacion
+```
+
+## Configuracion
+
+Archivo principal:
+
+```text
+src/main/resources/application.yaml
+```
+
+Configuracion actual:
+
+- Nombre de aplicacion: `donatrack`
+- Maximo tamano de archivo multipart: `10MB`
+- Maximo tamano de request multipart: `10MB`
+
