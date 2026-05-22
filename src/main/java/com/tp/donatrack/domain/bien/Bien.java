@@ -10,4 +10,10 @@ public abstract class Bien {
     protected String descripcion;
     protected String foto;
     protected SubCategoria subCategoria;
+
+    public abstract Object getCriterioSegmentacion();
+
+    public ClaveAgrupacion getClaveAgrupacion() {
+        return new ClaveAgrupacion(this.subCategoria, this.getCriterioSegmentacion());
+    }
 }

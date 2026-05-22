@@ -3,8 +3,14 @@ package com.tp.donatrack.domain.donacion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.stream.Collectors;
 
+import com.tp.donatrack.domain.bien.EstadoBien;
 import com.tp.donatrack.domain.bien.Bien;
+import com.tp.donatrack.domain.bien.BienPerecedero;
+import com.tp.donatrack.domain.bien.BienDuradero;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +26,9 @@ class DonacionTest {
     private Donante donanteMock;
     private SubCategoria perecederos;
     private SubCategoria duraderos;
-    private Bien manzana;
-    private Bien leche;
-    private Bien silla;
+    private BienPerecedero manzana;
+    private BienPerecedero leche;
+    private BienDuradero silla;
 
     @BeforeEach
     void setUp() {
@@ -30,9 +36,31 @@ class DonacionTest {
         perecederos = mock(SubCategoria.class);
         duraderos = mock(SubCategoria.class);
 
-        manzana = crearBienMock(perecederos);
-        leche = crearBienMock(perecederos);
-        silla = crearBienMock(duraderos);
+        Date fechaVencimientoComun = new Date();
+
+        manzana = new BienPerecedero(
+            "Manzana", 
+            "Cajón de manzanas", 
+            "url_foto_manzana", 
+            perecederos, 
+            fechaVencimientoComun
+        );
+        
+        leche = new BienPerecedero(
+            "Leche", 
+            "Sachet de leche entera", 
+            "url_foto_leche", 
+            perecederos, 
+            fechaVencimientoComun
+        );
+        
+        silla = new BienDuradero(
+            "Silla", 
+            "Silla de oficina", 
+            "url_foto_silla", 
+            duraderos, 
+            EstadoBien.NUEVO 
+        );
 
         List<Bien> bienesEntrantes = Arrays.asList(manzana, leche, silla);
 
@@ -96,9 +124,61 @@ class DonacionTest {
         assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.ADJUDICADA);
     }
 
-    private Bien crearBienMock(SubCategoria sub) {
-        Bien bien = mock(Bien.class);
-        when(bien.getSubCategoria()).thenReturn(sub);
-        return bien;
+    @Test
+    @DisplayName("Debe agrupar por misma subcategoría y separar si difieren en criterio (fecha/estado)")
+    void segmentar_separaPorCriterioPolimorfico() {
+        Donante donanteMock = mock(Donante.class);
+        SubCategoria alimentos = mock(SubCategoria.class);
+        SubCategoria muebles = mock(SubCategoria.class);
+
+        Date venceHoy = new Date();
+        Date venceEnUnMes = new Date(venceHoy.getTime() + (1000L * 60 * 60 * 24 * 30));
+
+        BienPerecedero leche = new BienPerecedero("Leche", "Sachet", "leche.jpg", alimentos, venceHoy);
+        BienPerecedero yogur = new BienPerecedero("Yogur", "Pote", "yogurt.jpg", alimentos, venceHoy);
+        BienPerecedero arroz = new BienPerecedero("Arroz", "Paquete", "arroz.jpg", alimentos, venceEnUnMes);
+
+        BienDuradero sillaNueva = new BienDuradero("Silla", "De madera", "silla.jpg", muebles, EstadoBien.NUEVO);
+        BienDuradero mesaUsada = new BienDuradero("Mesa", "De pino", "mesa.jpg", muebles, EstadoBien.USADO);
+
+        List<Bien> bienesEntrantes = Arrays.asList(leche, yogur, arroz, sillaNueva, mesaUsada);
+
+        Donacion donacion = new Donacion(donanteMock, "Donación Mixta", new Date(), bienesEntrantes);
+        List<DonacionSegmentada> segmentosGenerados = donacion.getDonacionesSegmentadas();
+
+        assertEquals(4, segmentosGenerados.size(), "Debería haber generado 4 segmentos distintos en total");
+
+        List<DonacionSegmentada> segmentosAlimentos = segmentosGenerados.stream()
+                .filter(s -> s.getSubCategoria().equals(alimentos))
+                .collect(Collectors.toList());
+
+        assertEquals(2, segmentosAlimentos.size(), "Alimentos debe partirse en 2 donaciones por tener fechas distintas");
+
+        DonacionSegmentada donacionParaHoy = segmentosAlimentos.stream()
+                .filter(s -> s.getBienes().size() == 2)
+                .findFirst()
+                .orElseThrow();
+        
+        assertTrue(donacionParaHoy.getBienes().contains(leche), "Debe contener la leche");
+        assertTrue(donacionParaHoy.getBienes().contains(yogur), "Debe contener el yogur");
+
+        DonacionSegmentada donacionParaElMesQueViene = segmentosAlimentos.stream()
+                .filter(s -> s.getBienes().size() == 1)
+                .findFirst()
+                .orElseThrow();
+                
+        assertTrue(donacionParaElMesQueViene.getBienes().contains(arroz), "El arroz debe estar en un segmento solo");
+
+        List<DonacionSegmentada> segmentosMuebles = segmentosGenerados.stream()
+                .filter(s -> s.getSubCategoria().equals(muebles))
+                .collect(Collectors.toList());
+
+        assertEquals(2, segmentosMuebles.size(), "Muebles debe partirse en 2 donaciones por tener estados distintos");
+        
+        boolean existeSillaSola = segmentosMuebles.stream().anyMatch(s -> s.getBienes().contains(sillaNueva));
+        boolean existeMesaSola = segmentosMuebles.stream().anyMatch(s -> s.getBienes().contains(mesaUsada));
+        
+        assertTrue(existeSillaSola, "La silla nueva debe estar en su propia caja");
+        assertTrue(existeMesaSola, "La mesa usada debe estar en su propia caja");
     }
 }

@@ -3,6 +3,7 @@ package com.tp.donatrack.domain.donacion;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.bien.Bien;
+import com.tp.donatrack.domain.bien.ClaveAgrupacion;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,24 +39,17 @@ public class Donacion {
     }
 
     private List<DonacionSegmentada> segmentar(List<Bien> bienes) {       
-        Map<SubCategoria, List<Bien>> agrupados = bienes.stream()
-            .collect(Collectors.groupingBy(Bien::getSubCategoria));
+        Map<ClaveAgrupacion, List<Bien>> agrupados = bienes.stream()
+            .collect(Collectors.groupingBy(Bien::getClaveAgrupacion));
 
-        List<DonacionSegmentada> segmentos = new ArrayList<>();
-        agrupados.forEach((subCat, listaDeBienes) -> {
-            int cantidad = listaDeBienes.size();
-            
-            DonacionSegmentada nuevaDonacion = new DonacionSegmentada(
-                cantidad, 
-                subCat, 
-                true,
-                listaDeBienes
-            );
-
-            segmentos.add(nuevaDonacion);
-        });
-
-        return segmentos;
+        return agrupados.entrySet().stream()
+            .map(entry -> new DonacionSegmentada(
+                entry.getValue().size(), 
+                entry.getKey().subCategoria(),
+                true, 
+                entry.getValue()
+            ))
+            .collect(Collectors.toList());
     }
 
     public EstadoDonacion getEstado() {

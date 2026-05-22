@@ -21,4 +21,9 @@ public class BienDuradero extends Bien {
         this.subCategoria = subCategoria;
         this.estado = estado;
     }
+
+    @Override
+    public Object getCriterioSegmentacion() {
+        return this.estado; 
+    }
 }

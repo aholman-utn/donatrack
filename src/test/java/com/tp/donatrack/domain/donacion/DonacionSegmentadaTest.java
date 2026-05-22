@@ -36,8 +36,8 @@ public class DonacionSegmentadaTest {
         unaCategoria = new Categoria("Alimento");
         unaSubCategoria = new SubCategoria(
             unaCategoria, 
-            "Alimento no perecedero", 
-            Unidad.UNIDADES
+            "Arroz", 
+            Unidad.KG
         );
         
         Donante donante = new Donante();

@@ -21,4 +21,9 @@ public class BienPerecedero extends Bien {
         this.subCategoria = subCategoria;
         this.fechaVencimiento = fechaVencimiento;
     }  
+
+    @Override
+    public Object getCriterioSegmentacion() {
+        return this.fechaVencimiento; 
+    }
 }
