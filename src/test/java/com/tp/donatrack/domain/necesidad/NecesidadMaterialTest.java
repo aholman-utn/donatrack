@@ -39,7 +39,7 @@ class NecesidadMaterialTest {
     @Test
     @DisplayName("Al agregar una donacion, la cantidad faltante debe disminuir")
     void alAgregarBienDisminuyeFaltante() {
-        donacion = new DonacionSegmentada(1, subCategoria, true, null);
+        donacion = new DonacionSegmentada(1, subCategoria, null);
         necesidad.recibirDonacion(donacion);
         assertEquals(2, necesidad.cantidadFaltanteDelPedido());
     }
@@ -47,7 +47,7 @@ class NecesidadMaterialTest {
     @Test
     @DisplayName("Al agregar una donacion parcialmente, el estado debe ser ACTIVO")
     void estadoParcialmenteSatisfecho() {
-        donacion = new DonacionSegmentada(1, subCategoria, true, null);
+        donacion = new DonacionSegmentada(1, subCategoria, null);
         necesidad.recibirDonacion(donacion);
         assertEquals(EstadoNecesidad.ACTIVO, necesidad.getEstado());
     }
@@ -55,7 +55,7 @@ class NecesidadMaterialTest {
     @Test
     @DisplayName("Al completar todos los bienes, el estado debe ser SATISFECHO")
     void estadoSatisfechoAlCompletarBienes() {
-        donacion = new DonacionSegmentada(3, subCategoria, true, null);
+        donacion = new DonacionSegmentada(3, subCategoria, null);
         necesidad.recibirDonacion(donacion);
         assertEquals(EstadoNecesidad.SATISFECHO, necesidad.getEstado());
         assertEquals(0, necesidad.cantidadFaltanteDelPedido());
@@ -64,7 +64,7 @@ class NecesidadMaterialTest {
     @Test
     @DisplayName("La cantidad faltante nunca debe ser negativa")
     void cantidadFaltanteNuncaNegativa() {
-        donacion = new DonacionSegmentada(5, subCategoria, true, null);
+        donacion = new DonacionSegmentada(5, subCategoria, null);
         necesidad.recibirDonacion(donacion);
         assertEquals(0, necesidad.cantidadFaltanteDelPedido());
     }

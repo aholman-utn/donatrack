@@ -26,7 +26,7 @@ class EntidadBeneficiariaTest {
         entidad = new EntidadBeneficiaria();
         Categoria categoria = new Categoria("Alimentos");
         subCategoria = new SubCategoria(categoria, "Alimento no perecedero", Unidad.UNIDADES);
-        donacionSegmentada = new DonacionSegmentada(1, subCategoria, true, null);
+        donacionSegmentada = new DonacionSegmentada(1, subCategoria, null);
     }
 
     @Test

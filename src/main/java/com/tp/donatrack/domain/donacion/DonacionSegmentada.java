@@ -13,19 +13,16 @@ import java.util.List;
 public class DonacionSegmentada {
     private int cantidad;
     private SubCategoria subCategoria;
-    private Boolean disponible;
     private List<Bien> bienes;
     public EstadoDonacionSegmentada estado;
 
     public DonacionSegmentada(
         int cantidad, 
         SubCategoria subCategoria, 
-        Boolean disponible, 
         List<Bien> bienes
     ) {
         this.cantidad = cantidad;
         this.subCategoria = subCategoria;
-        this.disponible = disponible;
         this.bienes = bienes;
         this.estado = EstadoDonacionSegmentada.PENDIENTE;
     }
