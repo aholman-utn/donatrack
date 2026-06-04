@@ -10,8 +10,7 @@ public class BienPerecederoTest {
     @Test
     @DisplayName("Debe crear un Bien Perecedero (Arroz) con su categoría Alimentos")
     public void debeCrearArrozCorrectamente() {
-        Categoria alimentos = new Categoria("Alimentos");
-        SubCategoria arrozSub = new SubCategoria(alimentos, "Arroz", Unidad.KG);
+        SubCategoria arrozSub = new SubCategoria(Categoria.ALIMENTOS, "Arroz", Unidad.KG);
         Date fechaVenc = new Date();
 
         BienPerecedero arroz = new BienPerecedero(
@@ -23,7 +22,6 @@ public class BienPerecederoTest {
         );
 
         Assertions.assertEquals("Arroz Gallo", arroz.getNombre());
-        Assertions.assertEquals("Alimentos", arroz.getSubCategoria().getCategoria().getDescripcion());
         Assertions.assertEquals("Arroz", arroz.getSubCategoria().getDescripcion());
     }
 }

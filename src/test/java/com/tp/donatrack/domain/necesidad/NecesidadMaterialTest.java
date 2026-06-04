@@ -19,7 +19,7 @@ class NecesidadMaterialTest {
 
     @BeforeEach
     void setUp() {
-        categoria = new Categoria("Muebles");
+        categoria = Categoria.MOBILIARIO;
         subCategoria = new SubCategoria(categoria, "Sillas", Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 3, new Date(), "Inundación");
     }

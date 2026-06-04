@@ -12,7 +12,7 @@ public class PersonaHumanaTest {
         String nombre = "Leando";
         String apellido = "Perez";
         String genero = "Masculino";
-        int nroDocumento = 12345678;
+        String nroDocumento = "12345678";
         int edad = 25;
         Date fechaNac = new Calendar.Builder().setDate(2000, 0, 1).build().getTime();
 

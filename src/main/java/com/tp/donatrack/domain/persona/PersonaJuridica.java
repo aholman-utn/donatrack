@@ -11,6 +11,7 @@ import java.util.List;
 public class PersonaJuridica extends Persona {
     private String razonSocial;
     private TipoOrganizacion tipo;
+    private String cuit;
     private String rubro;
     private List<PersonaRepresentante> personasRepresentantes;
 

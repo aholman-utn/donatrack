@@ -33,7 +33,7 @@ public class DonacionSegmentadaTest {
     @BeforeEach
     void setUp() {
         unaEntidadBeneficiaria = new EntidadBeneficiaria();
-        unaCategoria = new Categoria("Alimento");
+        unaCategoria = Categoria.ALIMENTOS;
         unaSubCategoria = new SubCategoria(
             unaCategoria, 
             "Arroz", 

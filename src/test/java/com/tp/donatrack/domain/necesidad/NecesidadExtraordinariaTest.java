@@ -18,7 +18,7 @@ class NecesidadExtraordinariaTest {
 
     @BeforeEach
     void setUp() {
-        Categoria categoria = new Categoria("Alimentos");
+        Categoria categoria = Categoria.ALIMENTOS;
         subCategoria = new SubCategoria(categoria, "Alimento no perecedero", Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 5, new Date(), "Terremoto");
     }

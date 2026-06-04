@@ -17,5 +17,5 @@ public class PersonaHumana extends Persona {
     private String apellido;
     private Date fechaNacimiento;
     private Integer edad;
-    private Integer nroDocumento;
+    private String nroDocumento;
 }

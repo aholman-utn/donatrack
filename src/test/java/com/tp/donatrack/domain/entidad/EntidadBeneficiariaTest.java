@@ -24,7 +24,7 @@ class EntidadBeneficiariaTest {
     @BeforeEach
     void setUp() {
         entidad = new EntidadBeneficiaria();
-        Categoria categoria = new Categoria("Alimentos");
+        Categoria categoria = Categoria.ALIMENTOS;
         subCategoria = new SubCategoria(categoria, "Alimento no perecedero", Unidad.UNIDADES);
         donacionSegmentada = new DonacionSegmentada(1, subCategoria, null);
     }

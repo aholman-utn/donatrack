@@ -20,7 +20,7 @@ class NecesidadRecurrenteTest {
 
     @BeforeEach
     void setUp() {
-        Categoria categoria = new Categoria("Higiene");
+        Categoria categoria = Categoria.HIGIENE;
         subCategoria = new SubCategoria(categoria, "Productos de limpieza", Unidad.UNIDADES);
         necesidad = new NecesidadRecurrente(subCategoria, 10, new Date(), 30);
     }

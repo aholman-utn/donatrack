@@ -137,7 +137,7 @@ public class DonanteService {
                 String documentoLimpio = documento.replaceAll("[^0-9]", "");
                 String genero = "Sin especificar";
                 Integer edad = 0;
-                persona = new PersonaHumana(nombre_persona, genero, apellido, null, edad, Integer.parseInt(documentoLimpio));
+                persona = new PersonaHumana(nombre_persona, genero, apellido, null, edad, documentoLimpio);
                 persona.agregarMedioDeContacto("email",email);
                 persona.agregarMedioDeContacto("telefono",telefono);
 
