@@ -7,4 +7,8 @@ import lombok.Setter;
 @Setter
 public class Pais {
     private String nombre;
+
+    public Pais(String paisNombre) {
+        this.nombre = paisNombre;
+    }
 }

@@ -26,6 +26,37 @@ public class DonanteService {
         this.notifService = notifService;
     }
 
+    //CREATE
+    public Donante registrar(Persona persona) {
+        Donante donante = new Donante(persona);
+        return donanteRepository.create(donante);
+    }
+
+    //READ
+    public List<Donante> listarTodos() {
+        return donanteRepository.findAll();
+    }
+
+    //UPDATE TODO: aca actualizo la persona completa, el problema es que en un futuro esto me va a cambiar el ID
+    public Donante actualizar(String email, Persona personaActualizada) {
+        Donante donante = buscarDonante(email);
+        donante.setPersona(personaActualizada);
+        return donanteRepository.create(donante);
+    }
+
+    //DELETE
+    public void eliminar(String email){
+        Donante donanteAEliminar = buscarDonante(email);
+        if ( donanteAEliminar != null ) {
+            donanteRepository.delete(donanteAEliminar);
+        }
+    }
+
+    public Donante buscarDonante(String email){
+        return this.donanteRepository.find(email);
+    }
+
+
     public ImportacionResponseDTO importarCSV(MultipartFile archivo) {
 
         if (archivo == null || archivo.isEmpty()) {
@@ -87,7 +118,7 @@ public class DonanteService {
     }
 
     private Donante darDeAlta(Donante donante){
-        Donante nuevo_donante = this.donanteRepository.darDeAlta(donante);
+        Donante nuevo_donante = this.donanteRepository.create(donante);
         if(nuevo_donante!= null) {
             //Notifico
             Notificacion notif_bienvenida = new Notificacion();
@@ -154,7 +185,7 @@ public class DonanteService {
             }
 
             donante.setPersona(persona);
-            this.darDeAlta(donante);
+            this.darDeAlta(donante); //TODO: quizas se puede reemplazar por this.registrar(Persona)
 
         } else {
             //actualizar los campos
@@ -186,7 +217,4 @@ public class DonanteService {
 
     }
 
-    public Donante buscarDonante(String email){
-        return this.donanteRepository.buscarDonante(email);
-    }
 }

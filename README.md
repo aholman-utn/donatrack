@@ -87,6 +87,20 @@ El proyecto usa **JUnit 5** con `maven-surefire-junit5-tree-reporter` para una s
 ```
 
 ---
+## Capas
+### 🛂 Controller.
+**Responsabilidades:**
+- Recibir peticiones HTTP y devolver respuestas HTTP.
+- Validar y transformar los datos de entrada (DTO → dominio).
+- Delegar la lógica al Service.
+
+**Lo que NO hace:**
+- No contiene lógica de negocio.
+- No accede directamente al repositorio.
+
+Las rutas están centralizadas en DonanteRoutes para tenerlas en un solo lugar
+
+---
 
 ## 📁 Estructura del proyecto
 
