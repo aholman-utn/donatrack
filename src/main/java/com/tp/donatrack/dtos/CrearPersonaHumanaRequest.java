@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class CrearDonanteHumanoRequest {
+public class CrearPersonaHumanaRequest {
 
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;

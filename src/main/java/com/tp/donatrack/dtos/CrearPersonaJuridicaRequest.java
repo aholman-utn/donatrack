@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class CrearDonanteJuridicoRequest {
+public class CrearPersonaJuridicaRequest {
 
     @NotBlank(message = "La razón social es obligatoria")
     private String razonSocial;
@@ -33,7 +33,8 @@ public class CrearDonanteJuridicoRequest {
         p.setRubro(rubro);
         p.setMedioPredeterminado(medioPredeterminado);
 
-        if (direccion != null) p.setDireccion(direccion.toDomain());
+        if (direccion != null)
+            p.setDireccion(direccion.toDomain());
         if (mediosDeContacto != null) {
             Map<String, List<String>> mediosMap = new java.util.HashMap<>();
             for (ContactoValorRequest cr : mediosDeContacto) {
