@@ -1,6 +1,8 @@
 package com.tp.donatrack.controllers;
 
-import com.tp.donatrack.ImportacionResponseDTO;
+import com.tp.donatrack.dtos.ImportacionResponseDTO;
+import com.tp.donatrack.dtos.CrearDonanteHumanoRequest;
+import com.tp.donatrack.dtos.CrearDonanteJuridicoRequest;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.routes.DonanteRoutes;
 import com.tp.donatrack.services.DonanteService;
@@ -54,7 +56,7 @@ public class DonanteController {
     */
     @PostMapping(DonanteRoutes.HUMANO)
     public ResponseEntity<Donante> crearHumano(
-            @Valid @RequestBody DonanteDTO.CrearDonanteHumanoRequest request) {
+            @Valid @RequestBody CrearDonanteHumanoRequest request) {
         Donante creado = donanteService.registrar(request.toDomain());
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
@@ -62,7 +64,7 @@ public class DonanteController {
     // POST /donantes/juridico → crear donante jurídico
     @PostMapping(DonanteRoutes.JURIDICO)
     public ResponseEntity<Donante> crearJuridico(
-            @Valid @RequestBody DonanteDTO.CrearDonanteJuridicoRequest request) {
+            @Valid @RequestBody CrearDonanteJuridicoRequest request) {
 
         Donante creado = donanteService.registrar(request.toDomain());
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
@@ -82,7 +84,7 @@ public class DonanteController {
     @PutMapping(DonanteRoutes.ACTUALIZAR_HUMANO)
     public ResponseEntity<Donante> actualizarHumano(
             @PathVariable String email,
-            @Valid @RequestBody DonanteDTO.CrearDonanteHumanoRequest request) {
+            @Valid @RequestBody CrearDonanteHumanoRequest request) {
 
         Donante actualizado = donanteService.actualizar(email, request.toDomain());
         return ResponseEntity.ok(actualizado);
@@ -92,7 +94,7 @@ public class DonanteController {
     @PutMapping(DonanteRoutes.ACTUALIZAR_JURIDICO)
     public ResponseEntity<Donante> actualizarJuridico(
             @PathVariable String email,
-            @Valid @RequestBody DonanteDTO.CrearDonanteJuridicoRequest request) {
+            @Valid @RequestBody CrearDonanteJuridicoRequest request) {
 
         Donante actualizado = donanteService.actualizar(email, request.toDomain());
         return ResponseEntity.ok(actualizado);

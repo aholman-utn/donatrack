@@ -1,4 +1,4 @@
-package com.tp.donatrack;
+package com.tp.donatrack.dtos;
 
 import com.tp.donatrack.domain.donante.Donante;
 import lombok.Getter;
@@ -11,6 +11,7 @@ public class ImportacionResponseDTO {
     private Boolean success;
     private String message;
     private List<Donante> data = null;
+    
     public ImportacionResponseDTO(Boolean success, String message){
         this.success=success;
         this.message=message;
@@ -23,5 +24,4 @@ public class ImportacionResponseDTO {
     public String getMessage(){
         return this.message;
     }
-
 }

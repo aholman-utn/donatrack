@@ -1,6 +1,6 @@
 package com.tp.donatrack.services;
 
-import com.tp.donatrack.ImportacionResponseDTO;
+import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.notificacion.Notificacion;
 import com.tp.donatrack.domain.notificacion.TipoNotificacion;
