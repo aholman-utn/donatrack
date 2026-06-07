@@ -1,23 +1,32 @@
 package com.tp.donatrack.domain.entidad;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.necesidad.NecesidadMaterial;
-
 import com.tp.donatrack.domain.persona.PersonaJuridica;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class EntidadBeneficiaria {
     private PersonaJuridica datosDeEntidad;
     private List<NecesidadMaterial> nececidades = new ArrayList<>();
+    private Integer id;
 
     private List<NecesidadMaterial> necesidadesActivas() {
         return nececidades.stream().filter(NecesidadMaterial::activo).toList();
+    }
+
+
+    public EntidadBeneficiaria(PersonaJuridica personaJuridica) {
+        this.datosDeEntidad = personaJuridica;
+        //TODO: aca puedo poner una notificacion de bienvenida o similar
+
     }
 
     public void agregarNecesidad(NecesidadMaterial necesidad) {

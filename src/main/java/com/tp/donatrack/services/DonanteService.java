@@ -18,8 +18,8 @@ import java.util.*;
 @Service
 public class DonanteService {
 
-    private DonanteRepository donanteRepository;
-    private NotificacionService notifService;
+    private final DonanteRepository donanteRepository;
+    private final NotificacionService notifService;
 
     public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService) {
         this.donanteRepository = donanteRepository;

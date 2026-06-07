@@ -4,14 +4,13 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class DonanteRepository {
 
     //por ahora, en memoria
-    private List<Donante> donantes;
+    private final List<Donante> donantes;
     public DonanteRepository() {
         this.donantes = new ArrayList<>();
     }

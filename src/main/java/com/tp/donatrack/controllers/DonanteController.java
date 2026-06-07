@@ -25,7 +25,7 @@ public class DonanteController {
     }
 
     // GET /donantes → listar todos
-    @GetMapping
+    @GetMapping(DonanteRoutes.BASE)
     public ResponseEntity<List<Donante>> listarTodos() {
         return ResponseEntity.ok(donanteService.listarTodos());
     }

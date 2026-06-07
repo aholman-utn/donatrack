@@ -13,32 +13,97 @@
         {
           "name": "Donante Juridico",
           "request": {
-            "method": "GET",
-            "header": []
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Fundación Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/juridico",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "juridico"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Donante Humano",
           "request": {
-            "method": "GET",
-            "header": []
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"carlos\",\n  \"apellido\": \"pangaro\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"12345678\",\n  \"direccion\": {\n    \"calle1\": \"una calle\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 2,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"carlos@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"carlos@mail.com\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "humano"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Eliminar Donante Por Mail",
           "request": {
-            "method": "GET",
-            "header": []
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/lucas@mail.com",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "lucas@mail.com"
+              ]
+            }
           },
           "response": []
         },
         {
-          "name": "Todos los Donantes",
+          "name": "Listar Donantes",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes"
+              ]
+            }
           },
           "response": []
         },
@@ -46,15 +111,217 @@
           "name": "Buscar Por Mail",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/carlos@mail.com",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "carlos@mail.com"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Actualizar Datos",
           "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"carlitos\",\n  \"apellido\": \"pangaro\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"87654321\",\n  \"direccion\": {\n    \"calle1\": \"Calle actualizada\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 123,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"B\",\n    \"ciudadNombre\": \"Bariloche\",\n    \"provinciaNombre\": \"Rio Negro\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"carlos@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"carlos@mail.com\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/carlos@mail.com/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "carlos@mail.com",
+                "humano"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entidades Beneficiarias",
+      "item": [
+        {
+          "name": "Entidad Beneficiaria",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Entidades",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Entidad",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Datos",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Datos Copy",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Entidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
           },
           "response": []
         }

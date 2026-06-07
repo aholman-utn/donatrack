@@ -1,7 +1,7 @@
 package com.tp.donatrack.routes;
 
 public class DonanteRoutes {
-        private DonanteRoutes() {} // Clase utilitaria, no instanciable
+        private DonanteRoutes() {}
 
         public static final String BASE             = "/donantes";
         public static final String POR_EMAIL           = "/{email}";
