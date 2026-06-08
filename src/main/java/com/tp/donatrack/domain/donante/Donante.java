@@ -12,7 +12,7 @@ import com.tp.donatrack.domain.persona.Persona;
 public class Donante {
     private Integer id;
     private Persona persona;
-
+    private String password;
     public Donante(Persona persona) {
         this.persona = persona;
         this.persona.agregarNotificacion(

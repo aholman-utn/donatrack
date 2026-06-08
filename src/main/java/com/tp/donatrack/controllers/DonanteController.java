@@ -77,10 +77,11 @@ public class DonanteController {
     @PostMapping("/importar")
     public ResponseEntity<ImportacionResponseDTO> importarCSV(@RequestParam("file") MultipartFile csv) {
 
-        ImportacionResponseDTO response = donanteService.importarCSV(csv);
+        ImportacionResponseDTO response = donanteService.importarDonantes(csv);
 
         return ResponseEntity.ok(response);
     }
+
 
     // PUT /donantes/{email}/humano → actualizar donante humano
     @PutMapping(DonanteRoutes.ACTUALIZAR_HUMANO)

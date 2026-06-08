@@ -37,6 +37,8 @@ public class DonanteRepository {
                 .orElse(null);
     }
 
+    //TODO
+    public Donante update(Integer id){ return new Donante(); }
 
     public List<Donante> findAll(){
         return this.donantes;
