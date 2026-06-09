@@ -27,55 +27,60 @@ class EventoTrazabilidadTest {
     }
 
     @Test
-    @DisplayName("Al crear una donación segmentada, se registra el evento inicial")
+    @DisplayName("Al registrar una donación, queda EN_DEPOSITO con evento inicial")
     void registraEventoInicial() {
-        List<EventoTrazabilidad> historial = donacion.getHistorial();
+        assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, donacion.getEstado());
 
+        List<EventoTrazabilidad> historial = donacion.getHistorial();
         assertEquals(1, historial.size());
+
         EventoTrazabilidad evento = historial.get(0);
         assertNull(evento.getEstadoAnterior());
-        assertEquals(EstadoDonacionSegmentada.PENDIENTE, evento.getEstadoNuevo());
-        assertEquals("Sistema", evento.getActor());
-        assertNotNull(evento.getFecha());
-    }
-
-    @Test
-    @DisplayName("Al transicionar estado, se registra el evento con actor y descripción")
-    void registraEventoAlTransicionar() {
-        donacion.transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador", "Ingresada al depósito");
-
-        List<EventoTrazabilidad> historial = donacion.getHistorial();
-        assertEquals(2, historial.size());
-
-        EventoTrazabilidad evento = historial.get(1);
-        assertEquals(EstadoDonacionSegmentada.PENDIENTE, evento.getEstadoAnterior());
         assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, evento.getEstadoNuevo());
         assertEquals("Administrador", evento.getActor());
-        assertEquals("Ingresada al depósito", evento.getDescripcion());
     }
 
     @Test
-    @DisplayName("El historial registra toda la cadena de transiciones")
-    void registraCadenaCompleta() {
-        donacion.transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador", "Ingresada al depósito");
-        donacion.transicionar(EstadoDonacionSegmentada.ADJUDICADA, "Administrador", "Asignada a Escuela N°10");
-        donacion.marcarEnTransito("Logística");
+    @DisplayName("Flujo completo: EN_DEPOSITO → ASIGNACION_REALIZADA → LISTA_PARA_ENTREGAR → EN_TRASLADO → ENTREGADA")
+    void flujoCompletoExitoso() {
+        donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada por algoritmo");
+        donacion.listarParaEntrega("Logística");
+        donacion.iniciarTraslado("Chofer Pérez");
         donacion.confirmarEntrega("Escuela N°10");
 
-        List<EventoTrazabilidad> historial = donacion.getHistorial();
-        assertEquals(5, historial.size());
         assertEquals(EstadoDonacionSegmentada.ENTREGADA, donacion.getEstado());
-        assertEquals(EstadoDonacionSegmentada.ENTREGADA, donacion.getUltimoEvento().getEstadoNuevo());
+        assertEquals(5, donacion.getHistorial().size());
     }
 
     @Test
-    @DisplayName("marcarVencida registra el evento correctamente")
-    void marcarVencidaRegistraEvento() {
-        donacion.marcarVencida();
+    @DisplayName("Entrega fallida registra justificación y vuelve a EN_DEPOSITO")
+    void entregaFallidaConJustificacion() {
+        donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
+        donacion.listarParaEntrega("Logística");
+        donacion.iniciarTraslado("Chofer");
+
+        donacion.registrarEntregaFallida("Chofer", "Tocamos timbre pero nadie respondió");
+
+        assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, donacion.getEstado());
+
+        // Verificar que se registraron ambos eventos: ENTREGA_FALLIDA y vuelta a EN_DEPOSITO
+        List<EventoTrazabilidad> historial = donacion.getHistorial();
+        EventoTrazabilidad eventoFallido = historial.get(historial.size() - 2);
+        assertEquals(EstadoDonacionSegmentada.ENTREGA_FALLIDA, eventoFallido.getEstadoNuevo());
+        assertEquals("Tocamos timbre pero nadie respondió", eventoFallido.getDescripcion());
+
+        EventoTrazabilidad eventoVuelta = historial.get(historial.size() - 1);
+        assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, eventoVuelta.getEstadoNuevo());
+    }
+
+    @Test
+    @DisplayName("Administrador puede marcar una donación como vencida")
+    void marcarVencida() {
+        donacion.marcarVencida("Admin López");
 
         assertEquals(EstadoDonacionSegmentada.VENCIDA, donacion.getEstado());
         EventoTrazabilidad ultimo = donacion.getUltimoEvento();
-        assertEquals("Sistema", ultimo.getActor());
+        assertEquals("Admin López", ultimo.getActor());
         assertEquals(EstadoDonacionSegmentada.VENCIDA, ultimo.getEstadoNuevo());
     }
 
@@ -88,12 +93,21 @@ class EventoTrazabilidadTest {
 
     @Test
     @DisplayName("getUltimoEvento devuelve el evento más reciente")
-    void ultimoEventoEsElMasReciente() {
-        donacion.transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Admin", "Depósito");
-        donacion.transicionar(EstadoDonacionSegmentada.ADJUDICADA, "Admin", "Asignada");
+    void ultimoEvento() {
+        donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
+        donacion.listarParaEntrega("Logística");
 
         EventoTrazabilidad ultimo = donacion.getUltimoEvento();
-        assertEquals(EstadoDonacionSegmentada.ADJUDICADA, ultimo.getEstadoNuevo());
-        assertEquals("Asignada", ultimo.getDescripcion());
+        assertEquals(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, ultimo.getEstadoNuevo());
+    }
+
+    @Test
+    @DisplayName("Cada evento tiene fecha no nula")
+    void eventosConFecha() {
+        donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
+
+        for (EventoTrazabilidad evento : donacion.getHistorial()) {
+            assertNotNull(evento.getFecha());
+        }
     }
 }

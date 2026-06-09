@@ -107,7 +107,7 @@ class DonacionTest {
     @DisplayName("Debería seguir retornando PENDIENTE si solo algunos segmentos fueron adjudicados")
     void testEstadoCuandoSeAdjudicaParcialmente() {
         DonacionSegmentada segPerecederos = donacion.buscarPorSubcategoria(perecederos).get();
-        segPerecederos.setEstado(EstadoDonacionSegmentada.ADJUDICADA);
+        segPerecederos.setEstado(EstadoDonacionSegmentada.ASIGNACION_REALIZADA);
 
         assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.PENDIENTE);
     }
@@ -118,7 +118,7 @@ class DonacionTest {
         List<DonacionSegmentada> todosLosSegmentos = donacion.getDonacionesSegmentadas();
 
         for (DonacionSegmentada segmento : todosLosSegmentos) {
-            segmento.setEstado(EstadoDonacionSegmentada.ADJUDICADA);
+            segmento.setEstado(EstadoDonacionSegmentada.ASIGNACION_REALIZADA);
         }
 
         assertThat(donacion.getEstado()).isEqualTo(EstadoDonacion.ADJUDICADA);

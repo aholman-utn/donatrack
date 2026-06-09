@@ -52,10 +52,13 @@ public class Donacion {
     }
 
     public EstadoDonacion getEstado() {
-        boolean todasAdjudicadas = this.donacionesSegmentadas.stream()
-                .allMatch(s -> s.getEstado() == EstadoDonacionSegmentada.ADJUDICADA); 
+        boolean todasAsignadas = this.donacionesSegmentadas.stream()
+                .allMatch(s -> s.getEstado() == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
+                        || s.getEstado() == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR
+                        || s.getEstado() == EstadoDonacionSegmentada.EN_TRASLADO
+                        || s.getEstado() == EstadoDonacionSegmentada.ENTREGADA); 
         
-        return todasAdjudicadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
+        return todasAsignadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
     }
 
     public Optional<DonacionSegmentada> buscarPorSubcategoria(SubCategoria sub) {

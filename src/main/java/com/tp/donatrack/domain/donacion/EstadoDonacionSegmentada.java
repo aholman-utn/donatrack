@@ -1,11 +1,11 @@
 package com.tp.donatrack.domain.donacion;
 
 public enum EstadoDonacionSegmentada {
-    PENDIENTE,
     EN_DEPOSITO,
-    MESA_DE_ENTRADA,
-    ADJUDICADA,
-    EN_TRANSITO,
+    ASIGNACION_REALIZADA,
+    LISTA_PARA_ENTREGAR,
+    EN_TRASLADO,
     ENTREGADA,
+    ENTREGA_FALLIDA,
     VENCIDA
 }

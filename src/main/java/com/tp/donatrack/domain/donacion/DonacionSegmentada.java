@@ -29,8 +29,8 @@ public class DonacionSegmentada {
         this.cantidad = cantidad;
         this.subCategoria = subCategoria;
         this.bienes = bienes;
-        this.estado = EstadoDonacionSegmentada.PENDIENTE;
-        registrarEvento(null, EstadoDonacionSegmentada.PENDIENTE, "Sistema", "Donación registrada en el sistema");
+        this.estado = EstadoDonacionSegmentada.EN_DEPOSITO;
+        registrarEvento(null, EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador", "Donación registrada e ingresada al depósito");
     }
 
     public void transicionar(EstadoDonacionSegmentada nuevoEstado, String actor, String descripcion) {
@@ -39,25 +39,36 @@ public class DonacionSegmentada {
         registrarEvento(anterior, nuevoEstado, actor, descripcion);
     }
 
-    public void donar(EntidadBeneficiaria entidad) {
-        try {
-            entidad.implementarDonacion(this);
-            transicionar(EstadoDonacionSegmentada.ADJUDICADA, "Administrador", "Donación asignada a entidad beneficiaria");
-        } catch (RuntimeException e) {
-            System.err.println("Error al procesar la donación: " + e.getMessage());
-        }
+    public void asignar(EntidadBeneficiaria entidad, String actor) {
+        entidad.implementarDonacion(this);
+        transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, actor, "Donación asignada a entidad beneficiaria");
     }
 
-    public void marcarEnTransito(String actor) {
-        transicionar(EstadoDonacionSegmentada.EN_TRANSITO, actor, "Donación despachada en camión");
+    /** @deprecated Usar asignar(entidad, actor) para trazabilidad completa */
+    public void donar(EntidadBeneficiaria entidad) {
+        asignar(entidad, "Administrador");
+    }
+
+    public void listarParaEntrega(String actor) {
+        transicionar(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, actor, "Ruta de entrega planificada");
+    }
+
+    public void iniciarTraslado(String actor) {
+        transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
     }
 
     public void confirmarEntrega(String actor) {
         transicionar(EstadoDonacionSegmentada.ENTREGADA, actor, "Entidad beneficiaria confirmó la recepción");
     }
 
-    public void marcarVencida() {
-        transicionar(EstadoDonacionSegmentada.VENCIDA, "Sistema", "Bien perecedero vencido en depósito");
+    public void registrarEntregaFallida(String actor, String justificacion) {
+        transicionar(EstadoDonacionSegmentada.ENTREGA_FALLIDA, actor, justificacion);
+        // Vuelve al depósito
+        transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Sistema", "Donación devuelta al depósito tras entrega fallida");
+    }
+
+    public void marcarVencida(String actor) {
+        transicionar(EstadoDonacionSegmentada.VENCIDA, actor, "Donación marcada como vencida por administrador");
     }
 
     public List<EventoTrazabilidad> getHistorial() {
