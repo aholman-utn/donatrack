@@ -46,7 +46,8 @@ public class Donacion {
             .map(entry -> new DonacionSegmentada(
                 entry.getValue().size(), 
                 entry.getKey().subCategoria(),
-                entry.getValue()
+                entry.getValue(),
+                this.donante != null ? this.donante.getId() : null
             ))
             .collect(Collectors.toList());
     }

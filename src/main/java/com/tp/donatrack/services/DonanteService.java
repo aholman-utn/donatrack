@@ -68,6 +68,10 @@ public class DonanteService {
         return this.donanteRepository.find(email);
     }
 
+    public Donante buscarDonantePorId(Integer id) {
+        return this.donanteRepository.findById(id);
+    }
+
     public ImportacionResponseDTO importarDonantes(MultipartFile archivo) {
         try {
             // 1. Extraer la extensión del archivo (ej: "csv" o "xlsx")

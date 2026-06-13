@@ -37,6 +37,13 @@ public class DonanteRepository {
                 .orElse(null);
     }
 
+    public Donante findById(Integer id) {
+        return this.donantes.stream()
+                .filter(donante -> donante.getId() != null && donante.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
     //TODO
     public Donante update(Integer id){ return new Donante(); }
 

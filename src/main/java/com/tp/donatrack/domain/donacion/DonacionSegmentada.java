@@ -20,17 +20,27 @@ public class DonacionSegmentada {
     private List<Bien> bienes;
     private EstadoDonacionSegmentada estado;
     private final List<EventoTrazabilidad> historial = new ArrayList<>();
+    private Integer donanteId;
 
     public DonacionSegmentada(
-        int cantidad,
-        SubCategoria subCategoria,
-        List<Bien> bienes
-    ) {
+            int cantidad,
+            SubCategoria subCategoria,
+            List<Bien> bienes) {
+        this(cantidad, subCategoria, bienes, null);
+    }
+
+    public DonacionSegmentada(
+            int cantidad,
+            SubCategoria subCategoria,
+            List<Bien> bienes,
+            Integer donanteId) {
         this.cantidad = cantidad;
         this.subCategoria = subCategoria;
         this.bienes = bienes;
+        this.donanteId = donanteId;
         this.estado = EstadoDonacionSegmentada.EN_DEPOSITO;
-        registrarEvento(null, EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador", "Donación registrada e ingresada al depósito");
+        registrarEvento(null, EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador",
+                "Donación registrada e ingresada al depósito");
     }
 
     public void transicionar(EstadoDonacionSegmentada nuevoEstado, String actor, String descripcion) {
@@ -45,6 +55,7 @@ public class DonacionSegmentada {
     }
 
     /** @deprecated Usar asignar(entidad, actor) para trazabilidad completa */
+    @Deprecated
     public void donar(EntidadBeneficiaria entidad) {
         asignar(entidad, "Administrador");
     }
@@ -57,14 +68,25 @@ public class DonacionSegmentada {
         transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
     }
 
+    // TODO Una vez que la donacion se "ENTREGA"
+    // TODO Una vez que la donacion se entrega es necesario entregar el ID del
+    // donante y el actor al servicio de incentivos
     public void confirmarEntrega(String actor) {
+        confirmarEntrega(actor, null);
+    }
+
+    public void confirmarEntrega(String actor, DonacionEventPublisher eventPublisher) {
         transicionar(EstadoDonacionSegmentada.ENTREGADA, actor, "Entidad beneficiaria confirmó la recepción");
+        if (eventPublisher != null && this.donanteId != null) {
+            eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, actor));
+        }
     }
 
     public void registrarEntregaFallida(String actor, String justificacion) {
         transicionar(EstadoDonacionSegmentada.ENTREGA_FALLIDA, actor, justificacion);
         // Vuelve al depósito
-        transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Sistema", "Donación devuelta al depósito tras entrega fallida");
+        transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Sistema",
+                "Donación devuelta al depósito tras entrega fallida");
     }
 
     public void marcarVencida(String actor) {
@@ -76,11 +98,13 @@ public class DonacionSegmentada {
     }
 
     public EventoTrazabilidad getUltimoEvento() {
-        if (historial.isEmpty()) return null;
+        if (historial.isEmpty())
+            return null;
         return historial.get(historial.size() - 1);
     }
 
-    private void registrarEvento(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor, String descripcion) {
+    private void registrarEvento(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor,
+            String descripcion) {
         historial.add(new EventoTrazabilidad(anterior, nuevo, actor, descripcion));
     }
 }
