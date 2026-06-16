@@ -68,15 +68,13 @@ public class DonacionSegmentada {
         transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
     }
 
-    // TODO Una vez que la donacion se "ENTREGA"
-    // TODO Una vez que la donacion se entrega es necesario entregar el ID del
-    // donante y la entidad beneficiaria al servicio de incentivos
     public void confirmarEntrega(Integer entidadBeneficiariaId) {
         confirmarEntrega(entidadBeneficiariaId, null);
     }
 
     public void confirmarEntrega(Integer entidadBeneficiariaId, DonacionEventPublisher eventPublisher) {
-        transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId), "Entidad beneficiaria confirmó la recepción");
+        transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId),
+                "Entidad beneficiaria confirmó la recepción");
         if (eventPublisher != null && this.donanteId != null) {
             eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, entidadBeneficiariaId));
         }
