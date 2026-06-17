@@ -12,4 +12,5 @@ public class RankingItemDTO {
     private Integer donanteId;
     private int totalDonacionesExitosas;
     private String categoriaDonante;
+    private int totalMisionesCompletadas;
 }

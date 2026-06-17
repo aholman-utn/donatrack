@@ -75,13 +75,13 @@ public class IncentivosController {
     }
 
     /**
-     * Retorna el ranking global de donantes ordenado por donaciones exitosas
-     * (DESC).
+     * Retorna el ranking global de donantes ordenado por misiones completadas.
      * GET /incentivos/ranking
      */
     @GetMapping("/ranking")
-    public ResponseEntity<List<RankingItemDTO>> obtenerRanking() {
-        return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto());
+    public ResponseEntity<List<RankingItemDTO>> obtenerRanking(
+            @RequestParam(value = "mesActual", required = false, defaultValue = "false") boolean mesActual) {
+        return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto(mesActual));
     }
 
     /**
@@ -89,8 +89,10 @@ public class IncentivosController {
      * GET /incentivos/ranking/{donanteId}
      */
     @GetMapping("/ranking/{donanteId}")
-    public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(@PathVariable Integer donanteId) {
-        return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId));
+    public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(
+            @PathVariable Integer donanteId,
+            @RequestParam(value = "mesActual", required = false, defaultValue = "false") boolean mesActual) {
+        return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId, mesActual));
     }
 
 }

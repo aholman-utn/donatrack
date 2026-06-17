@@ -1,5 +1,6 @@
 package com.tp.incentivos.domain;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class Perfil {
     private List<Insignia> insigniasGanadas;
     private List<RegistroDonacionMensual> historialMensual;
     private Boolean visibilidadInsignia = true;
+    private List<Mision> misionesCompletadas; // lo necesito para el ranking
 
     public Perfil(Integer donanteId) {
         this.donanteId = donanteId;
@@ -37,6 +39,7 @@ public class Perfil {
         this.insigniasGanadas = new ArrayList<>();
         this.historialMensual = new ArrayList<>();
         this.visibilidadInsignia = true;
+        this.misionesCompletadas = new ArrayList<>();
     }
 
     public void registrarEntrega(Integer entidadBeneficiariaId) {
@@ -111,5 +114,20 @@ public class Perfil {
                         6, "Racha Legendaria",
                         "Dona durante 6 meses consecutivos",
                         new Insignia(nombreUsuario, "Racha", "Donaste durante 6 meses seguidos sin parar"))));
+    }
+
+    public long getMisionesCompletadasCountHistorico() {
+        return misionesCompletadas.size();
+    }
+
+    public long getMisionesCompletadasCountMesActual() {
+        LocalDate ahora = LocalDate.now();
+        int mes = ahora.getMonthValue();
+        int anio = ahora.getYear();
+        return misionesCompletadas.stream()
+                .filter(m -> m.getFechaObtencion() != null &&
+                        m.getFechaObtencion().getMonthValue() == mes &&
+                        m.getFechaObtencion().getYear() == anio)
+                .count();
     }
 }

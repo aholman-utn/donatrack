@@ -25,18 +25,28 @@ public class ServicioRanking {
     }
 
     public List<RankingItemDTO> obtenerRankingCompleto() {
+        return obtenerRankingCompleto(false);
+    }
+
+    public List<RankingItemDTO> obtenerRankingCompleto(boolean mesActual) {
         List<Perfil> ordenados = new ArrayList<>(repository.findAll());
-        ordenados.sort(Comparator.comparingInt(Perfil::getTotalDonacionesExitosas).reversed());
+        if (mesActual) {
+            ordenados.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountMesActual).reversed());
+        } else {
+            ordenados.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountHistorico).reversed());
+        }
 
         List<RankingItemDTO> ranking = new ArrayList<>();
         AtomicInteger posicion = new AtomicInteger(1);
 
         for (Perfil perfil : ordenados) {
+            int misionesCount = (int) (mesActual ? perfil.getMisionesCompletadasCountMesActual() : perfil.getMisionesCompletadasCountHistorico());
             ranking.add(RankingItemDTO.builder()
                     .posicion(posicion.getAndIncrement())
                     .donanteId(perfil.getDonanteId())
                     .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
                     .categoriaDonante(perfil.getCategoriaDonante().name())
+                    .totalMisionesCompletadas(misionesCount)
                     .build());
         }
 
@@ -44,7 +54,11 @@ public class ServicioRanking {
     }
 
     public RankingItemDTO obtenerPosicionDonante(Integer donanteId) {
-        List<RankingItemDTO> rankingCompleto = obtenerRankingCompleto();
+        return obtenerPosicionDonante(donanteId, false);
+    }
+
+    public RankingItemDTO obtenerPosicionDonante(Integer donanteId, boolean mesActual) {
+        List<RankingItemDTO> rankingCompleto = obtenerRankingCompleto(mesActual);
 
         return rankingCompleto.stream()
                 .filter(item -> item.getDonanteId().equals(donanteId))
@@ -54,10 +68,15 @@ public class ServicioRanking {
                         .donanteId(donanteId)
                         .totalDonacionesExitosas(0)
                         .categoriaDonante("SIN_PERFIL")
+                        .totalMisionesCompletadas(0)
                         .build());
     }
 
     public int calcularPosicion(Integer donanteId) {
-        return obtenerPosicionDonante(donanteId).getPosicion();
+        return calcularPosicion(donanteId, false);
+    }
+
+    public int calcularPosicion(Integer donanteId, boolean mesActual) {
+        return obtenerPosicionDonante(donanteId, mesActual).getPosicion();
     }
 }

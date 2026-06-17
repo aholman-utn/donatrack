@@ -28,6 +28,7 @@ public class ServicioEvaluadorMisiones {
         if (misionActual.evaluarYMarcarCompletitud()) {
             // Otorgar la insignia de la misión completada
             perfil.getInsigniasGanadas().add(misionActual.getInsigniaAsociada());
+            perfil.getMisionesCompletadas().add(misionActual);
 
             boolean todasCompletas = perfil.getMisionesActuales().stream()
                     .allMatch(Mision::isCompletada);

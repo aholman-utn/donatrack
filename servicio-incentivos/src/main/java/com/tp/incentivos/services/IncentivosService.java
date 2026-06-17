@@ -66,10 +66,6 @@ public class IncentivosService {
         repository.create(perfil);
     }
 
-    /**
-     * Retorna el perfil completo de incentivos del donante, incluyendo métricas,
-     * misiones, insignias, historial mensual y posición en el ranking.
-     */
     public PerfilIncentivosDTO obtenerPerfil(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
@@ -92,10 +88,6 @@ public class IncentivosService {
                 .build();
     }
 
-    /**
-     * Retorna la misión actual, las próximas misiones pendientes y las completadas
-     * de un donante.
-     */
     public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
@@ -126,9 +118,6 @@ public class IncentivosService {
                 .build();
     }
 
-    /**
-     * Retorna las insignias ganadas de un donante.
-     */
     public InsigniasDonanteDTO obtenerInsignias(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
@@ -146,7 +135,8 @@ public class IncentivosService {
     }
 
     /**
-     * Retorna las métricas de actividad de un donante (acumuladas y del período actual).
+     * Retorna las métricas de actividad de un donante (acumuladas y del período
+     * actual).
      */
     public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
