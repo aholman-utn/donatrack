@@ -1,0 +1,212 @@
+{
+  "name": "Ranking",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "25edca77-91b6-4846-8c74-e72ecfeb4f20",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8081/perfil/ranking",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "70114377-28d2-472b-94f7-e70df85beb83",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1wukl4y9KyWlUjRlUv7styIzaylfMQAGaeLBLSxu6Ea0",
+          "mode": "list",
+          "cachedResultName": "Ranking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wukl4y9KyWlUjRlUv7styIzaylfMQAGaeLBLSxu6Ea0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wukl4y9KyWlUjRlUv7styIzaylfMQAGaeLBLSxu6Ea0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "categoriaDonante": "={{ $json.categoriaDonante }}",
+            "Fecha": "={{ $('Schedule Trigger').item.json.Year }} {{ $('Schedule Trigger').item.json.Month }}",
+            "Posicion": "={{ $json.posicion }}",
+            "ID Donante": "={{ $json.donanteId }}",
+            "cant Donacioness": "={{ $json.totalDonacionesExitosas }}",
+            "Total Misiones Completadas": "={{ $json.totalMisionesCompletadas }}"
+          },
+          "matchingColumns": [
+            "Fecha"
+          ],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Posicion",
+              "displayName": "Posicion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID Donante",
+              "displayName": "ID Donante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cant Donacioness",
+              "displayName": "cant Donacioness",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoriaDonante",
+              "displayName": "categoriaDonante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Misiones Completadas",
+              "displayName": "Total Misiones Completadas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "0941fa9f-c357-4d3e-b3da-5f06a3409643",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BNBEzkGGjYEA1Ouz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().slice(0, 3);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -208
+      ],
+      "id": "87998715-0a24-4cf5-bb60-583c5fba76cb",
+      "name": "Acorta el ranking a solo 3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Acorta el ranking a solo 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acorta el ranking a solo 3": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "444389ba-83fc-46c4-a749-9e63049151f4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b350326ce4a193af92133940de53e07941ee6ae913202d3984c661c6ddaa01f7"
+  },
+  "nodeGroups": [],
+  "id": "cZo2dylkOmdadz4C",
+  "tags": []
+}
