@@ -42,7 +42,7 @@ public class IncentivosController {
      * Retorna el perfil completo de incentivos de un donante.
      * GET /incentivos/perfil/{donanteId}
      */
-    @GetMapping("/perfil/{donanteId}")
+    @GetMapping("/{donanteId}")
     public ResponseEntity<PerfilIncentivosDTO> obtenerPerfil(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerPerfil(donanteId));
     }

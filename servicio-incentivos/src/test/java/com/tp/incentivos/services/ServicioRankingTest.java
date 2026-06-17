@@ -5,6 +5,7 @@ import com.tp.incentivos.domain.Mision;
 import com.tp.incentivos.domain.MisionDonacionesExitosas;
 import com.tp.incentivos.domain.Perfil;
 import com.tp.incentivos.dtos.RankingItemDTO;
+import com.tp.incentivos.dtos.InsigniasDonanteDTO;
 import com.tp.incentivos.repositories.IncentivosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

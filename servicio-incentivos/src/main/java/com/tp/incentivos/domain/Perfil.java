@@ -82,6 +82,10 @@ public class Perfil {
                         "Completa tu primer donación exitosa",
                         new Insignia(nombreUsuario, "Donacion Exitosa",
                                 "Completaste tus primeras 3 donaciones exitosas")),
+                new MisionCompletitud(
+                        2, "Diversificador",
+                        "Ayuda con donaciones de 2 categorías de bienes distintas",
+                        new Insignia(nombreUsuario, "Completitud", "Ayudaste en 2 categorías diferentes de donación")),
                 new MisionRacha(
                         2, "Constancia Inicial",
                         "Dona durante 2 months consecutivos",

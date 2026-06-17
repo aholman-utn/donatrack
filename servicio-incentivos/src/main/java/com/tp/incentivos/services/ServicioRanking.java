@@ -29,25 +29,31 @@ public class ServicioRanking {
     }
 
     public List<RankingItemDTO> obtenerRankingCompleto(boolean mesActual) {
-        List<Perfil> ordenados = new ArrayList<>(repository.findAll());
+        List<Perfil> unicos = new ArrayList<>();
+        java.util.Set<Integer> idsVistos = new java.util.HashSet<>();
+        for (Perfil perfil : repository.findAll()) {
+            if (perfil != null && idsVistos.add(perfil.getDonanteId())) {
+                unicos.add(perfil);
+            }
+        }
+
         if (mesActual) {
-            ordenados.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountMesActual).reversed());
+            unicos.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountMesActual).reversed());
         } else {
-            ordenados.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountHistorico).reversed());
+            unicos.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountHistorico).reversed());
         }
 
         List<RankingItemDTO> ranking = new ArrayList<>();
         AtomicInteger posicion = new AtomicInteger(1);
 
-        for (Perfil perfil : ordenados) {
+        for (Perfil perfil : unicos) {
             int misionesCount = (int) (mesActual ? perfil.getMisionesCompletadasCountMesActual()
                     : perfil.getMisionesCompletadasCountHistorico());
             ranking.add(RankingItemDTO.builder()
                     .posicion(posicion.getAndIncrement())
                     .donanteId(perfil.getDonanteId())
-                    .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas()) // quizas se podria sacar si no me
-                                                                                  // importa en las metricas del ranking
-                    .categoriaDonante(perfil.getCategoriaDonante().name()) // idem antetior
+                    .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
+                    .categoriaDonante(perfil.getCategoriaDonante().name())
                     .totalMisionesCompletadas(misionesCount)
                     .build());
         }

@@ -23,9 +23,13 @@ public class ServicioEvaluadorMisiones {
             return;
         }
 
+        String usuario = perfil.getNombreUsuario();
+        String nombreMision = misionActual.getInsigniaAsociada().getTitulo();
+        String description = misionActual.getInsigniaAsociada().getDescripcion();
+
         misionActual.actualizarProgreso(infoDonacion);
 
-        if (misionActual.evaluarYMarcarCompletitud()) {
+        if (misionActual.evaluarYMarcarCompletitud(usuario, nombreMision, description)) {
             // Otorgar la insignia de la misión completada
             perfil.getInsigniasGanadas().add(misionActual.getInsigniaAsociada());
             perfil.getMisionesCompletadas().add(misionActual);

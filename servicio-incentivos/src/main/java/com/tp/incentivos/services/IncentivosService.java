@@ -40,6 +40,9 @@ public class IncentivosService {
         Integer donanteId = dto.getDonanteId();
 
         Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
 
         perfil.registrarEntrega(dto.getEntidadBeneficiariaId());
 
@@ -87,6 +90,9 @@ public class IncentivosService {
 
     public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
 
         Mision misionActual = perfil.getMisionActual();
         List<MisionDTO> proximasMisiones = new ArrayList<>();
@@ -104,8 +110,6 @@ public class IncentivosService {
         }
 
         return MisionesDonanteDTO.builder()
-                .donanteId(donanteId)
-                .categoriaDonante(perfil.getCategoriaDonante().name())
                 .misionActual(misionActual != null ? mapearMision(misionActual) : null)
                 .proximasMisiones(proximasMisiones)
                 .misionesCompletadas(misionesCompletadas)
@@ -121,8 +125,6 @@ public class IncentivosService {
         List<InsigniaDTO> insignias = mapearInsignias(perfil);
 
         return InsigniasDonanteDTO.builder()
-                .donanteId(donanteId)
-                .visibilidadInsignia(perfil.getVisibilidadInsignia())
                 .insignias(insignias)
                 .totalInsignias(perfil.getInsigniasGanadas().size())
                 .build();
@@ -134,6 +136,9 @@ public class IncentivosService {
      */
     public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
 
         LocalDate ahora = LocalDate.now();
         int mesActual = ahora.getMonthValue();
