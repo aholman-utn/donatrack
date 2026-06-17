@@ -1,18 +1,23 @@
 package com.tp.incentivos.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 import java.util.Set;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PerfilIncentivosDTO {
-    private Long donanteId;
+    private Integer donanteId;
     private int totalDonacionesExitosas;
     private int entidadesAyudadasCount;
-    private Set<Long> entidadesAyudadasIds;
+    private Set<Integer> entidadesAyudadasIds;
+    private String categoriaDonante;
+    private int posicionRanking;
+    private List<RegistroDonacionMensualDTO> comparacionesMensuales;
+    private List<InsigniaDTO> insigniasGanadas;
+    private MisionDTO misionActual;
+    private List<MisionDTO> todasLasMisiones;
 }

@@ -2,20 +2,25 @@ package com.tp.incentivos.repositories;
 
 import com.tp.incentivos.domain.PerfilIncentivosDonante;
 import org.springframework.stereotype.Repository;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 @Repository
 public class IncentivosRepository {
-    private final Map<Long, PerfilIncentivosDonante> perfiles = new ConcurrentHashMap<>();
+    private final List<PerfilIncentivosDonante> perfiles = new ArrayList<>();
 
-    public Optional<PerfilIncentivosDonante> findByDonanteId(Long donanteId) {
-        return Optional.ofNullable(perfiles.get(donanteId));
+    public PerfilIncentivosDonante findByDonanteId(Integer donanteId) {
+        return this.perfiles.stream().filter(p -> p.getDonanteId().equals(donanteId)).findFirst().orElse(null);
     }
 
-    public PerfilIncentivosDonante save(PerfilIncentivosDonante perfil) {
-        perfiles.put(perfil.getDonanteId(), perfil);
+    public PerfilIncentivosDonante create(PerfilIncentivosDonante perfil) {
+        this.perfiles.add(perfil);
         return perfil;
+    }
+
+    public Collection<PerfilIncentivosDonante> findAll() {
+        return perfiles;
     }
 }

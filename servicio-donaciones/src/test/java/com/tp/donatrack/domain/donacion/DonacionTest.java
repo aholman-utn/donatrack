@@ -13,6 +13,8 @@ import com.tp.donatrack.domain.bien.BienPerecedero;
 import com.tp.donatrack.domain.bien.BienDuradero;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.bien.SubCategoria;
+import com.tp.donatrack.domain.bien.Categoria;
+import com.tp.donatrack.domain.bien.Unidad;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,9 +34,9 @@ class DonacionTest {
 
     @BeforeEach
     void setUp() {
-        donanteMock = mock(Donante.class);
-        perecederos = mock(SubCategoria.class);
-        duraderos = mock(SubCategoria.class);
+        donanteMock = new Donante();
+        perecederos = new SubCategoria(Categoria.ALIMENTOS, "Perecederos", Unidad.UNIDADES);
+        duraderos = new SubCategoria(Categoria.MOBILIARIO, "Duraderos", Unidad.UNIDADES);
 
         Date fechaVencimientoComun = new Date();
 
@@ -127,9 +129,9 @@ class DonacionTest {
     @Test
     @DisplayName("Debe agrupar por misma subcategoría y separar si difieren en criterio (fecha/estado)")
     void segmentar_separaPorCriterioPolimorfico() {
-        Donante donanteMock = mock(Donante.class);
-        SubCategoria alimentos = mock(SubCategoria.class);
-        SubCategoria muebles = mock(SubCategoria.class);
+        Donante donanteMock = new Donante();
+        SubCategoria alimentos = new SubCategoria(Categoria.ALIMENTOS, "Alimentos", Unidad.KG);
+        SubCategoria muebles = new SubCategoria(Categoria.MOBILIARIO, "Muebles", Unidad.UNIDADES);
 
         Date venceHoy = new Date();
         Date venceEnUnMes = new Date(venceHoy.getTime() + (1000L * 60 * 60 * 24 * 30));
