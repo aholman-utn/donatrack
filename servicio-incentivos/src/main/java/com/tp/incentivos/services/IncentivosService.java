@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -80,7 +81,7 @@ public class IncentivosService {
         return PerfilIncentivosDTO.builder()
                 .donanteId(perfil.getDonanteId())
                 .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
-                .entidadesAyudadasCount(perfil.getEntidadesAyudadasIds().size())
+                .entidadesAyudadasCount((int) perfil.getEntidadesAyudadasIds().stream().distinct().count())
                 .entidadesAyudadasIds(perfil.getEntidadesAyudadasIds())
                 .categoriaDonante(perfil.getCategoriaDonante().name())
                 .posicionRanking(servicioRanking.calcularPosicion(donanteId))
@@ -123,7 +124,7 @@ public class IncentivosService {
 
     private List<InsigniaDTO> mapearInsignias(Perfil perfil) {
         List<InsigniaDTO> resultado = new ArrayList<>();
-        if (perfil.getVisibilidadInsignia() == true) {
+        if (Boolean.TRUE.equals(perfil.getVisibilidadInsignia())) {
             for (Insignia i : perfil.getInsigniasGanadas()) {
                 resultado.add(new InsigniaDTO(i.getTitulo(), i.getDescripcion()));
             }

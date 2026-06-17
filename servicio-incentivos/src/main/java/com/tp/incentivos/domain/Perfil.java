@@ -25,7 +25,7 @@ public class Perfil {
     private List<Mision> misionesActuales;
     private List<Insignia> insigniasGanadas;
     private List<RegistroDonacionMensual> historialMensual;
-    private Boolean visibilidadInsignia;
+    private Boolean visibilidadInsignia = true;
 
     public Perfil(Integer donanteId) {
         this.donanteId = donanteId;
@@ -36,6 +36,7 @@ public class Perfil {
         this.misionesActuales = inicializarMisionesColaborador();
         this.insigniasGanadas = new ArrayList<>();
         this.historialMensual = new ArrayList<>();
+        this.visibilidadInsignia = true;
     }
 
     public void registrarEntrega(Integer entidadBeneficiariaId) {
@@ -74,7 +75,7 @@ public class Perfil {
     private List<Mision> inicializarMisionesColaborador() {
         return new ArrayList<>(List.of(
                 new MisionDonacionesExitosas(
-                        3, "Primer Paso",
+                        1, "Primer Paso",
                         "Completa 3 donaciones exitosas",
                         new Insignia(nombreUsuario, "Donacion Exitosa",
                                 "Completaste tus primeras 3 donaciones exitosas")),

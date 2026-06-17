@@ -74,7 +74,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/donantes/lucas@mail.com",
+              "raw": "http://localhost:8080/donantes/contacto@fundacion.org",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -82,7 +82,7 @@
               "port": "8080",
               "path": [
                 "donantes",
-                "lucas@mail.com"
+                "contacto@fundacion.org"
               ]
             }
           },
@@ -326,6 +326,173 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Servicio - Incentivos",
+      "item": [
+        {
+          "name": "Perfil de donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/incentivos/perfil/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "incentivos",
+                "perfil",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prueba conexión entre servicios de Donaciones e Incentivos",
+      "item": [
+        {
+          "name": "1) Creacion del donante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pepe\",\n  \"apellido\": \"Pangaro\",\n  \"nroDocumento\": 12345678,\n  \"mediosDeContacto\": [\n    { \"medio\": \"EMAIL\", \"valor\": \"pepe@mail.com\" }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"pepe@mail.com\"\n  }\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "humano"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2) Creacion de la donacion con ID del donante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"Paquete de arroz 1kg\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3) Entregar Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donanteId\": 1,\n  \"entidadBeneficiariaId\": 98\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones/entregar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "entregar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4) Obtengo perfil desde el servicio de incentivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/incentivos/perfil/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "incentivos",
+                "perfil",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "nueva Insignia",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\"user\": \"Lauta\",\n\"badge\": \"Donacion Exitosa\",\n\"description\": \"Realizar una donacion de forma exitosa\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5678/webhook-test/nueva_insignia",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5678",
+          "path": [
+            "webhook-test",
+            "nueva_insignia"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }

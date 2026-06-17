@@ -24,7 +24,6 @@ public class DonacionController {
         List<DonacionHistorialDTO> historial = donacionService.obtenerHistorialPorDonante(donanteId);
         return ResponseEntity.ok(historial);
     }
-
     @PostMapping
     public ResponseEntity<?> crearDonacion(@RequestBody com.tp.donatrack.dtos.CrearDonacionRequest request) {
         try {
@@ -35,20 +34,10 @@ public class DonacionController {
         }
     }
 
-    @PostMapping("/test-crear/{donanteId}")
-    public ResponseEntity<String> crearDonacionPrueba(@PathVariable Integer donanteId) {
+    @PostMapping("/entregar")
+    public ResponseEntity<String> entregarDonacion(@RequestBody EntregaRequest request) {
         try {
-            donacionService.registrarDonacionPrueba(donanteId);
-            return ResponseEntity.ok("Donación de prueba creada exitosamente para el donante " + donanteId);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/test-entregar")
-    public ResponseEntity<String> entregarDonacionPrueba(@RequestBody EntregaRequest request) {
-        try {
-            donacionService.confirmarEntregaPrueba(request.getDonanteId(), request.getEntidadBeneficiariaId());
+            donacionService.registrarEntrega(request.getDonanteId(), request.getEntidadBeneficiariaId());
             return ResponseEntity.ok("Donación/es entregadas y evento de incentivos disparado.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

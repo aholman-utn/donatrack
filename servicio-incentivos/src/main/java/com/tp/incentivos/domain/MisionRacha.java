@@ -10,7 +10,6 @@ public class MisionRacha extends Mision {
     private final int objetivo;
     private final String titulo;
     private final String descripcion;
-    private Insignia insignia;
 
     private int mesesConsecutivos = 0;
     private YearMonth ultimoMesRegistrado = null;
@@ -19,7 +18,7 @@ public class MisionRacha extends Mision {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
-        this.insignia = insignia;
+        this.insigniaAsociada = insignia;
     }
 
     @Override

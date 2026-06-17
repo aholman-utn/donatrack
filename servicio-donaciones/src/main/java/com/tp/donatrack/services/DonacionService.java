@@ -42,37 +42,7 @@ public class DonacionService {
         return donacionRepository.save(donacion);
     }
 
-    public Donacion registrarDonacionPrueba(Integer donanteId) {
-        com.tp.donatrack.domain.donante.Donante donante = donanteService.buscarDonantePorId(donanteId);
-        if (donante == null) {
-            throw new IllegalArgumentException("No se encontró el donante con ID: " + donanteId);
-        }
-
-        com.tp.donatrack.domain.bien.SubCategoria sub = new com.tp.donatrack.domain.bien.SubCategoria(
-            com.tp.donatrack.domain.bien.Categoria.ALIMENTOS, 
-            "Alimentos de Prueba", 
-            com.tp.donatrack.domain.bien.Unidad.KG
-        );
-
-        com.tp.donatrack.domain.bien.BienPerecedero alimento = new com.tp.donatrack.domain.bien.BienPerecedero(
-            "Alimento Prueba", 
-            "Descripción Alimento Prueba", 
-            "prueba.jpg", 
-            sub, 
-            new java.util.Date()
-        );
-
-        Donacion donacion = new Donacion(
-            donante, 
-            "Donación de prueba en Postman", 
-            new java.util.Date(), 
-            java.util.Arrays.asList(alimento)
-        );
-
-        return donacionRepository.save(donacion);
-    }
-
-    public void confirmarEntregaPrueba(Integer donanteId, Integer entidadBeneficiariaId) {
+    public void registrarEntrega(Integer donanteId, Integer entidadBeneficiariaId) {
         List<Donacion> donaciones = donacionRepository.findByDonanteId(donanteId);
         if (donaciones.isEmpty()) {
             throw new IllegalArgumentException("No se encontraron donaciones para el donante con ID: " + donanteId);

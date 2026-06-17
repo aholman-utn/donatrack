@@ -8,6 +8,7 @@ import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,8 @@ public class DonacionSegmentada {
         transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId),
                 "Entidad beneficiaria confirmó la recepción");
         if (eventPublisher != null && this.donanteId != null) {
-            eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, entidadBeneficiariaId));
+            eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, entidadBeneficiariaId,
+                    this.subCategoria.getCategoria(), LocalDate.now()));
         }
     }
 

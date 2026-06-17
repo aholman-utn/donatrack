@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/incentivos")
+@RequestMapping("/incentivos")
 public class IncentivosController {
 
     private final IncentivosService service;
@@ -27,7 +27,7 @@ public class IncentivosController {
     /**
      * Recibe notificación del servicio-donaciones cuando una donación es entregada.
      * Procesa el impacto en métricas y misiones del donante.
-     * POST /api/incentivos/entrega
+     * POST /incentivos/entrega
      */
     @PostMapping("/entrega")
     public ResponseEntity<Void> procesarEntrega(@Valid @RequestBody EntregaDonacionDTO dto) {
@@ -37,7 +37,7 @@ public class IncentivosController {
 
     /**
      * Retorna el perfil completo de incentivos de un donante.
-     * GET /api/incentivos/perfil/{donanteId}
+     * GET /incentivos/perfil/{donanteId}
      */
     @GetMapping("/perfil/{donanteId}")
     public ResponseEntity<PerfilIncentivosDTO> obtenerPerfil(@PathVariable Integer donanteId) {
@@ -45,8 +45,9 @@ public class IncentivosController {
     }
 
     /**
-     * Retorna el ranking global de donantes ordenado por donaciones exitosas (DESC).
-     * GET /api/incentivos/ranking
+     * Retorna el ranking global de donantes ordenado por donaciones exitosas
+     * (DESC).
+     * GET /incentivos/ranking
      */
     @GetMapping("/ranking")
     public ResponseEntity<List<RankingItemDTO>> obtenerRanking() {
@@ -55,28 +56,11 @@ public class IncentivosController {
 
     /**
      * Retorna la posición en el ranking de un donante específico.
-     * GET /api/incentivos/ranking/{donanteId}
+     * GET /incentivos/ranking/{donanteId}
      */
     @GetMapping("/ranking/{donanteId}")
     public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId));
     }
 
-    /**
-     * Cambia la visibilidad de una insignia en el perfil público del donante.
-     * PUT /api/incentivos/perfil/{donanteId}/insignias/{titulo}/visibilidad
-     * Body: { "visible": true/false }
-     */
-    @PutMapping("/perfil/{donanteId}/insignias/{titulo}/visibilidad")
-    public ResponseEntity<Void> cambiarVisibilidadInsignia(
-            @PathVariable Integer donanteId,
-            @PathVariable String titulo,
-            @RequestBody Map<String, Boolean> body) {
-        Boolean visible = body.get("visible");
-        if (visible == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        service.cambiarVisibilidadInsignia(donanteId, titulo, visible);
-        return ResponseEntity.ok().build();
-    }
 }

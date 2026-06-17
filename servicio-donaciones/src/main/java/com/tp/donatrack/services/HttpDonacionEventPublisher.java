@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,14 +25,17 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
 
     @Override
     public void publicar(DonacionEntregadaEvent event) {
-        Map<String, Integer> requestBody = new HashMap<>();
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("donanteId", event.donanteId());
         requestBody.put("entidadBeneficiariaId", event.entidadBeneficiariaId());
-        
+        requestBody.put("categoriaDonacion", event.categoriaDonacion());
+        requestBody.put("fechaDonacion", LocalDate.now());
+
         try {
             restTemplate.postForEntity(incentivosUrl, requestBody, Void.class);
         } catch (Exception e) {
-            // Se captura la excepcion para que no corte el flujo principal si el microservicio esta caido
+            // Se captura la excepcion para que no corte el flujo principal si el
+            // microservicio esta caido
             System.err.println("Error al notificar al servicio de incentivos: " + e.getMessage());
         }
     }

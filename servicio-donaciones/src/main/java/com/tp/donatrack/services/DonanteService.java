@@ -31,40 +31,41 @@ public class DonanteService {
     @Autowired
     private List<iLectorArchivo> lectoresDeArchivos;
 
-    public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService, List<iLectorArchivo> lectores) {
+    public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService,
+            List<iLectorArchivo> lectores) {
         this.donanteRepository = donanteRepository;
         this.notifService = notifService;
-        this.lectoresDeArchivos=lectores;
+        this.lectoresDeArchivos = lectores;
     }
 
-
-    //CREATE
+    // CREATE
     public Donante registrar(Persona persona) {
         Donante donante = new Donante(persona);
         return donanteRepository.create(donante);
     }
 
-    //READ
+    // READ
     public List<Donante> listarTodos() {
         return donanteRepository.findAll();
     }
 
-    //UPDATE TODO: aca actualizo la persona completa, el problema es que en un futuro esto me va a cambiar el ID
+    // UPDATE TODO: aca actualizo la persona completa, el problema es que en un
+    // futuro esto me va a cambiar el ID
     public Donante actualizar(String email, Persona personaActualizada) {
         Donante donante = buscarDonante(email);
         donante.setPersona(personaActualizada);
         return donanteRepository.create(donante);
     }
 
-    //DELETE
-    public void eliminar(String email){
+    // DELETE
+    public void eliminar(String email) {
         Donante donanteAEliminar = buscarDonante(email);
-        if ( donanteAEliminar != null ) {
+        if (donanteAEliminar != null) {
             donanteRepository.delete(donanteAEliminar);
         }
     }
 
-    public Donante buscarDonante(String email){
+    public Donante buscarDonante(String email) {
         return this.donanteRepository.find(email);
     }
 
@@ -90,7 +91,7 @@ public class DonanteService {
             // 4. Capa de Negocio: Procesamos las reglas de negocio sobre esos objetos
             List<Donante> nuevos_donantes = importadorCargaMasiva.iniciar_migracion(registros);
 
-            for(Donante donante: nuevos_donantes){
+            for (Donante donante : nuevos_donantes) {
                 Notificacion notif_bienvenida = new Notificacion();
                 notif_bienvenida.setTipo(TipoNotificacion.BIENVENIDA);
                 String email = donante.getPersona().getMedioDeContacto().get("email").getFirst();
@@ -98,10 +99,10 @@ public class DonanteService {
                 notif_bienvenida.setTitulo("Bienvenido a DonaTrack");
                 notif_bienvenida.setAsunto("Registro exitoso");
                 notif_bienvenida.setCuerpo(
-                        "¡Bienvenido a DonaTrack! Gracias por sumarte como donante. A continuación, te compartiremos las credenciales de acceso para iniciar sesion:\n" +
+                        "¡Bienvenido a DonaTrack! Gracias por sumarte como donante. A continuación, te compartiremos las credenciales de acceso para iniciar sesion:\n"
+                                +
                                 "Email: " + donante.getPersona().getMedioDeContacto().get("email").get(0) + "\n" +
-                                "Password: " + password
-                );
+                                "Password: " + password);
                 notif_bienvenida.setFecha(new Date());
                 this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
             }
@@ -116,10 +117,10 @@ public class DonanteService {
         }
     }
 
-    private Donante darDeAlta(Donante donante){
+    private Donante darDeAlta(Donante donante) {
         Donante nuevo_donante = this.donanteRepository.create(donante);
-        if(nuevo_donante!= null) {
-            //Notifico
+        if (nuevo_donante != null) {
+            // Notifico
             Notificacion notif_bienvenida = new Notificacion();
             notif_bienvenida.setTipo(TipoNotificacion.BIENVENIDA);
             String email = donante.getPersona().getMedioDeContacto().get("email").getFirst();
@@ -127,10 +128,10 @@ public class DonanteService {
             notif_bienvenida.setTitulo("Bienvenido a DonaTrack");
             notif_bienvenida.setAsunto("Registro exitoso");
             notif_bienvenida.setCuerpo(
-                    "¡Bienvenido a DonaTrack! Gracias por sumarte como donante. A continuación, te compartiremos las credenciales de acceso para iniciar sesion:\n" +
+                    "¡Bienvenido a DonaTrack! Gracias por sumarte como donante. A continuación, te compartiremos las credenciales de acceso para iniciar sesion:\n"
+                            +
                             "Email: " + donante.getPersona().getMedioDeContacto().get("email").get(0) + "\n" +
-                            "Password: " + password
-            );
+                            "Password: " + password);
             notif_bienvenida.setFecha(new Date());
             this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
         }

@@ -12,4 +12,4 @@ spring:
 
 services:
   incentivos:
-    url: http://localhost:8081/api/incentivos/entrega
+    url: http://localhost:8081/incentivos/entrega
