@@ -40,8 +40,14 @@ public class IncentivosService {
         Integer donanteId = dto.getDonanteId();
 
         Perfil perfil = repository.findByDonanteId(donanteId);
+        boolean esNuevo = false;
         if (perfil == null) {
             perfil = new Perfil(donanteId);
+            esNuevo = true;
+        }
+
+        if (dto.getNombreUsuario() != null) {
+            perfil.setNombreUsuario(dto.getNombreUsuario());
         }
 
         perfil.registrarEntrega(dto.getEntidadBeneficiariaId());
@@ -63,7 +69,9 @@ public class IncentivosService {
 
         evaluadorMisiones.evaluar(perfil, infoDonacion);
 
-        repository.create(perfil);
+        if (esNuevo) {
+            repository.create(perfil);
+        }
     }
 
     public PerfilIncentivosDTO obtenerPerfil(Integer donanteId) {

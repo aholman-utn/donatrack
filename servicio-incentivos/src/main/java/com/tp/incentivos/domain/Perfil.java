@@ -55,6 +55,17 @@ public class Perfil {
         }
     }
 
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+        if (misionesActuales != null) {
+            for (Mision m : misionesActuales) {
+                if (m.getInsigniaAsociada() != null) {
+                    m.getInsigniaAsociada().setNombreDonante(nombreUsuario);
+                }
+            }
+        }
+    }
+
     public Mision getMisionActual() {
         return misionesActuales.stream()
                 .filter(m -> !m.isCompletada())

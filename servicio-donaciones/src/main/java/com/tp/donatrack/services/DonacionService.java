@@ -33,11 +33,10 @@ public class DonacionService {
 
         List<com.tp.donatrack.domain.bien.Bien> bienes = request.toDomainBienes();
         Donacion donacion = new Donacion(
-            donante,
-            request.getDescripcion(),
-            new java.util.Date(),
-            bienes
-        );
+                donante,
+                request.getDescripcion(),
+                new java.util.Date(),
+                bienes);
 
         return donacionRepository.save(donacion);
     }
@@ -59,22 +58,23 @@ public class DonacionService {
 
     public List<DonacionHistorialDTO> obtenerHistorialPorDonante(Integer donanteId) {
         List<Donacion> donaciones = donacionRepository.findByDonanteId(donanteId);
-        
+
         return donaciones.stream().map(donacion -> {
             List<DonacionSegmentadaHistorialDTO> segmentadas = donacion.getDonacionesSegmentadas().stream()
-                .map(ds -> DonacionSegmentadaHistorialDTO.builder()
-                    .subCategoria(ds.getSubCategoria() != null ? ds.getSubCategoria().getDescripcion() : "Sin Categoría")
-                    .cantidad(ds.getCantidad())
-                    .estado(ds.getEstado())
-                    .build())
-                .collect(Collectors.toList());
+                    .map(ds -> DonacionSegmentadaHistorialDTO.builder()
+                            .subCategoria(ds.getSubCategoria() != null ? ds.getSubCategoria().getDescripcion()
+                                    : "Sin Categoría")
+                            .cantidad(ds.getCantidad())
+                            .estado(ds.getEstado())
+                            .build())
+                    .collect(Collectors.toList());
 
             return DonacionHistorialDTO.builder()
-                .descripcion(donacion.getDescripcion())
-                .fechaIngreso(donacion.getFechaIngreso())
-                .estado(donacion.getEstado())
-                .donacionesSegmentadas(segmentadas)
-                .build();
+                    .descripcion(donacion.getDescripcion())
+                    .fechaIngreso(donacion.getFechaIngreso())
+                    .estado(donacion.getEstado())
+                    .donacionesSegmentadas(segmentadas)
+                    .build();
         }).collect(Collectors.toList());
     }
 }

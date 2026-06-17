@@ -23,7 +23,7 @@ public class ServicioEvaluadorMisiones {
             return;
         }
 
-        String usuario = perfil.getNombreUsuario();
+        String usuario = misionActual.getInsigniaAsociada().getNombreDonante();
         String nombreMision = misionActual.getInsigniaAsociada().getTitulo();
         String description = misionActual.getInsigniaAsociada().getDescripcion();
 

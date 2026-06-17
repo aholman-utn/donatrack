@@ -21,4 +21,5 @@ public class EntregaDonacionDTO {
     private int cantidadBienes;
     private LocalDate fechaDonacion;
     private CategoriaBien categoriaDonacion;
+    private String nombreUsuario;
 }

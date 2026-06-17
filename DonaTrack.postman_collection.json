@@ -336,18 +336,102 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8081/incentivos/perfil/1",
+              "raw": "http://localhost:8081/perfil/1",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8081",
               "path": [
-                "incentivos",
                 "perfil",
                 "1"
               ]
             }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener misiones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/misiones/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "misiones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener metricas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/metricas/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "metricas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ranking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/ranking",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "ranking"
+              ]
+            },
+            "description": "\\[ { \"posicion\": 1,\n\n\"donanteId\": 1,\n\n\"totalDonacionesExitosas\": 4,\n\n\"categoriaDonante\": \"COLABORADOR\",\n\n\"totalMisionesCompletadas\": 1 },\n\n---\n\n{ \"posicion\": 2, \"donanteId\": 2, \"totalDonacionesExitosas\": 3, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 3, \"donanteId\": 4, \"totalDonacionesExitosas\": 1, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 4, \"donanteId\": 3, \"totalDonacionesExitosas\": 2, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 }\\]"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener insignias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/insignias/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "insignias",
+                "1"
+              ]
+            },
+            "description": "{ \"insignias\": \\[ { \"titulo\": \"Donacion Exitosa\", \"descripcion\": \"Completaste tus primeras 3 donaciones exitosas\" } \\], \"totalInsignias\": 1}"
           },
           "response": []
         }
@@ -363,7 +447,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Pepe\",\n  \"apellido\": \"Pangaro\",\n  \"nroDocumento\": 12345678,\n  \"mediosDeContacto\": [\n    { \"medio\": \"EMAIL\", \"valor\": \"pepe@mail.com\" }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"pepe@mail.com\"\n  }\n}\n",
+              "raw": "{\n  \"nombre\": \"Lucas\",\n  \"apellido\": \".p\",\n  \"nroDocumento\": 12345678,\n  \"mediosDeContacto\": [\n    { \"medio\": \"EMAIL\", \"valor\": \"pepe@mail.com\" }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"pepe@mail.com\"\n  }\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -392,7 +476,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"Paquete de arroz 1kg\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -420,7 +504,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"entidadBeneficiariaId\": 98\n}\n",
+              "raw": "{\n  \"donanteId\": 1,\n  \"entidadBeneficiariaId\": 11\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -448,16 +532,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8081/incentivos/perfil/2",
+              "raw": "http://localhost:8081/perfil/1",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8081",
               "path": [
-                "incentivos",
                 "perfil",
-                "2"
+                "1"
               ]
             }
           },
