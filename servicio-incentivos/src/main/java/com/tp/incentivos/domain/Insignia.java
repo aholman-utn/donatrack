@@ -8,11 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Insignia {
-    // private Mision mision;
     private String titulo;
     private String descripcion;
     private String nombreDonante;
-    private boolean visible = true;
     private Date fechaObtencion = new Date();
     // TODO: private String imagen; la genero desde n8n. ver despues como la podemos
     // agregar aca

@@ -1,9 +1,7 @@
 package com.tp.incentivos.domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import lombok.*;
 
@@ -16,23 +14,24 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PerfilIncentivosDonante {
+public class Perfil {
 
     private Integer donanteId;
     private String nombreUsuario;
     private int totalDonacionesExitosas;
-    private Set<Integer> entidadesAyudadasIds;
-    private Set<CategoriaBien> categoriasAyudadas;
+    private List<Integer> entidadesAyudadasIds;
+    private List<CategoriaBien> categoriasAyudadas;
     private CategoriaDonante categoriaDonante;
     private List<Mision> misionesActuales;
     private List<Insignia> insigniasGanadas;
     private List<RegistroDonacionMensual> historialMensual;
+    private Boolean visibilidadInsignia;
 
-    public PerfilIncentivosDonante(Integer donanteId) {
+    public Perfil(Integer donanteId) {
         this.donanteId = donanteId;
         this.totalDonacionesExitosas = 0;
-        this.entidadesAyudadasIds = new HashSet<>();
-        this.categoriasAyudadas = new HashSet<>();
+        this.entidadesAyudadasIds = new ArrayList<>();
+        this.categoriasAyudadas = new ArrayList<>();
         this.categoriaDonante = CategoriaDonante.COLABORADOR;
         this.misionesActuales = inicializarMisionesColaborador();
         this.insigniasGanadas = new ArrayList<>();
@@ -59,6 +58,7 @@ public class PerfilIncentivosDonante {
                 .orElse(null);
     }
 
+    // TODO: ACÁ poner el notificador de que subio de categoria
     public void subirCategoria() {
         if (categoriaDonante == CategoriaDonante.COLABORADOR) {
             categoriaDonante = CategoriaDonante.SOSTENEDOR;
@@ -80,7 +80,7 @@ public class PerfilIncentivosDonante {
                                 "Completaste tus primeras 3 donaciones exitosas")),
                 new MisionRacha(
                         2, "Constancia Inicial",
-                        "Dona durante 2 meses consecutivos",
+                        "Dona durante 2 months consecutivos",
                         new Insignia(nombreUsuario, "Racha", "Donaste durante 2 meses seguidos"))));
     }
 

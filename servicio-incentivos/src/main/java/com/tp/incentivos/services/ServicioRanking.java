@@ -1,6 +1,6 @@
 package com.tp.incentivos.services;
 
-import com.tp.incentivos.domain.PerfilIncentivosDonante;
+import com.tp.incentivos.domain.Perfil;
 import com.tp.incentivos.dtos.RankingItemDTO;
 import com.tp.incentivos.repositories.IncentivosRepository;
 import org.springframework.stereotype.Service;
@@ -25,13 +25,13 @@ public class ServicioRanking {
     }
 
     public List<RankingItemDTO> obtenerRankingCompleto() {
-        List<PerfilIncentivosDonante> ordenados = new ArrayList<>(repository.findAll());
-        ordenados.sort(Comparator.comparingInt(PerfilIncentivosDonante::getTotalDonacionesExitosas).reversed());
+        List<Perfil> ordenados = new ArrayList<>(repository.findAll());
+        ordenados.sort(Comparator.comparingInt(Perfil::getTotalDonacionesExitosas).reversed());
 
         List<RankingItemDTO> ranking = new ArrayList<>();
         AtomicInteger posicion = new AtomicInteger(1);
 
-        for (PerfilIncentivosDonante perfil : ordenados) {
+        for (Perfil perfil : ordenados) {
             ranking.add(RankingItemDTO.builder()
                     .posicion(posicion.getAndIncrement())
                     .donanteId(perfil.getDonanteId())

@@ -28,6 +28,7 @@ public abstract class Mision {
             this.completada = true;
             this.fechaObtencion = LocalDate.now();
             // TODO ACA hacer el POST a n8n necesito
+            // TODO ACA poner el notificador para cuando se completa la mision
             return true;
         }
         return false;

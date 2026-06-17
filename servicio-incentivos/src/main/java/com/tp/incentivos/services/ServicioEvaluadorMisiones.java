@@ -2,7 +2,7 @@ package com.tp.incentivos.services;
 
 import com.tp.incentivos.domain.CategoriaDonante;
 import com.tp.incentivos.domain.Mision;
-import com.tp.incentivos.domain.PerfilIncentivosDonante;
+import com.tp.incentivos.domain.Perfil;
 import com.tp.incentivos.domain.InfoDonacion;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServicioEvaluadorMisiones {
 
-    public void evaluar(PerfilIncentivosDonante perfil, InfoDonacion infoDonacion) {
+    public void evaluar(Perfil perfil, InfoDonacion infoDonacion) {
         Mision misionActual = perfil.getMisionActual();
 
         if (misionActual == null) {

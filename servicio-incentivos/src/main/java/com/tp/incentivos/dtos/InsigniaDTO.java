@@ -10,5 +10,4 @@ import lombok.*;
 public class InsigniaDTO {
     private String titulo;
     private String descripcion;
-    private boolean visible;
 }
