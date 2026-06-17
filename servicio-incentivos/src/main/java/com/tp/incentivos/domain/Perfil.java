@@ -76,7 +76,7 @@ public class Perfil {
         return new ArrayList<>(List.of(
                 new MisionDonacionesExitosas(
                         1, "Primer Paso",
-                        "Completa 3 donaciones exitosas",
+                        "Completa tu primer donación exitosa",
                         new Insignia(nombreUsuario, "Donacion Exitosa",
                                 "Completaste tus primeras 3 donaciones exitosas")),
                 new MisionRacha(

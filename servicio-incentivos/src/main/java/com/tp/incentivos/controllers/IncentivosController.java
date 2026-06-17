@@ -1,6 +1,9 @@
 package com.tp.incentivos.controllers;
 
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
+import com.tp.incentivos.dtos.InsigniasDonanteDTO;
+import com.tp.incentivos.dtos.MetricasActividadDTO;
+import com.tp.incentivos.dtos.MisionesDonanteDTO;
 import com.tp.incentivos.dtos.PerfilIncentivosDTO;
 import com.tp.incentivos.dtos.RankingItemDTO;
 import com.tp.incentivos.services.IncentivosService;
@@ -42,6 +45,33 @@ public class IncentivosController {
     @GetMapping("/perfil/{donanteId}")
     public ResponseEntity<PerfilIncentivosDTO> obtenerPerfil(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerPerfil(donanteId));
+    }
+
+    /**
+     * Retorna la misión actual y las próximas misiones de un donante.
+     * GET /incentivos/misiones/{donanteId}
+     */
+    @GetMapping("/misiones/{donanteId}")
+    public ResponseEntity<MisionesDonanteDTO> obtenerMisiones(@PathVariable Integer donanteId) {
+        return ResponseEntity.ok(service.obtenerMisiones(donanteId));
+    }
+
+    /**
+     * Retorna las insignias ganadas de un donante.
+     * GET /incentivos/insignias/{donanteId}
+     */
+    @GetMapping("/insignias/{donanteId}")
+    public ResponseEntity<InsigniasDonanteDTO> obtenerInsignias(@PathVariable Integer donanteId) {
+        return ResponseEntity.ok(service.obtenerInsignias(donanteId));
+    }
+
+    /**
+     * Retorna las métricas de actividad de un donante (acumuladas y período actual).
+     * GET /incentivos/metricas/{donanteId}
+     */
+    @GetMapping("/metricas/{donanteId}")
+    public ResponseEntity<MetricasActividadDTO> obtenerMetricas(@PathVariable Integer donanteId) {
+        return ResponseEntity.ok(service.obtenerMetricas(donanteId));
     }
 
     /**

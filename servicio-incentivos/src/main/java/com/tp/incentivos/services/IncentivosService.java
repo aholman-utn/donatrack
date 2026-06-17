@@ -93,8 +93,90 @@ public class IncentivosService {
     }
 
     /**
-     * Cambia la visibilidad de una insignia específica del donante.
+     * Retorna la misión actual, las próximas misiones pendientes y las completadas
+     * de un donante.
      */
+    public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
+        Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
+
+        Mision misionActual = perfil.getMisionActual();
+        List<MisionDTO> proximasMisiones = new ArrayList<>();
+        List<MisionDTO> misionesCompletadas = new ArrayList<>();
+
+        boolean encontroActual = false;
+        for (Mision m : perfil.getMisionesActuales()) {
+            if (m.isCompletada()) {
+                misionesCompletadas.add(mapearMision(m));
+            } else if (!encontroActual) {
+                encontroActual = true; // esta es la misión actual, la salteamos
+            } else {
+                proximasMisiones.add(mapearMision(m));
+            }
+        }
+
+        return MisionesDonanteDTO.builder()
+                .donanteId(donanteId)
+                .categoriaDonante(perfil.getCategoriaDonante().name())
+                .misionActual(misionActual != null ? mapearMision(misionActual) : null)
+                .proximasMisiones(proximasMisiones)
+                .misionesCompletadas(misionesCompletadas)
+                .build();
+    }
+
+    /**
+     * Retorna las insignias ganadas de un donante.
+     */
+    public InsigniasDonanteDTO obtenerInsignias(Integer donanteId) {
+        Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
+
+        List<InsigniaDTO> insignias = mapearInsignias(perfil);
+
+        return InsigniasDonanteDTO.builder()
+                .donanteId(donanteId)
+                .visibilidadInsignia(perfil.getVisibilidadInsignia())
+                .insignias(insignias)
+                .totalInsignias(perfil.getInsigniasGanadas().size())
+                .build();
+    }
+
+    /**
+     * Retorna las métricas de actividad de un donante (acumuladas y del período actual).
+     */
+    public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
+        Perfil perfil = repository.findByDonanteId(donanteId);
+        if (perfil == null) {
+            perfil = new Perfil(donanteId);
+        }
+
+        LocalDate ahora = LocalDate.now();
+        int mesActual = ahora.getMonthValue();
+        int anioActual = ahora.getYear();
+
+        int donacionesMesActual = perfil.getHistorialMensual().stream()
+                .filter(r -> r.getAnio() == anioActual && r.getMes() == mesActual)
+                .findFirst()
+                .map(RegistroDonacionMensual::getTotalDonaciones)
+                .orElse(0);
+
+        return MetricasActividadDTO.builder()
+                .donanteId(donanteId)
+                .categoriaDonante(perfil.getCategoriaDonante().name())
+                .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
+                .entidadesAyudadasCount((int) perfil.getEntidadesAyudadasIds().stream().distinct().count())
+                .entidadesAyudadasIds(perfil.getEntidadesAyudadasIds())
+                .posicionRanking(servicioRanking.calcularPosicion(donanteId))
+                .donacionesMesActual(donacionesMesActual)
+                .mesPeriodoActual(mesActual)
+                .anioPeriodoActual(anioActual)
+                .comparacionesMensuales(mapearHistorialMensual(perfil))
+                .build();
+    }
 
     // ── Métodos privados auxiliares ───────────────────────────────────────────
 
