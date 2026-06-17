@@ -197,7 +197,7 @@
     {
       "parameters": {
         "person": "MlEcbVsLio",
-        "text": "=¡Felicitaciones a {{ $json.body.user }}! 🎉 Acaba de conseguir la insignia {{ $json.body.badge }} en #DonaTrack tras cumplir el logro: {{ $json.body.description }}. ¡Gracias por tu compromiso solidario! ❤️",
+        "text": "=¡Felicitaciones a {{ $json.body.user }}! 🎉 Acaba de conseguir la insignia {{ $json.body.nombreMision }} en #DonaTrack tras cumplir el logro: {{ $json.body.description }}. ¡Gracias por tu compromiso solidario! ❤️",
         "shareMediaCategory": "IMAGE",
         "additionalFields": {
           "visibility": "PUBLIC"
@@ -360,7 +360,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "aa0a808d-7a79-468f-9d43-8dee8c747937",
+  "versionId": "af785968-8b6e-4dbb-9a40-477bc89d10aa",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b350326ce4a193af92133940de53e07941ee6ae913202d3984c661c6ddaa01f7"

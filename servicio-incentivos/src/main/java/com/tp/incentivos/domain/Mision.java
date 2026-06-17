@@ -42,7 +42,7 @@ public abstract class Mision {
             body.put("user", usuario);
             body.put("nombreMision", nombreMision);
             body.put("descripcion", descripcion);
-            restTemplate.postForEntity("http://localhost:5678/webhook-test/nueva_insignia", body, String.class);
+            restTemplate.postForEntity("http://localhost:5678/webhook/nueva_insignia", body, String.class);
         } catch (Exception e) {
             System.err.println("Error al enviar webhook: " + e.getMessage());
         }
