@@ -40,9 +40,6 @@ public class IncentivosService {
         Integer donanteId = dto.getDonanteId();
 
         Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            perfil = new Perfil(donanteId);
-        }
 
         perfil.registrarEntrega(dto.getEntidadBeneficiariaId());
 
@@ -90,9 +87,6 @@ public class IncentivosService {
 
     public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            perfil = new Perfil(donanteId);
-        }
 
         Mision misionActual = perfil.getMisionActual();
         List<MisionDTO> proximasMisiones = new ArrayList<>();
@@ -140,9 +134,6 @@ public class IncentivosService {
      */
     public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            perfil = new Perfil(donanteId);
-        }
 
         LocalDate ahora = LocalDate.now();
         int mesActual = ahora.getMonthValue();

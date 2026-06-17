@@ -22,11 +22,6 @@ public class MisionRacha extends Mision {
     }
 
     @Override
-    public boolean puedePerderProgreso() {
-        return true;
-    }
-
-    @Override
     public void actualizarProgreso(InfoDonacion infoDonacion) {
         YearMonth mesDonacion = YearMonth.from(infoDonacion.getFechaDonacion());
 

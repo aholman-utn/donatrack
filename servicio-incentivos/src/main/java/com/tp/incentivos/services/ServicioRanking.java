@@ -40,12 +40,14 @@ public class ServicioRanking {
         AtomicInteger posicion = new AtomicInteger(1);
 
         for (Perfil perfil : ordenados) {
-            int misionesCount = (int) (mesActual ? perfil.getMisionesCompletadasCountMesActual() : perfil.getMisionesCompletadasCountHistorico());
+            int misionesCount = (int) (mesActual ? perfil.getMisionesCompletadasCountMesActual()
+                    : perfil.getMisionesCompletadasCountHistorico());
             ranking.add(RankingItemDTO.builder()
                     .posicion(posicion.getAndIncrement())
                     .donanteId(perfil.getDonanteId())
-                    .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
-                    .categoriaDonante(perfil.getCategoriaDonante().name())
+                    .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas()) // quizas se podria sacar si no me
+                                                                                  // importa en las metricas del ranking
+                    .categoriaDonante(perfil.getCategoriaDonante().name()) // idem antetior
                     .totalMisionesCompletadas(misionesCount)
                     .build());
         }

@@ -33,8 +33,4 @@ public abstract class Mision {
         }
         return false;
     }
-
-    public boolean puedePerderProgreso() {
-        return false;
-    }
 }

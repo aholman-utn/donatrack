@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/incentivos")
+@RequestMapping("/perfil")
 public class IncentivosController {
 
     private final IncentivosService service;
@@ -30,7 +30,7 @@ public class IncentivosController {
     /**
      * Recibe notificación del servicio-donaciones cuando una donación es entregada.
      * Procesa el impacto en métricas y misiones del donante.
-     * POST /incentivos/entrega
+     * POST /perfil/entrega
      */
     @PostMapping("/entrega")
     public ResponseEntity<Void> procesarEntrega(@Valid @RequestBody EntregaDonacionDTO dto) {
@@ -47,41 +47,29 @@ public class IncentivosController {
         return ResponseEntity.ok(service.obtenerPerfil(donanteId));
     }
 
-    /**
-     * Retorna la misión actual y las próximas misiones de un donante.
-     * GET /incentivos/misiones/{donanteId}
-     */
     @GetMapping("/misiones/{donanteId}")
     public ResponseEntity<MisionesDonanteDTO> obtenerMisiones(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerMisiones(donanteId));
     }
 
-    /**
-     * Retorna las insignias ganadas de un donante.
-     * GET /incentivos/insignias/{donanteId}
-     */
     @GetMapping("/insignias/{donanteId}")
     public ResponseEntity<InsigniasDonanteDTO> obtenerInsignias(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerInsignias(donanteId));
     }
 
-    /**
-     * Retorna las métricas de actividad de un donante (acumuladas y período actual).
-     * GET /incentivos/metricas/{donanteId}
-     */
     @GetMapping("/metricas/{donanteId}")
     public ResponseEntity<MetricasActividadDTO> obtenerMetricas(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerMetricas(donanteId));
     }
 
     /**
-     * Retorna el ranking global de donantes ordenado por misiones completadas.
+     * Retorna el ranking global de donantes ordenado por donaciones exitosas
+     * (DESC).
      * GET /incentivos/ranking
      */
     @GetMapping("/ranking")
-    public ResponseEntity<List<RankingItemDTO>> obtenerRanking(
-            @RequestParam(value = "mesActual", required = false, defaultValue = "false") boolean mesActual) {
-        return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto(mesActual));
+    public ResponseEntity<List<RankingItemDTO>> obtenerRanking() {
+        return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto());
     }
 
     /**
@@ -89,10 +77,8 @@ public class IncentivosController {
      * GET /incentivos/ranking/{donanteId}
      */
     @GetMapping("/ranking/{donanteId}")
-    public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(
-            @PathVariable Integer donanteId,
-            @RequestParam(value = "mesActual", required = false, defaultValue = "false") boolean mesActual) {
-        return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId, mesActual));
+    public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(@PathVariable Integer donanteId) {
+        return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId));
     }
 
 }
