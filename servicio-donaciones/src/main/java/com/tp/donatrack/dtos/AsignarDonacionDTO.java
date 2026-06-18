@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AsignarDonacionRequest {
+public class AsignarDonacionDTO {
 
     @NotNull(message = "El ID de la donación segmentada es obligatorio")
     private Integer donacionSegmentadaId;

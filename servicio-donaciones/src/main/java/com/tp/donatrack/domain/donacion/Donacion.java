@@ -17,6 +17,7 @@ import java.util.Optional;
 @Getter
 @Setter
 public class Donacion {
+    private Integer id;
     private Donante donante;
     private String descripcion;
     private Date fechaIngreso;

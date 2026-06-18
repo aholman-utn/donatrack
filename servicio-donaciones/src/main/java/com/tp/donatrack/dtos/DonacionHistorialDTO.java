@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class DonacionHistorialDTO {
+    private Integer id;
     private String descripcion;
     private Date fechaIngreso;
     private EstadoDonacion estado;

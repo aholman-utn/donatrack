@@ -13,16 +13,24 @@ import java.util.stream.Collectors;
 public class DonacionRepository {
 
     private final List<Donacion> donaciones = new ArrayList<>();
-    private final AtomicInteger secuenciaSegmentada = new AtomicInteger(1);
+    private final AtomicInteger idsDonacion = new AtomicInteger(1);
+    private final AtomicInteger idsSegmentada = new AtomicInteger(1);
 
     public Donacion save(Donacion donacion) {
+        if (donacion.getId() == null) {
+            donacion.setId(idsDonacion.getAndIncrement());
+        }
         for (DonacionSegmentada ds : donacion.getDonacionesSegmentadas()) {
             if (ds.getId() == null) {
-                ds.setId(secuenciaSegmentada.getAndIncrement());
+                ds.setId(idsSegmentada.getAndIncrement());
             }
         }
         this.donaciones.add(donacion);
         return donacion;
+    }
+
+    public void delete(Donacion donacion) {
+        this.donaciones.remove(donacion);
     }
 
     public List<Donacion> findByDonanteId(Integer donanteId) {
@@ -31,13 +39,17 @@ public class DonacionRepository {
                 .collect(Collectors.toList());
     }
 
+    public Donacion findById(Integer id) {
+        return this.donaciones.stream()
+                .filter(d -> d.getId() != null && d.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<Donacion> findAll() {
         return new ArrayList<>(this.donaciones);
     }
 
-    /**
-     * Busca una donación segmentada por su ID a través de todas las donaciones.
-     */
     public DonacionSegmentada findSegmentadaById(Integer segmentadaId) {
         return this.donaciones.stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
@@ -46,9 +58,6 @@ public class DonacionRepository {
                 .orElse(null);
     }
 
-    /**
-     * Retorna todas las donaciones segmentadas en estado EN_DEPOSITO de un donante.
-     */
     public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Integer donanteId) {
         return findByDonanteId(donanteId).stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
@@ -56,8 +65,8 @@ public class DonacionRepository {
                 .collect(Collectors.toList());
     }
 
-    public void clear() {
+    public void clear() { // creo que no se usa
         this.donaciones.clear();
-        this.secuenciaSegmentada.set(1);
+        this.idsSegmentada.set(1);
     }
 }

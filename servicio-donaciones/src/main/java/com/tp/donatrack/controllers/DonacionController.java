@@ -19,10 +19,47 @@ public class DonacionController {
         this.donacionService = donacionService;
     }
 
-    @GetMapping("/donante/{donanteId}")
-    public ResponseEntity<List<DonacionHistorialDTO>> obtenerHistorialPorDonante(@PathVariable Integer donanteId) {
-        List<DonacionHistorialDTO> historial = donacionService.obtenerHistorialPorDonante(donanteId);
-        return ResponseEntity.ok(historial);
+    @GetMapping
+    public ResponseEntity<List<DonacionHistorialDTO>> listarDonaciones(
+            @RequestParam(required = false) Integer donanteId) {
+        if (donanteId != null) {
+            return ResponseEntity.ok(donacionService.obtenerHistorialPorDonante(donanteId));
+        }
+        return ResponseEntity.ok(donacionService.obtenerTodas());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerPorId(@PathVariable Integer id) {
+        try {
+            DonacionHistorialDTO donacion = donacionService.obtenerPorId(id);
+            return ResponseEntity.ok(donacion);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarDonacion(
+            @PathVariable Integer id,
+            @RequestBody com.tp.donatrack.dtos.ActualizarDonacionRequest request) {
+        try {
+            DonacionHistorialDTO actualizada = donacionService.actualizarDonacion(id, request);
+            return ResponseEntity.ok(actualizada);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar la donación: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarDonacion(@PathVariable Integer id) {
+        try {
+            donacionService.eliminarDonacion(id);
+            return ResponseEntity.ok("Donación eliminada exitosamente.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
     @PostMapping
     public ResponseEntity<?> crearDonacion(@RequestBody com.tp.donatrack.dtos.CrearDonacionRequest request) {

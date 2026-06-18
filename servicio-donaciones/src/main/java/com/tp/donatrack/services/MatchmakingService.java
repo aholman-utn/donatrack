@@ -45,7 +45,8 @@ public class MatchmakingService {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
         if (segmentada.getEstado() != EstadoDonacionSegmentada.EN_DEPOSITO) {
-            throw new IllegalStateException("Solo se puede ejecutar el matchmaking para donaciones en estado EN_DEPOSITO");
+            throw new IllegalStateException(
+                    "Solo se puede ejecutar el matchmaking para donaciones en estado EN_DEPOSITO");
         }
 
         List<EntidadBeneficiaria> todasLasEntidades = entidadBeneficiariaRepository.findAll();
@@ -59,9 +60,11 @@ public class MatchmakingService {
      * Retorna el ranking para todas las donaciones en depósito de un donante.
      */
     public List<ResultadoMatchmakingDTO> obtenerRankingPorDonante(Integer donanteId) {
-        List<DonacionSegmentada> segmentadasEnDeposito = donacionRepository.findSegmentadasEnDepositoByDonanteId(donanteId);
+        List<DonacionSegmentada> segmentadasEnDeposito = donacionRepository
+                .findSegmentadasEnDepositoByDonanteId(donanteId);
         if (segmentadasEnDeposito.isEmpty()) {
-            throw new IllegalArgumentException("No se encontraron donaciones en depósito para el donante con ID: " + donanteId);
+            throw new IllegalArgumentException(
+                    "No se encontraron donaciones en depósito para el donante con ID: " + donanteId);
         }
 
         List<EntidadBeneficiaria> todasLasEntidades = entidadBeneficiariaRepository.findAll();
@@ -88,18 +91,18 @@ public class MatchmakingService {
 
         EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(entidadBeneficiariaId);
         if (entidad == null) {
-            throw new IllegalArgumentException("No se encontró la entidad beneficiaria con ID: " + entidadBeneficiariaId);
+            throw new IllegalArgumentException(
+                    "No se encontró la entidad beneficiaria con ID: " + entidadBeneficiariaId);
         }
 
         segmentada.asignar(entidad, "Administrador");
     }
 
-    // ── Mappers privados ──────────────────────────────────────────────────────
-
     private ResultadoMatchmakingDTO mapearResultado(DonacionSegmentada segmentada, ResultadoMatchmaking resultado) {
         return ResultadoMatchmakingDTO.builder()
                 .donacionSegmentadaId(segmentada.getId())
-                .subCategoria(segmentada.getSubCategoria() != null ? segmentada.getSubCategoria().getDescripcion() : "Sin Categoría")
+                .subCategoria(segmentada.getSubCategoria() != null ? segmentada.getSubCategoria().getDescripcion()
+                        : "Sin Categoría")
                 .cantidadBienes(segmentada.getCantidad())
                 .coincidencias(mapearEntidades(resultado.getCoincidencias()))
                 .rankingCompatibilidad(mapearEntidades(resultado.getResultadoCompatibilidad()))
@@ -113,7 +116,8 @@ public class MatchmakingService {
         return entidades.stream()
                 .map(e -> EntidadRankingDTO.builder()
                         .id(e.getId())
-                        .razonSocial(e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getRazonSocial() : "Sin nombre")
+                        .razonSocial(
+                                e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getRazonSocial() : "Sin nombre")
                         .cantNecesidadesActivas(e.getCantNececidadesActivas())
                         .build())
                 .collect(Collectors.toList());
