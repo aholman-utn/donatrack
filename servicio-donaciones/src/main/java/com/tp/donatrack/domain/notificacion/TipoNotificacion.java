@@ -5,5 +5,6 @@ public enum TipoNotificacion {
     CAMBIO_DE_ESTADO,
     ASIGNACION,
     ENTREGAS,
-    RECOMPENSAS
+    RECOMPENSAS,
+    INACTIVIDAD
 }

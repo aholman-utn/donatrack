@@ -1,14 +1,13 @@
 package com.tp.donatrack.domain.donante;
 
+import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.notificacion.Notificacion;
 import com.tp.donatrack.domain.notificacion.TipoNotificacion;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
-
 @Getter
 @Setter
 public class Donante {

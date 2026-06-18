@@ -19,13 +19,15 @@ public class DonacionRepository {
     public Donacion save(Donacion donacion) {
         if (donacion.getId() == null) {
             donacion.setId(idsDonacion.getAndIncrement());
+            this.donaciones.add(donacion);
+        } else if (!this.donaciones.contains(donacion)) {
+            this.donaciones.add(donacion);
         }
         for (DonacionSegmentada ds : donacion.getDonacionesSegmentadas()) {
             if (ds.getId() == null) {
                 ds.setId(idsSegmentada.getAndIncrement());
             }
         }
-        this.donaciones.add(donacion);
         return donacion;
     }
 

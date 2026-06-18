@@ -2,33 +2,32 @@ package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.notificacion.Notificacion;
 import com.tp.donatrack.domain.notificador.TipoNotificador;
-import com.tp.donatrack.domain.notificador.iNotificador;
+import com.tp.donatrack.dtos.NotificacionRequestDTO;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class NotificacionService {
 
-    private final Map<TipoNotificador, iNotificador> notificadores;
-
-    public NotificacionService(List<iNotificador> lista) {
-        this.notificadores = lista.stream()
-                .collect(Collectors.toMap(
-                        iNotificador::getTipo,
-                        n -> n
-                ));
-    }
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String urlServicioNotificaciones = "http://localhost:8082/api/notificaciones";
 
     public void notificar(Notificacion notif, TipoNotificador tipo, String contacto) {
-        iNotificador notificador = notificadores.get(tipo);
+        
+        NotificacionRequestDTO dto = new NotificacionRequestDTO();
+        dto.setTitulo(notif.getTitulo());
+        dto.setCuerpo(notif.getCuerpo());
+        dto.setAsunto(notif.getAsunto());
+        
+        dto.setTipo(tipo); 
+        
+        dto.setContacto(contacto);
 
-        if (notificador == null) {
-            throw new IllegalArgumentException("No existe notificador: " + tipo);
+        try {
+            restTemplate.postForEntity(urlServicioNotificaciones, dto, Void.class);
+            System.out.println("POST enviado con éxito al servicio de notificaciones.");
+        } catch (Exception e) {
+            System.err.println("Falló la comunicación con el servicio de notificaciones: " + e.getMessage());
         }
-
-        notificador.enviarNotificacion(contacto, notif);
     }
 }
