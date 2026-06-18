@@ -1,0 +1,1058 @@
+openapi: 3.0.3
+info:
+  title: DonaTrack - Servicio de Donaciones
+  description: |
+    API REST del servicio de donaciones de DonaTrack.
+    Gestiona donantes (personas humanas y jurídicas), donaciones, entidades beneficiarias,
+    matchmaking entre donaciones y necesidades, y el CRUD de necesidades.
+  version: 1.0.0
+  contact:
+    name: Equipo DonaTrack
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local de desarrollo
+
+tags:
+  - name: Donaciones
+    description: Gestión del ciclo de vida de las donaciones
+  - name: Donantes
+    description: Alta, consulta, actualización y baja de donantes
+  - name: Entidades Beneficiarias
+    description: CRUD de entidades beneficiarias
+  - name: Matchmaking
+    description: Ranking y asignación de donaciones a entidades beneficiarias
+  - name: Necesidades
+    description: CRUD de necesidades de las entidades beneficiarias
+
+paths:
+  # ─────────────────────────────────────────────
+  #  DONACIONES
+  # ─────────────────────────────────────────────
+  /donaciones:
+    get:
+      tags: [Donaciones]
+      summary: Listar donaciones
+      description: Devuelve todas las donaciones, o filtra por donante si se indica `donanteId`.
+      operationId: listarDonaciones
+      parameters:
+        - name: donanteId
+          in: query
+          required: false
+          description: ID del donante para filtrar el historial
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de donaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DonacionHistorialDTO'
+
+    post:
+      tags: [Donaciones]
+      summary: Crear donación
+      description: Registra una nueva donación con sus bienes asociados.
+      operationId: crearDonacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearDonacionRequest'
+      responses:
+        '201':
+          description: Donación creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donacion'
+        '400':
+          description: Error de validación o de negocio
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /donaciones/{id}:
+    get:
+      tags: [Donaciones]
+      summary: Obtener donación por ID
+      operationId: obtenerDonacionPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Donación encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DonacionHistorialDTO'
+        '404':
+          description: Donación no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+
+    put:
+      tags: [Donaciones]
+      summary: Actualizar donación
+      operationId: actualizarDonacion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualizarDonacionRequest'
+      responses:
+        '200':
+          description: Donación actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DonacionHistorialDTO'
+        '404':
+          description: Donación no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Error al actualizar
+          content:
+            application/json:
+              schema:
+                type: string
+
+    delete:
+      tags: [Donaciones]
+      summary: Eliminar donación
+      operationId: eliminarDonacion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Donación eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Donación no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /donaciones/entregar:
+    post:
+      tags: [Donaciones]
+      summary: Registrar entrega de donación segmentada
+      description: Marca una donación segmentada como entregada y dispara el evento de incentivos.
+      operationId: entregarDonacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntregaRequest'
+      responses:
+        '200':
+          description: Entrega registrada exitosamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Error en la entrega
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  DONANTES
+  # ─────────────────────────────────────────────
+  /donantes:
+    get:
+      tags: [Donantes]
+      summary: Listar todos los donantes
+      operationId: listarDonantes
+      responses:
+        '200':
+          description: Lista de donantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Donante'
+
+  /donantes/{email}:
+    get:
+      tags: [Donantes]
+      summary: Buscar donante por email
+      operationId: buscarDonantePorEmail
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+          example: pepe@mail.com
+      responses:
+        '200':
+          description: Donante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donante'
+        '404':
+          description: Donante no encontrado
+
+    delete:
+      tags: [Donantes]
+      summary: Eliminar donante por email
+      operationId: eliminarDonante
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Donante eliminado exitosamente
+
+  /donantes/humano:
+    post:
+      tags: [Donantes]
+      summary: Crear donante persona humana
+      operationId: crearDonanteHumano
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaHumanaRequest'
+            example:
+              nombre: "pepe"
+              apellido: "pangaro"
+              nroDocumento: "12345678"
+              mediosDeContacto:
+                - medio: "EMAIL"
+                  valor: "pepe@mail.com"
+              medioPredeterminado:
+                medio: "EMAIL"
+                valor: "pepe@mail.com"
+      responses:
+        '201':
+          description: Donante humano creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donante'
+
+  /donantes/juridico:
+    post:
+      tags: [Donantes]
+      summary: Crear donante persona jurídica
+      operationId: crearDonanteJuridico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaJuridicaRequest'
+      responses:
+        '201':
+          description: Donante jurídico creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donante'
+
+  /donantes/{email}/humano:
+    put:
+      tags: [Donantes]
+      summary: Actualizar donante humano
+      operationId: actualizarDonanteHumano
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaHumanaRequest'
+      responses:
+        '200':
+          description: Donante humano actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donante'
+
+  /donantes/{email}/juridico:
+    put:
+      tags: [Donantes]
+      summary: Actualizar donante jurídico
+      operationId: actualizarDonanteJuridico
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaJuridicaRequest'
+      responses:
+        '200':
+          description: Donante jurídico actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Donante'
+
+  /donantes/importar:
+    post:
+      tags: [Donantes]
+      summary: Importar donantes desde CSV
+      description: Recibe un archivo CSV con datos de donantes para importación masiva.
+      operationId: importarDonantesCSV
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo CSV con donantes
+              required:
+                - file
+      responses:
+        '200':
+          description: Resultado de la importación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportacionResponseDTO'
+
+  # ─────────────────────────────────────────────
+  #  ENTIDADES BENEFICIARIAS
+  # ─────────────────────────────────────────────
+  /entidadBeneficiaria:
+    post:
+      tags: [Entidades Beneficiarias]
+      summary: Crear entidad beneficiaria
+      operationId: crearEntidadBeneficiaria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaJuridicaRequest'
+      responses:
+        '201':
+          description: Entidad beneficiaria creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntidadBeneficiaria'
+
+    get:
+      tags: [Entidades Beneficiarias]
+      summary: Listar todas las entidades beneficiarias
+      operationId: listarEntidadesBeneficiarias
+      responses:
+        '200':
+          description: Lista de entidades beneficiarias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntidadBeneficiaria'
+
+  /entidadBeneficiaria/{id}:
+    get:
+      tags: [Entidades Beneficiarias]
+      summary: Buscar entidad beneficiaria por ID
+      operationId: buscarEntidadBeneficiaria
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entidad beneficiaria encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntidadBeneficiaria'
+        '404':
+          description: Entidad no encontrada
+
+    put:
+      tags: [Entidades Beneficiarias]
+      summary: Actualizar datos de entidad beneficiaria
+      operationId: actualizarEntidadBeneficiaria
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPersonaJuridicaRequest'
+      responses:
+        '200':
+          description: Entidad beneficiaria actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntidadBeneficiaria'
+
+    delete:
+      tags: [Entidades Beneficiarias]
+      summary: Eliminar entidad beneficiaria
+      operationId: eliminarEntidadBeneficiaria
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Entidad eliminada exitosamente
+
+  # ─────────────────────────────────────────────
+  #  MATCHMAKING
+  # ─────────────────────────────────────────────
+  /matchmaking/ranking:
+    get:
+      tags: [Matchmaking]
+      summary: Obtener ranking de entidades para una donación segmentada
+      description: |
+        Devuelve el ranking de entidades beneficiarias compatibles
+        con una donación segmentada específica.
+      operationId: obtenerRankingMatchmaking
+      parameters:
+        - name: donacionSegmentadaId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ranking de matchmaking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultadoMatchmakingDTO'
+        '400':
+          description: Error en los parámetros
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /matchmaking/ranking/donante/{donanteId}:
+    get:
+      tags: [Matchmaking]
+      summary: Obtener ranking para todas las donaciones de un donante
+      description: |
+        Devuelve el ranking de matchmaking para TODAS las donaciones
+        en depósito de un donante específico.
+      operationId: obtenerRankingPorDonante
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de resultados de matchmaking
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResultadoMatchmakingDTO'
+        '400':
+          description: Error en los parámetros
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /matchmaking/asignar:
+    post:
+      tags: [Matchmaking]
+      summary: Asignar donación a entidad beneficiaria
+      description: |
+        Asigna una donación segmentada a la entidad beneficiaria
+        seleccionada del ranking de matchmaking.
+      operationId: asignarDonacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsignarDonacionDTO'
+            example:
+              donacionSegmentadaId: 1
+              entidadBeneficiariaId: 2
+      responses:
+        '200':
+          description: Donación asignada exitosamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Error en la asignación
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  NECESIDADES
+  # ─────────────────────────────────────────────
+  /api/necesidades:
+    post:
+      tags: [Necesidades]
+      summary: Crear necesidad
+      description: Registra una nueva necesidad para una entidad beneficiaria.
+      operationId: crearNecesidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearNecesidadDTO'
+      responses:
+        '201':
+          description: Necesidad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NecesidadResponseDTO'
+
+  /api/necesidades/{id}:
+    get:
+      tags: [Necesidades]
+      summary: Obtener necesidad por ID
+      operationId: obtenerNecesidadPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Necesidad encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NecesidadResponseDTO'
+        '404':
+          description: Necesidad no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+
+    put:
+      tags: [Necesidades]
+      summary: Actualizar necesidad
+      operationId: actualizarNecesidad
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearNecesidadDTO'
+      responses:
+        '200':
+          description: Necesidad actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NecesidadResponseDTO'
+        '404':
+          description: Necesidad no encontrada
+
+    delete:
+      tags: [Necesidades]
+      summary: Eliminar necesidad
+      operationId: eliminarNecesidad
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Necesidad eliminada
+        '404':
+          description: Necesidad no encontrada
+
+  /api/necesidades/entidad/{entidadId}:
+    get:
+      tags: [Necesidades]
+      summary: Listar necesidades por entidad beneficiaria
+      operationId: listarNecesidadesPorEntidad
+      parameters:
+        - name: entidadId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista de necesidades de la entidad
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NecesidadResponseDTO'
+
+# ═══════════════════════════════════════════════
+#  SCHEMAS
+# ═══════════════════════════════════════════════
+components:
+  schemas:
+    # ── Enumeraciones ──────────────────────────
+    EstadoDonacion:
+      type: string
+      enum: [PENDIENTE, ADJUDICADA]
+
+    EstadoDonacionSegmentada:
+      type: string
+      enum: [EN_DEPOSITO, ASIGNACION_REALIZADA, LISTA_PARA_ENTREGAR, EN_TRASLADO, ENTREGADA, ENTREGA_FALLIDA, VENCIDA]
+
+    Categoria:
+      type: string
+      enum: [MOBILIARIO, ALIMENTOS, VESTIMENTA, HIGIENE]
+
+    Unidad:
+      type: string
+      enum: [UNIDADES, KG, METROS, LITROS]
+
+    EstadoBien:
+      type: string
+      enum: [NUEVO, USADO]
+
+    TipoOrganizacion:
+      type: string
+      enum: [GUBERNAMENTAL, ONG, EMPRESA, INSTITUCION]
+
+    TipoNotificador:
+      type: string
+      enum: [EMAIL, SMS, WHATSAPP]
+
+    # ── DTOs de Donación ───────────────────────
+    DonacionHistorialDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+        fechaIngreso:
+          type: string
+          format: date-time
+        estado:
+          $ref: '#/components/schemas/EstadoDonacion'
+        donacionesSegmentadas:
+          type: array
+          items:
+            $ref: '#/components/schemas/DonacionSegmentadaHistorialDTO'
+
+    DonacionSegmentadaHistorialDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        subCategoria:
+          type: string
+        cantidad:
+          type: integer
+        estado:
+          $ref: '#/components/schemas/EstadoDonacionSegmentada'
+        entidadBeneficiariaAsignadaId:
+          type: integer
+
+    CrearDonacionRequest:
+      type: object
+      required: [donanteId]
+      properties:
+        donanteId:
+          type: integer
+          description: ID del donante que realiza la donación
+        descripcion:
+          type: string
+          description: Descripción general de la donación
+        bienes:
+          type: array
+          items:
+            $ref: '#/components/schemas/BienRequest'
+
+    BienRequest:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum: [PERECEDERO, DURADERO]
+          description: Tipo del bien
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        foto:
+          type: string
+          description: URL o base64 de la foto del bien
+        subCategoria:
+          $ref: '#/components/schemas/SubCategoriaRequest'
+        fechaVencimiento:
+          type: string
+          format: date-time
+          description: Solo para bienes perecederos
+        estadoBien:
+          $ref: '#/components/schemas/EstadoBien'
+          description: Solo para bienes duraderos
+
+    SubCategoriaRequest:
+      type: object
+      properties:
+        categoria:
+          $ref: '#/components/schemas/Categoria'
+        descripcion:
+          type: string
+        unidad:
+          $ref: '#/components/schemas/Unidad'
+
+    ActualizarDonacionRequest:
+      type: object
+      properties:
+        descripcion:
+          type: string
+
+    EntregaRequest:
+      type: object
+      required: [donacionSegmentadaId]
+      properties:
+        donacionSegmentadaId:
+          type: integer
+          description: ID de la donación segmentada a entregar
+
+    Donacion:
+      type: object
+      description: Representación completa de una donación (entidad de dominio)
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+        fechaIngreso:
+          type: string
+          format: date-time
+        estado:
+          $ref: '#/components/schemas/EstadoDonacion'
+
+    # ── DTOs de Donante ────────────────────────
+    Donante:
+      type: object
+      description: Representación de un donante (persona humana o jurídica)
+      properties:
+        id:
+          type: integer
+        tipo:
+          type: string
+          description: Tipo de persona (HUMANA / JURIDICA)
+
+    CrearPersonaHumanaRequest:
+      type: object
+      required: [nombre, apellido]
+      properties:
+        nombre:
+          type: string
+          description: Nombre del donante (obligatorio)
+        apellido:
+          type: string
+          description: Apellido del donante (obligatorio)
+        genero:
+          type: string
+        fechaNacimiento:
+          type: string
+          format: date-time
+        edad:
+          type: integer
+        nroDocumento:
+          type: string
+        direccion:
+          $ref: '#/components/schemas/DireccionRequest'
+        mediosDeContacto:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactoValorRequest'
+        medioPredeterminado:
+          type: object
+          additionalProperties:
+            type: string
+          description: "Medio de contacto predeterminado (ej: {medio: 'EMAIL', valor: 'x@mail.com'})"
+
+    CrearPersonaJuridicaRequest:
+      type: object
+      required: [razonSocial, tipo]
+      properties:
+        razonSocial:
+          type: string
+          description: Razón social (obligatorio)
+        tipo:
+          $ref: '#/components/schemas/TipoOrganizacion'
+        rubro:
+          type: string
+        representantes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepresentanteRequest'
+        direccion:
+          $ref: '#/components/schemas/DireccionRequest'
+        mediosDeContacto:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactoValorRequest'
+        medioPredeterminado:
+          type: object
+          additionalProperties:
+            type: string
+
+    ContactoValorRequest:
+      type: object
+      properties:
+        medio:
+          $ref: '#/components/schemas/TipoNotificador'
+        valor:
+          type: string
+          description: "Valor del contacto (email, número, etc.)"
+
+    DireccionRequest:
+      type: object
+      properties:
+        calle1:
+          type: string
+        calle2:
+          type: string
+        altura:
+          type: integer
+        sinAltura:
+          type: boolean
+        piso:
+          type: integer
+        cuerpo:
+          type: integer
+        departamento:
+          type: string
+        ciudadNombre:
+          type: string
+        provinciaNombre:
+          type: string
+        paisNombre:
+          type: string
+
+    RepresentanteRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+        apellido:
+          type: string
+        nroDocumento:
+          type: integer
+
+    ImportacionResponseDTO:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Donante'
+
+    # ── Entidad Beneficiaria ───────────────────
+    EntidadBeneficiaria:
+      type: object
+      description: Representación de una entidad beneficiaria
+      properties:
+        id:
+          type: integer
+        razonSocial:
+          type: string
+        tipo:
+          $ref: '#/components/schemas/TipoOrganizacion'
+
+    # ── DTOs de Matchmaking ────────────────────
+    ResultadoMatchmakingDTO:
+      type: object
+      properties:
+        donacionSegmentadaId:
+          type: integer
+        subCategoria:
+          type: string
+        cantidadBienes:
+          type: integer
+        coincidencias:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntidadRankingDTO'
+        rankingCompatibilidad:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntidadRankingDTO'
+        rankingSubAtendidos:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntidadRankingDTO'
+        entidadesPropuestas:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntidadRankingDTO'
+        huboCoincidencias:
+          type: boolean
+
+    EntidadRankingDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        razonSocial:
+          type: string
+        cantNecesidadesActivas:
+          type: integer
+
+    AsignarDonacionDTO:
+      type: object
+      required: [donacionSegmentadaId, entidadBeneficiariaId]
+      properties:
+        donacionSegmentadaId:
+          type: integer
+          description: ID de la donación segmentada (obligatorio)
+        entidadBeneficiariaId:
+          type: integer
+          description: ID de la entidad beneficiaria (obligatorio)
+
+    # ── DTOs de Necesidades ────────────────────
+    CrearNecesidadDTO:
+      type: object
+      required: [entidadBeneficiariaId, subCategoriaNombre, cantidad, fechaLimite, tipoNecesidad]
+      properties:
+        entidadBeneficiariaId:
+          type: integer
+          format: int64
+          description: ID de la entidad beneficiaria (obligatorio)
+        subCategoriaNombre:
+          type: string
+          description: Nombre de la subcategoría (obligatorio)
+        cantidad:
+          type: integer
+          minimum: 1
+          description: Cantidad solicitada (obligatorio, mayor a cero)
+        fechaLimite:
+          type: string
+          format: date
+          description: Fecha límite de la necesidad (obligatorio, actual o futura)
+        tipoNecesidad:
+          type: string
+          enum: [RECURRENTE, EXTRAORDINARIA]
+          description: Tipo de necesidad (obligatorio)
+        diasRecurrencia:
+          type: integer
+          description: Días de recurrencia (solo para necesidades recurrentes)
+        causa:
+          type: string
+          description: Causa de la necesidad (solo para necesidades extraordinarias)
+
+    NecesidadResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        entidadBeneficiariaId:
+          type: integer
+          format: int64
+        subCategoriaNombre:
+          type: string
+        cantidadSolicitada:
+          type: integer
+        cantidadCubierta:
+          type: integer
+        fechaDelPedido:
+          type: string
+          format: date-time
+        estado:
+          type: string
+        activa:
+          type: boolean
+        tipoNecesidad:
+          type: string
+        diasRecurrencia:
+          type: integer
+        causa:
+          type: string

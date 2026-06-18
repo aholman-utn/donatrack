@@ -1,0 +1,426 @@
+openapi: 3.0.3
+info:
+  title: DonaTrack - Servicio de Incentivos
+  description: |
+    API REST del servicio de incentivos de DonaTrack.
+    Gestiona perfiles de incentivos, misiones, insignias, métricas de actividad
+    y el ranking global de donantes. Se comunica con el servicio de donaciones
+    para recibir eventos de entregas.
+  version: 1.0.0
+  contact:
+    name: Equipo DonaTrack
+
+servers:
+  - url: http://localhost:8081
+    description: Servidor local de desarrollo
+
+tags:
+  - name: Perfil de Incentivos
+    description: Gestión de perfiles de incentivos de donantes
+  - name: Misiones
+    description: Consulta de misiones del donante
+  - name: Insignias
+    description: Consulta de insignias obtenidas
+  - name: Métricas
+    description: Métricas de actividad del donante
+  - name: Ranking
+    description: Ranking global de donantes
+  - name: Entregas
+    description: Procesamiento de eventos de entrega de donaciones
+
+paths:
+  # ─────────────────────────────────────────────
+  #  PERFIL
+  # ─────────────────────────────────────────────
+  /perfil:
+    post:
+      tags: [Perfil de Incentivos]
+      summary: Crear perfil de incentivos
+      description: Crea el perfil de incentivos inicial para un donante.
+      operationId: crearPerfil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPerfilDTO'
+            example:
+              donanteId: 1
+              nombreUsuario: "pepe_donante"
+      responses:
+        '201':
+          description: Perfil creado exitosamente
+        '400':
+          description: Error de validación
+
+  /perfil/{donanteId}:
+    get:
+      tags: [Perfil de Incentivos]
+      summary: Obtener perfil completo de incentivos
+      description: Retorna el perfil completo de incentivos de un donante, incluyendo misiones, insignias y métricas.
+      operationId: obtenerPerfil
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Perfil de incentivos del donante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilIncentivosDTO'
+        '404':
+          description: Donante no encontrado
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  ENTREGAS
+  # ─────────────────────────────────────────────
+  /perfil/entrega:
+    post:
+      tags: [Entregas]
+      summary: Procesar entrega de donación
+      description: |
+        Recibe notificación del servicio-donaciones cuando una donación es entregada.
+        Procesa el impacto en métricas y misiones del donante.
+      operationId: procesarEntrega
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntregaDonacionDTO'
+      responses:
+        '200':
+          description: Entrega procesada exitosamente
+        '400':
+          description: Error de validación
+
+  # ─────────────────────────────────────────────
+  #  MISIONES
+  # ─────────────────────────────────────────────
+  /perfil/misiones/{donanteId}:
+    get:
+      tags: [Misiones]
+      summary: Obtener misiones del donante
+      description: Retorna la misión actual, próximas misiones y misiones completadas.
+      operationId: obtenerMisiones
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Misiones del donante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MisionesDonanteDTO'
+        '404':
+          description: Donante no encontrado
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  INSIGNIAS
+  # ─────────────────────────────────────────────
+  /perfil/insignias/{donanteId}:
+    get:
+      tags: [Insignias]
+      summary: Obtener insignias del donante
+      description: Retorna todas las insignias obtenidas por el donante.
+      operationId: obtenerInsignias
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Insignias del donante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsigniasDonanteDTO'
+        '404':
+          description: Donante no encontrado
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  MÉTRICAS
+  # ─────────────────────────────────────────────
+  /perfil/metricas/{donanteId}:
+    get:
+      tags: [Métricas]
+      summary: Obtener métricas de actividad del donante
+      description: |
+        Retorna métricas acumuladas, del período actual y el historial mensual
+        del donante.
+      operationId: obtenerMetricas
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Métricas de actividad
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricasActividadDTO'
+        '404':
+          description: Donante no encontrado
+          content:
+            application/json:
+              schema:
+                type: string
+
+  # ─────────────────────────────────────────────
+  #  RANKING
+  # ─────────────────────────────────────────────
+  /perfil/ranking:
+    get:
+      tags: [Ranking]
+      summary: Obtener ranking global de donantes
+      description: |
+        Retorna el ranking global de donantes ordenado por donaciones exitosas
+        en orden descendente.
+      operationId: obtenerRanking
+      responses:
+        '200':
+          description: Ranking completo de donantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingItemDTO'
+
+  /perfil/ranking/{donanteId}:
+    get:
+      tags: [Ranking]
+      summary: Obtener posición en ranking de un donante
+      description: Retorna la posición en el ranking de un donante específico.
+      operationId: obtenerPosicionDonante
+      parameters:
+        - name: donanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Posición del donante en el ranking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankingItemDTO'
+        '404':
+          description: Donante no encontrado
+
+# ═══════════════════════════════════════════════
+#  SCHEMAS
+# ═══════════════════════════════════════════════
+components:
+  schemas:
+    # ── Enumeraciones ──────────────────────────
+    CategoriaBien:
+      type: string
+      enum: [MOBILIARIO, ALIMENTOS, VESTIMENTA, HIGIENE]
+
+    # ── DTOs de Perfil ─────────────────────────
+    CrearPerfilDTO:
+      type: object
+      required: [donanteId]
+      properties:
+        donanteId:
+          type: integer
+          description: ID del donante (obligatorio)
+        nombreUsuario:
+          type: string
+          description: Nombre de usuario para el perfil
+
+    PerfilIncentivosDTO:
+      type: object
+      properties:
+        donanteId:
+          type: integer
+        totalDonacionesExitosas:
+          type: integer
+        entidadesAyudadasCount:
+          type: integer
+        entidadesAyudadasIds:
+          type: array
+          items:
+            type: integer
+        categoriaDonante:
+          type: string
+          description: Categoría del donante basada en su actividad
+        posicionRanking:
+          type: integer
+        comparacionesMensuales:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegistroDonacionMensualDTO'
+        insigniasGanadas:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsigniaDTO'
+        misionActual:
+          $ref: '#/components/schemas/MisionDTO'
+        todasLasMisiones:
+          type: array
+          items:
+            $ref: '#/components/schemas/MisionDTO'
+        visibilidadInsignia:
+          type: boolean
+
+    # ── DTO de Entrega ─────────────────────────
+    EntregaDonacionDTO:
+      type: object
+      required: [donanteId, entidadBeneficiariaId]
+      properties:
+        donanteId:
+          type: integer
+          description: ID del donante (obligatorio)
+        entidadBeneficiariaId:
+          type: integer
+          description: ID de la entidad beneficiaria (obligatorio)
+        cantidadBienes:
+          type: integer
+          description: Cantidad de bienes entregados
+        fechaDonacion:
+          type: string
+          format: date
+          description: Fecha de la donación
+        categoriaDonacion:
+          $ref: '#/components/schemas/CategoriaBien'
+        nombreUsuario:
+          type: string
+
+    # ── DTOs de Misiones ───────────────────────
+    MisionesDonanteDTO:
+      type: object
+      properties:
+        misionActual:
+          $ref: '#/components/schemas/MisionDTO'
+        proximasMisiones:
+          type: array
+          items:
+            $ref: '#/components/schemas/MisionDTO'
+        misionesCompletadas:
+          type: array
+          items:
+            $ref: '#/components/schemas/MisionDTO'
+
+    MisionDTO:
+      type: object
+      properties:
+        titulo:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        progresoActual:
+          type: integer
+          description: Progreso actual hacia el objetivo
+        objetivo:
+          type: integer
+          description: Meta a alcanzar
+        completada:
+          type: boolean
+        fechaObtencion:
+          type: string
+          format: date
+
+    # ── DTOs de Insignias ──────────────────────
+    InsigniasDonanteDTO:
+      type: object
+      properties:
+        insignias:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsigniaDTO'
+        totalInsignias:
+          type: integer
+
+    InsigniaDTO:
+      type: object
+      properties:
+        titulo:
+          type: string
+        descripcion:
+          type: string
+
+    # ── DTOs de Métricas ───────────────────────
+    MetricasActividadDTO:
+      type: object
+      properties:
+        donanteId:
+          type: integer
+        categoriaDonante:
+          type: string
+        totalDonacionesExitosas:
+          type: integer
+          description: Total acumulado de donaciones exitosas
+        entidadesAyudadasCount:
+          type: integer
+        entidadesAyudadasIds:
+          type: array
+          items:
+            type: integer
+        posicionRanking:
+          type: integer
+        donacionesMesActual:
+          type: integer
+          description: Donaciones del mes en curso
+        mesPeriodoActual:
+          type: integer
+        anioPeriodoActual:
+          type: integer
+        comparacionesMensuales:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegistroDonacionMensualDTO'
+
+    RegistroDonacionMensualDTO:
+      type: object
+      properties:
+        anio:
+          type: integer
+        mes:
+          type: integer
+        totalDonaciones:
+          type: integer
+
+    # ── DTO de Ranking ─────────────────────────
+    RankingItemDTO:
+      type: object
+      properties:
+        posicion:
+          type: integer
+        donanteId:
+          type: integer
+        totalDonacionesExitosas:
+          type: integer
+        categoriaDonante:
+          type: string
+        totalMisionesCompletadas:
+          type: integer

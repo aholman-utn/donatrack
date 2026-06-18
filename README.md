@@ -87,6 +87,11 @@ El proyecto usa **JUnit 5** con `maven-surefire-junit5-tree-reporter` para una s
 ```
 
 ---
+# Para ejecutar los servicios
+./mvnw spring-boot:run -pl servicio-donaciones                                  
+./mvnw spring-boot:run -pl servicio-incentivos                                  
+./mvnw spring-boot:run -pl servicio-notificaciones                                  
+
 ## Capas
 ### 🛂 Controller.
 **Responsabilidades:**
