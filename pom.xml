@@ -20,6 +20,7 @@
 	<modules>
 		<module>servicio-donaciones</module>
 		<module>servicio-incentivos</module>
+        <module>servicio-notificaciones</module>
 	</modules>
 
 	<properties>
