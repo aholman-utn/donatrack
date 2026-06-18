@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notificaciones")
@@ -39,4 +42,16 @@ public class NotificacionController {
         response.setCuerpo(notif_creada.getCuerpo());
         return response;
     }
+    @GetMapping("/")
+    public List<NotificacionOutputDTO> buscarTodas(@Valid @PathVariable Long idPersona){
+        List<Notificacion> notificaciones = this.notifService.buscarTodas();
+        return notificaciones.stream().map(notif -> new NotificacionOutputDTO(notif.getId(),notif.getId_persona(),notif.getTitulo(),notif.getCuerpo(), notif.getFecha())).toList();
+    }
+
+    @GetMapping("/personas/{idPersona}")
+    public List<NotificacionOutputDTO> buscar_notificaciones_por_persona(@Valid @PathVariable Long idPersona){
+        List<Notificacion> notificaciones = this.notifService.buscar(idPersona);
+        return notificaciones.stream().map(notif -> new NotificacionOutputDTO(notif.getId(),notif.getId_persona(),notif.getTitulo(),notif.getCuerpo(), notif.getFecha())).toList();
+    }
+
 }

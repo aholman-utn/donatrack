@@ -21,14 +21,22 @@ public class NotificacionRepository {
         this.id=Long.valueOf(0);
     }
 
-    public Notificacion save(NotificacionInputDTO notif){
+    public Notificacion save(Long persona_id, String titulo, String mensaje){
         Notificacion notif_creada = new Notificacion();
         notif_creada.setId(this.id+1);
-        notif_creada.setTitulo(notif.getTitulo());
-        notif_creada.setCuerpo(notif.getCuerpo());
+        notif_creada.setTitulo(titulo);
+        notif_creada.setCuerpo(mensaje);
         notif_creada.setFecha(LocalDateTime.now());
-        notif_creada.setId_persona(notif.getId_persona());
+        notif_creada.setId_persona(persona_id);
         notificaciones.add(notif_creada);
         return notif_creada;
+    }
+
+    public List<Notificacion> findByIdPersona(Long id){
+        return this.notificaciones.stream().filter(notif -> notif.getId_persona().equals(id)).toList();
+    }
+
+    public List<Notificacion> findAll(){
+        return this.notificaciones;
     }
 }

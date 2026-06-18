@@ -1,5 +1,6 @@
 package com.tp.incentivos.services;
 
+import com.tp.donatrack.notificaciones.services.NotificacionService;
 import com.tp.incentivos.domain.CategoriaDonante;
 import com.tp.incentivos.domain.Mision;
 import com.tp.incentivos.domain.Perfil;
@@ -14,6 +15,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ServicioEvaluadorMisiones {
+
+    private final NotificacionService notifService;
+
+    public ServicioEvaluadorMisiones(NotificacionService notifService) {
+        this.notifService = notifService;
+    }
 
     public void evaluar(Perfil perfil, InfoDonacion infoDonacion) {
         Mision misionActual = perfil.getMisionActual();
@@ -34,10 +41,16 @@ public class ServicioEvaluadorMisiones {
             perfil.getInsigniasGanadas().add(misionActual.getInsigniaAsociada());
             perfil.getMisionesCompletadas().add(misionActual);
 
+            //notifico
+            //todo: necesito el id de la persona!
+            notifService.crearNotificacion(Long.valueOf(1),"¡Mision Completada!", "Completaste una mision perrito malvado");
+
             boolean todasCompletas = perfil.getMisionesActuales().stream()
                     .allMatch(Mision::isCompletada);
 
             if (todasCompletas && perfil.getCategoriaDonante() != CategoriaDonante.TRANSFORMADOR) {
+                //todo: necesito el id de la persona!
+                notifService.crearNotificacion(Long.valueOf(2),"¡Subiste de categoría", "Gracias por tu compromiso y participación. Nos complace informarte que has sido promovido a una nueva categoría debido a tu valiosa contribución. Este reconocimiento refleja el impacto positivo de tus acciones en nuestra comunidad. ¡Felicitaciones y gracias por seguir colaborando!");
                 perfil.subirCategoria();
             }
         }

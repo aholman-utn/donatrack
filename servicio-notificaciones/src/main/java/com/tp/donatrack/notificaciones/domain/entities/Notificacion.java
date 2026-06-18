@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class Notificacion {
-    Long id;
-    String titulo;
-    String cuerpo;
-    LocalDateTime fecha;
-    Long id_persona;
+    private Long id;
+    private String titulo;
+    private String cuerpo;
+    private LocalDateTime fecha;
+    private Long id_persona;
 }
