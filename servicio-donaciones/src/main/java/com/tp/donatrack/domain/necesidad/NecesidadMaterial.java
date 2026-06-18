@@ -14,6 +14,8 @@ import lombok.Setter;
 @Setter
 public abstract class NecesidadMaterial {
 
+    private Long id;
+    private Long entidadBeneficiariaId;
     private List<DonacionSegmentada> donaciones = new ArrayList<>();
     private SubCategoria subCategoria;
     private Date fechaDelPedido;

@@ -8,6 +8,8 @@ import com.tp.donatrack.domain.notificacion.Notificacion;
 import com.tp.donatrack.domain.notificacion.TipoNotificacion;
 import com.tp.donatrack.domain.notificador.TipoNotificador;
 import com.tp.donatrack.domain.persona.*;
+import com.tp.donatrack.domain.donante.DonanteCreadoEvent;
+import com.tp.donatrack.domain.donante.DonanteEventPublisher;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
 import com.tp.donatrack.repositories.DonanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ public class DonanteService {
 
     private DonanteRepository donanteRepository;
     private NotificacionService notifService;
+    private final DonanteEventPublisher eventPublisher;
 
     @Autowired
     private ImportadorCargaMasiva importadorCargaMasiva;
@@ -32,16 +35,21 @@ public class DonanteService {
     private List<iLectorArchivo> lectoresDeArchivos;
 
     public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService,
-            List<iLectorArchivo> lectores) {
+            List<iLectorArchivo> lectores, DonanteEventPublisher eventPublisher) {
         this.donanteRepository = donanteRepository;
         this.notifService = notifService;
         this.lectoresDeArchivos = lectores;
+        this.eventPublisher = eventPublisher;
     }
 
     // CREATE
     public Donante registrar(Persona persona) {
         Donante donante = new Donante(persona);
-        return donanteRepository.create(donante);
+        Donante nuevoDonante = donanteRepository.create(donante);
+        if (nuevoDonante != null) {
+            eventPublisher.publicar(new DonanteCreadoEvent(nuevoDonante.getId(), nuevoDonante.getNombreCompleto()));
+        }
+        return nuevoDonante;
     }
 
     // READ
@@ -134,6 +142,7 @@ public class DonanteService {
                             "Password: " + password);
             notif_bienvenida.setFecha(new Date());
             this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
+            eventPublisher.publicar(new DonanteCreadoEvent(nuevo_donante.getId(), nuevo_donante.getNombreCompleto()));
         }
         return nuevo_donante;
     }

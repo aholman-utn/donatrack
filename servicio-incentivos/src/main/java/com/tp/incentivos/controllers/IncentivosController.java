@@ -12,8 +12,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Map;
+import com.tp.incentivos.dtos.CrearPerfilDTO;
 
 @RestController
 @RequestMapping("/perfil")
@@ -25,6 +27,17 @@ public class IncentivosController {
     public IncentivosController(IncentivosService service, ServicioRanking servicioRanking) {
         this.service = service;
         this.servicioRanking = servicioRanking;
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> crearPerfil(@Valid @RequestBody CrearPerfilDTO dto) {
+        service.crearPerfilInicial(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleNotFound(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     /**

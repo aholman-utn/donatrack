@@ -328,6 +328,134 @@
       ]
     },
     {
+      "name": "Necesidades",
+      "item": [
+        {
+          "name": "Crear Necesidad",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Arroz\",\n  \"cantidad\": 50,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Necesidad por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Necesidades por Entidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/entidad/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "entidad",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Necesidad",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Fideos\",\n  \"cantidad\": 100,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Necesidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Servicio - Incentivos",
       "item": [
         {

@@ -27,9 +27,18 @@ public class IncentivosService {
         this.servicioRanking = servicioRanking;
     }
 
+    public void crearPerfilInicial(CrearPerfilDTO dto) {
+        Perfil perfil = repository.findByDonanteId(dto.getDonanteId());
+        if (perfil == null) {
+            perfil = new Perfil(dto.getDonanteId());
+            perfil.setNombreUsuario(dto.getNombreUsuario());
+            repository.create(perfil);
+        }
+    }
+
     /**
      * Procesa una nueva entrega de donación:
-     * 1. Obtiene o crea el perfil del donante.
+     * 1. Obtiene o crea el perfil del donante (resiliencia/fallback).
      * 2. Registra la entrega básica (total y entidad).
      * 3. Registra la categoría del bien donado.
      * 4. Actualiza el historial mensual.
@@ -40,10 +49,9 @@ public class IncentivosService {
         Integer donanteId = dto.getDonanteId();
 
         Perfil perfil = repository.findByDonanteId(donanteId);
-        boolean esNuevo = false;
         if (perfil == null) {
             perfil = new Perfil(donanteId);
-            esNuevo = true;
+            // NombreUsuario queda null aquí por fallback, se podría buscar pero lo creamos resiliente
         }
 
         if (dto.getNombreUsuario() != null) {
@@ -68,16 +76,13 @@ public class IncentivosService {
                 .build();
 
         evaluadorMisiones.evaluar(perfil, infoDonacion);
-
-        if (esNuevo) {
-            repository.create(perfil);
-        }
+        repository.create(perfil);
     }
 
     public PerfilIncentivosDTO obtenerPerfil(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
-            perfil = new Perfil(donanteId);
+            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
         }
 
         Mision misionActual = perfil.getMisionActual();
@@ -99,7 +104,7 @@ public class IncentivosService {
     public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
-            perfil = new Perfil(donanteId);
+            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
         }
 
         Mision misionActual = perfil.getMisionActual();
@@ -127,7 +132,7 @@ public class IncentivosService {
     public InsigniasDonanteDTO obtenerInsignias(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
-            perfil = new Perfil(donanteId);
+            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
         }
 
         List<InsigniaDTO> insignias = mapearInsignias(perfil);
@@ -145,7 +150,7 @@ public class IncentivosService {
     public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
-            perfil = new Perfil(donanteId);
+            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
         }
 
         LocalDate ahora = LocalDate.now();
