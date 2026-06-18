@@ -51,6 +51,9 @@ public class NecesidadService {
 
         necesidad.setEntidadBeneficiariaId(dto.getEntidadBeneficiariaId());
         necesidad = necesidadRepository.create(necesidad);
+        
+        // Vincular en memoria la necesidad a la entidad beneficiaria
+        entidad.agregarNecesidad(necesidad);
 
         return mapearADTO(necesidad);
     }
@@ -91,9 +94,15 @@ public class NecesidadService {
     }
 
     public void eliminarNecesidad(Long id) {
-        if (necesidadRepository.findById(id).isEmpty()) {
-            throw new IllegalArgumentException("Necesidad no encontrada con ID: " + id);
+        NecesidadMaterial necesidad = necesidadRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Necesidad no encontrada con ID: " + id));
+
+        // Desvincular en memoria de la entidad beneficiaria
+        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(Math.toIntExact(necesidad.getEntidadBeneficiariaId()));
+        if (entidad != null) {
+            entidad.removerNecesidad(necesidad);
         }
+
         necesidadRepository.deleteById(id);
     }
 

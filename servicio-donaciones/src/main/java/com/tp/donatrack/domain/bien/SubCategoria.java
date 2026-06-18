@@ -22,11 +22,16 @@ public class SubCategoria {
         this.unidad = unidad;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubCategoria subCategoraiO)) return false;
-        return Objects.equals(categoria, subCategoraiO.categoria) &&
-                Objects.equals(descripcion, subCategoraiO.descripcion) &&
-                Objects.equals(unidad, subCategoraiO.unidad);
+        if (!(o instanceof SubCategoria other)) return false;
+        if (this.descripcion == null || other.descripcion == null) return false;
+        return this.descripcion.equalsIgnoreCase(other.descripcion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(descripcion != null ? descripcion.toLowerCase() : null);
     }
 }

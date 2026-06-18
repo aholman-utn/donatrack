@@ -123,6 +123,65 @@ class ServicioMatchmakingTest {
         assertTrue(ranking.size() <= 10);
     }
 
+    @Test
+    @DisplayName("Escenario 10 Entidades: Evalua algoritmos y filtra coincidencias (Ganadoras)")
+    void deberiaProponerHastaDiezEntidadesYFiltrarCoincidencias() {
+        SubCategoria arroz = new SubCategoria(Categoria.ALIMENTOS, "Arroz", Unidad.KG);
+        SubCategoria sillasCat = new SubCategoria(Categoria.MOBILIARIO, "Sillas", Unidad.UNIDADES);
+
+        List<EntidadBeneficiaria> entidades = new ArrayList<>();
+
+        // Grupo C: Ganadoras (3 entidades) -> Necesitan Arroz y 0 donaciones previas
+        for (int i = 1; i <= 3; i++) {
+            EntidadBeneficiaria e = crearEntidad("Ganadora " + i);
+            e.agregarNecesidad(new NecesidadExtraordinaria(arroz, 100, new Date(), "Comedor"));
+            entidades.add(e);
+        }
+
+        // Grupo A: Solo Semántica (3 entidades) -> Necesitan Arroz, pero tienen muchas (50) donaciones previas
+        for (int i = 1; i <= 3; i++) {
+            EntidadBeneficiaria e = crearEntidad("Solo Semantica " + i);
+            NecesidadExtraordinaria nec = new NecesidadExtraordinaria(arroz, 100, new Date(), "Comedor");
+            for (int j = 0; j < 50; j++) {
+                nec.recibirDonacion(crearDonacion(arroz, 1));
+            }
+            e.agregarNecesidad(nec);
+            entidades.add(e);
+        }
+
+        // Grupo B: Solo Sub-atendidos (8 entidades) -> Necesitan Sillas (otra categoria) y 0 donaciones previas
+        for (int i = 1; i <= 8; i++) {
+            EntidadBeneficiaria e = crearEntidad("Solo Subatendida " + i);
+            e.agregarNecesidad(new NecesidadExtraordinaria(sillasCat, 10, new Date(), "Equipamiento"));
+            entidades.add(e);
+        }
+
+        // CREAR LA DONACIÓN EN DEPÓSITO A EVALUAR (Arroz)
+        DonacionSegmentada donacionPrueba = crearDonacion(arroz, 10);
+
+        // EJECUTAR EL SERVICIO MATCHMAKING (corre ambos algoritmos e intersecta)
+        ResultadoMatchmaking resultado = servicio.ejecutar(donacionPrueba, entidades);
+
+        // ASSERTIONS
+        // El ranking semántico debe tener 6 elementos (Grupo C + Grupo A) porque todos necesitan Arroz. Max 10.
+        assertEquals(6, resultado.getResultadoCompatibilidad().size());
+
+        // El ranking de sub-atendidos debe tener 10 elementos porque agrupamos C (3) y B (8) = 11 entidades con 0 donaciones. Max 10.
+        assertEquals(10, resultado.getResultadoSubAtendidos().size());
+
+        // Las propuestas finales (coincidencias) deben ser exactamente las 3 del Grupo C
+        assertTrue(resultado.isHuboCoincidencias());
+        assertEquals(3, resultado.getCoincidencias().size());
+
+        for (EntidadBeneficiaria ganadora : resultado.getCoincidencias()) {
+            assertTrue(ganadora.getDatosDeEntidad().getRazonSocial().startsWith("Ganadora"));
+            // Validar que tenga 0 donaciones
+            assertEquals(0, ganadora.getNececidades().get(0).getDonaciones().size());
+            // Validar que necesite arroz
+            assertEquals("Arroz", ganadora.getNececidades().get(0).getSubCategoria().getDescripcion());
+        }
+    }
+
     // Helpers
     private DonacionSegmentada crearDonacion(SubCategoria sub, int cantidad) {
         Bien bien = new BienDuradero("Item", "Desc", "img.png", sub, EstadoBien.NUEVO);

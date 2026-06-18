@@ -55,4 +55,9 @@ public class DonacionRepository {
                 .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.EN_DEPOSITO)
                 .collect(Collectors.toList());
     }
+
+    public void clear() {
+        this.donaciones.clear();
+        this.secuenciaSegmentada.set(1);
+    }
 }

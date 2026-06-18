@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/donantes")
+@RequestMapping(DonanteRoutes.BASE)
 public class DonanteController {
 
     private final DonanteService donanteService;
@@ -25,7 +25,7 @@ public class DonanteController {
     }
 
     // GET /donantes → listar todos
-    @GetMapping(DonanteRoutes.BASE)
+    @GetMapping
     public ResponseEntity<List<Donante>> listarTodos() {
         return ResponseEntity.ok(donanteService.listarTodos());
     }

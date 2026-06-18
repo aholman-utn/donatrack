@@ -32,4 +32,9 @@ public class EntidadBeneficiariaRepository {
 
     public void delete(EntidadBeneficiaria entidad) {entidades.remove(entidad);}
 
+    public void clear() {
+        this.entidades.clear();
+        this.secuencia.set(1);
+    }
+
 }

@@ -55,4 +55,9 @@ public class DonanteRepository {
         donantes.remove(donante);
     }
 
+    public void clear() {
+        this.donantes.clear();
+        this.secuencia.set(1);
+    }
+
 }
