@@ -41,19 +41,23 @@ public class DonacionService {
         return donacionRepository.save(donacion);
     }
 
-    public void registrarEntrega(Integer donanteId, Integer entidadBeneficiariaId) {
-        List<Donacion> donaciones = donacionRepository.findByDonanteId(donanteId);
-        if (donaciones.isEmpty()) {
-            throw new IllegalArgumentException("No se encontraron donaciones para el donante con ID: " + donanteId);
+    /**
+     * Confirma la entrega de una donación segmentada específica.
+     * Utiliza la entidad beneficiaria que fue asignada durante el matchmaking.
+     */
+    public void registrarEntrega(Integer donacionSegmentadaId) {
+        com.tp.donatrack.domain.donacion.DonacionSegmentada segmentada =
+                donacionRepository.findSegmentadaById(donacionSegmentadaId);
+
+        if (segmentada == null) {
+            throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
 
-        for (Donacion d : donaciones) {
-            for (com.tp.donatrack.domain.donacion.DonacionSegmentada ds : d.getDonacionesSegmentadas()) {
-                if (ds.getEstado() != com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA) {
-                    ds.confirmarEntrega(entidadBeneficiariaId, eventPublisher);
-                }
-            }
+        if (segmentada.getEntidadBeneficiariaAsignadaId() == null) {
+            throw new IllegalStateException("La donación segmentada no tiene una entidad beneficiaria asignada. Ejecute el matchmaking primero.");
         }
+
+        segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId(), eventPublisher);
     }
 
     public List<DonacionHistorialDTO> obtenerHistorialPorDonante(Integer donanteId) {
@@ -62,10 +66,12 @@ public class DonacionService {
         return donaciones.stream().map(donacion -> {
             List<DonacionSegmentadaHistorialDTO> segmentadas = donacion.getDonacionesSegmentadas().stream()
                     .map(ds -> DonacionSegmentadaHistorialDTO.builder()
+                            .id(ds.getId())
                             .subCategoria(ds.getSubCategoria() != null ? ds.getSubCategoria().getDescripcion()
                                     : "Sin Categoría")
                             .cantidad(ds.getCantidad())
                             .estado(ds.getEstado())
+                            .entidadBeneficiariaAsignadaId(ds.getEntidadBeneficiariaAsignadaId())
                             .build())
                     .collect(Collectors.toList());
 

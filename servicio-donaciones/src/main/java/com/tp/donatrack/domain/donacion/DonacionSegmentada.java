@@ -16,12 +16,14 @@ import java.util.List;
 @Getter
 @Setter
 public class DonacionSegmentada {
+    private Integer id;
     private int cantidad;
     private SubCategoria subCategoria;
     private List<Bien> bienes;
     private EstadoDonacionSegmentada estado;
     private final List<EventoTrazabilidad> historial = new ArrayList<>();
     private Integer donanteId;
+    private Integer entidadBeneficiariaAsignadaId;
 
     public DonacionSegmentada(
             int cantidad,
@@ -52,6 +54,7 @@ public class DonacionSegmentada {
 
     public void asignar(EntidadBeneficiaria entidad, String actor) {
         entidad.implementarDonacion(this);
+        this.entidadBeneficiariaAsignadaId = entidad.getId();
         transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, actor, "Donación asignada a entidad beneficiaria");
     }
 

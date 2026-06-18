@@ -37,8 +37,8 @@ public class DonacionController {
     @PostMapping("/entregar")
     public ResponseEntity<String> entregarDonacion(@RequestBody EntregaRequest request) {
         try {
-            donacionService.registrarEntrega(request.getDonanteId(), request.getEntidadBeneficiariaId());
-            return ResponseEntity.ok("Donación/es entregadas y evento de incentivos disparado.");
+            donacionService.registrarEntrega(request.getDonacionSegmentadaId());
+            return ResponseEntity.ok("Donación segmentada entregada y evento de incentivos disparado.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
@@ -47,7 +47,6 @@ public class DonacionController {
     @lombok.Getter
     @lombok.Setter
     public static class EntregaRequest {
-        private Integer donanteId;
-        private Integer entidadBeneficiariaId;
+        private Integer donacionSegmentadaId;
     }
 }
