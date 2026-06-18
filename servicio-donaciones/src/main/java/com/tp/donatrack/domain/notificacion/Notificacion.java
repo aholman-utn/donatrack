@@ -22,8 +22,4 @@ public class Notificacion {
         this.fecha = new Date();
         this.tipo = tipo;
     }
-
-    public Notificacion() {
-
-    }
 }

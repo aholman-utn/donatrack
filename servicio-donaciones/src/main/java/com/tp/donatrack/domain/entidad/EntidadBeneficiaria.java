@@ -46,16 +46,11 @@ public class EntidadBeneficiaria {
     }
 
     public void implementarDonacion(DonacionSegmentada donacion) {
-        List<NecesidadMaterial> necesidadesActivas = this.necesidadesActivas();
-        if (necesidadesActivas.isEmpty()) {
-            throw new RuntimeException("No existe esa necesidad en la lista de requerimientos");
-        } else {
-            for (NecesidadMaterial necesidad : necesidadesActivas) {
-                if (necesidad.getSubCategoria().equals(donacion.getSubCategoria())) {
-                    necesidad.recibirDonacion(donacion);
-                    break;
-                }
-            }
-        }
+        NecesidadMaterial necesidadCorrespondiente = this.necesidadesActivas().stream()
+        .filter(necesidad -> necesidad.getSubCategoria().equals(donacion.getSubCategoria()))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("La entidad no tiene una necesidad activa para la categoría: " + donacion.getSubCategoria()));
+
+        necesidadCorrespondiente.recibirDonacion(donacion);
     }
 }
