@@ -456,6 +456,88 @@
       ]
     },
     {
+      "name": "Matchmaking",
+      "item": [
+        {
+          "name": "Ranking por Donacion Segmentada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/ranking?donacionSegmentadaId=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "ranking"
+              ],
+              "query": [
+                {
+                  "key": "donacionSegmentadaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking por Donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/ranking/donante/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "ranking",
+                "donante",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donacionSegmentadaId\": 1,\n  \"entidadBeneficiariaId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/asignar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "asignar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Servicio - Incentivos",
       "item": [
         {
@@ -632,7 +714,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"entidadBeneficiariaId\": 11\n}\n",
+              "raw": "{\n  \"donacionSegmentadaId\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
