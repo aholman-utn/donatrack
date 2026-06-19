@@ -7,7 +7,7 @@ public class Resend implements iEmailProvider {
     //TODO: falta implementar las credenciales y todo eso
 
     @Override
-    public void enviarEmail(String destinatario, String mensaje) {
+    public void enviarEmail(String destinatario, String mensaje, String asunto) {
 
     }
 }

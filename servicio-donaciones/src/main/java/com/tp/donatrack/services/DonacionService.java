@@ -1,8 +1,7 @@
 package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.donacion.Donacion;
-import com.tp.donatrack.domain.notificacion.Notificacion;
-import com.tp.donatrack.domain.notificacion.TipoNotificacion;
+import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.dtos.DonacionHistorialDTO;
@@ -20,7 +19,6 @@ public class DonacionService {
     private final DonanteService donanteService;
     private final EntidadBeneficiariaService entidadBeneficiariaService;
     private final NotificacionService notificacionService;
-    private final PersonaService personaService;
     private final com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher;
 
     public DonacionService(
@@ -28,14 +26,12 @@ public class DonacionService {
         DonanteService donanteService,
         EntidadBeneficiariaService entidadBeneficiariaService,
         NotificacionService notificacionService,
-        PersonaService personaService,
         com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher
     ){
         this.donacionRepository = donacionRepository;
         this.donanteService = donanteService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
         this.eventPublisher = eventPublisher;
-        this.personaService = personaService;
         this.notificacionService = notificacionService;
     }
 
@@ -103,6 +99,12 @@ public class DonacionService {
         }
 
         segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId(), eventPublisher);
+        /*EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(
+                segmentada.getEntidadBeneficiariaAsignadaId()
+        );
+        //segmentada
+        this.notificarEntregaConfirmada(entidad);
+        */
     }
 
     public List<DonacionHistorialDTO> obtenerTodas() {
@@ -134,7 +136,7 @@ public class DonacionService {
             for (com.tp.donatrack.domain.donacion.DonacionSegmentada ds : d.getDonacionesSegmentadas()) {
                 if (ds.getEstado() != com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA) {
                     ds.confirmarEntrega(entidadBeneficiariaId, eventPublisher);                    
-                    this.notificarEntregaConfirmada(entidad, d.getDescripcion());
+                    this.notificarEntregaConfirmada(entidad);
 
                     SubCategoria subCategoria = ds.getSubCategoria(); 
                     
@@ -146,8 +148,8 @@ public class DonacionService {
         }
     }
 
-    private void notificarEntregaConfirmada(EntidadBeneficiaria entidad, String descripcionDonacion) {
-        com.tp.donatrack.domain.persona.Persona personaEntidad = entidad.getDatosDeEntidad();
+    private void notificarEntregaConfirmada(EntidadBeneficiaria entidad) {
+        Persona personaEntidad = entidad.getDatosDeEntidad();
         
         if (personaEntidad != null && personaEntidad.getMedioPredeterminado() != null && !personaEntidad.getMedioPredeterminado().isEmpty()) {
             
@@ -155,20 +157,13 @@ public class DonacionService {
             com.tp.donatrack.domain.notificador.TipoNotificador tipoNotificador = com.tp.donatrack.domain.notificador.TipoNotificador.valueOf(medio.getKey().toUpperCase());
             String contacto = medio.getValue();
 
-            Notificacion notificacionEntrega = new Notificacion(
-                "¡Entrega recibida con éxito!",
-                "Se ha confirmado la recepción de la donación: " + descripcionDonacion,
-                "Confirmación de Entrega",
-                TipoNotificacion.ENTREGAS
-            );
-
             notificacionService.notificar(
-                notificacionEntrega, 
-                tipoNotificador, 
-                contacto
+                tipoNotificador,
+                contacto,
+                "Se ha confirmado la recepción de la donación.",
+                "Confirmación de Entrega",
+                personaEntidad.getId()
             );
-
-            personaService.guardarNotificacion(personaEntidad, notificacionEntrega);
         }
     }
 

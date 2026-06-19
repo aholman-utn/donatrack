@@ -1,5 +1,6 @@
 package com.tp.donatrack.notificaciones.dtos;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -13,8 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class NotificacionOutputDTO {
     Long id;
-    Long id_persona;
-    String titulo;
-    String cuerpo;
+    Long idPersona;
+    String asunto;
+    String mensaje;
+    String destinatario;
     LocalDateTime fecha;
 }

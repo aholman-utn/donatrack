@@ -960,7 +960,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n\"user\": \"Lauta\",\n\"badge\": \"Donacion Exitosa\",\n\"description\": \"Realizar una donacion de forma exitosa\"\n}",
+          "raw": "{\n\"user\": \"Lauta\",\n\"nombreMision\": \"Donacion Exitosa\",\n\"descripcion\": \"Realizar una donacion de forma exitosa\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -981,6 +981,198 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Enviar Whatsapp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"WHATSAPP\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje de Whatsapp.\",\n  \"idPersona\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Enviar SMS",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"SMS\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje SMS.\",\n  \"idPersona\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Enviar Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"EMAIL\",\n  \"destinatario\": \"contact@gmail.com\",\n  \"mensaje\": \"Hola, este es un email..\",\n  \"asunto\": \"Asunto para todos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Simular inactividad de usuarios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/donantes/1/simular-inactividad",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "donantes",
+                "1",
+                "simular-inactividad"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener todas las notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                ""
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Obtener notificaciones de una persona",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/personas/2",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "personas",
+                "2"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
     }
   ]
 }

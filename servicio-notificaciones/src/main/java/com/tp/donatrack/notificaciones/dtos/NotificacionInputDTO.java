@@ -1,6 +1,6 @@
 package com.tp.donatrack.notificaciones.dtos;
 
-
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +8,14 @@ import lombok.Setter;
 @Setter
 public class NotificacionInputDTO {
 
-    Long id_persona;
-    String titulo;
-    String cuerpo;
+    private Long idPersona;
+
+    @NotBlank(message="El destinatario es requerido")
+    private String destinatario;
+
+    // Opcional
+    private String asunto;
+
+    @NotBlank(message="El mensaje no puede estar vacío")
+    private String mensaje;
 }

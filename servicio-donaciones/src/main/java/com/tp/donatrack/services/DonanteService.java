@@ -1,13 +1,12 @@
 package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
+import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.DonanteInactivoDTO;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.notificacion.Notificacion;
-import com.tp.donatrack.domain.notificacion.TipoNotificacion;
 import com.tp.donatrack.domain.notificador.TipoNotificador;
 import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.domain.donante.DonanteCreadoEvent;
@@ -17,10 +16,6 @@ import com.tp.donatrack.repositories.DonanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.*;
 
 import java.time.LocalDateTime;
@@ -32,7 +27,6 @@ public class DonanteService {
     private DonanteRepository donanteRepository;
     private NotificacionService notifService;
     private final DonanteEventPublisher eventPublisher;
-    private PersonaService personaService;
 
     @Autowired
     private ImportadorCargaMasiva importadorCargaMasiva;
@@ -41,12 +35,11 @@ public class DonanteService {
     private List<iLectorArchivo> lectoresDeArchivos;
 
     public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService,
-            List<iLectorArchivo> lectores, DonanteEventPublisher eventPublisher, PersonaService personaService) {
+            List<iLectorArchivo> lectores, DonanteEventPublisher eventPublisher) {
         this.donanteRepository = donanteRepository;
         this.notifService = notifService;
         this.lectoresDeArchivos = lectores;
         this.eventPublisher = eventPublisher;
-        this.personaService = personaService;
     }
 
     // CREATE
@@ -107,14 +100,15 @@ public class DonanteService {
             List<Donante> nuevos_donantes = importadorCargaMasiva.iniciar_migracion(registros);
 
             for (Donante donante : nuevos_donantes) {
-                Notificacion notif_bienvenida = new Notificacion(
-                        "¡Bienvenido a Donatrack!",
+                Persona persona = donante.getPersona();
+                String email = persona.getMedioDeContacto().get("email").getFirst();
+                notifService.notificar(
+                        TipoNotificador.EMAIL,
+                        email,
                         "Gracias por sumarte como donante...",
-                        "Registro exitoso",
-                        TipoNotificacion.BIENVENIDA);
-                String email = donante.getPersona().getMedioDeContacto().get("email").getFirst();
-                String password = donante.getPassword();
-                this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
+                        "¡Bienvenido a Donatrack!",
+                        persona.getId()
+                );
             }
             // 5. Respuesta de la aplicación
             String mensaje = "Importados " + registros.size() + " registros exitosamente";
@@ -130,26 +124,18 @@ public class DonanteService {
     private Donante darDeAlta(Donante donante) {
         Donante nuevo_donante = this.donanteRepository.create(donante);
         if (nuevo_donante != null) {
-            // Notifico
-            Notificacion notif_bienvenida = new Notificacion(
-                    "¡Bienvenido a Donatrack!",
+            Persona persona = donante.getPersona();
+            String email = persona.getMedioDeContacto().get("email").getFirst();
+            notifService.notificar(
+                    TipoNotificador.EMAIL,
+                    email,
                     "Gracias por sumarte como donante...",
-                    "Registro exitoso",
-                    TipoNotificacion.BIENVENIDA);
-            String email = donante.getPersona().getMedioDeContacto().get("email").getFirst();
-            String password = nuevo_donante.getPassword();
-            this.notifService.notificar(notif_bienvenida, TipoNotificador.EMAIL, email);
+                    "¡Bienvenido a Donatrack!",
+                    persona.getId()
+            );
             eventPublisher.publicar(new DonanteCreadoEvent(nuevo_donante.getId(), nuevo_donante.getNombreCompleto()));
         }
         return nuevo_donante;
-    }
-
-    public void guardarNotificacionEnHistorial(Integer donanteId, Notificacion notificacion) {
-        Donante donante = donanteRepository.findById(donanteId);
-
-        if (donante != null && donante.getPersona() != null) {
-            donante.getPersona().agregarNotificacion(notificacion);
-        }
     }
 
     public List<DonanteInactivoDTO> obtenerDonantesSinInteraccionMasDeDias(int dias) {
@@ -163,18 +149,25 @@ public class DonanteService {
                         donante.getPersona().getFechaUltimaInteraccion().isBefore(fechaLimite))
                 .map(donante -> {
                     DonanteInactivoDTO dto = new DonanteInactivoDTO();
-                    dto.setId(donante.getId());
+                    dto.setId(donante.getPersona().getId());
 
-                    Map.Entry<String, String> medio = donante.getPersona().getMedioPredeterminado().entrySet()
-                            .iterator().next();
+                    Map<String, String> medioMap = donante.getPersona().getMedioPredeterminado();
 
-                    dto.setContacto(medio.getValue());
-
-                    try {
-                        dto.setTipoNotificadorPreferido(TipoNotificador.valueOf(medio.getKey().toUpperCase()));
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Advertencia: El medio '" + medio.getKey()
-                                + "' no coincide con ningún TipoNotificador.");
+                    if (medioMap.containsKey("medio")) {
+                        dto.setContacto(medioMap.get("valor"));
+                        try {
+                            dto.setTipoNotificadorPreferido(TipoNotificador.valueOf(medioMap.get("medio").toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                            System.err.println("Advertencia: El medio '" + medioMap.get("medio") + "' no coincide con ningún TipoNotificador.");
+                        }
+                    } else {
+                        Map.Entry<String, String> entry = medioMap.entrySet().iterator().next();
+                        dto.setContacto(entry.getValue());
+                        try {
+                            dto.setTipoNotificadorPreferido(TipoNotificador.valueOf(entry.getKey().toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                            System.err.println("Advertencia: El medio '" + entry.getKey() + "' no coincide con ningún TipoNotificador.");
+                        }
                     }
 
                     return dto;
@@ -187,7 +180,7 @@ public class DonanteService {
         Donante donante = donanteRepository.findById(donanteId);
 
         if (donante != null) {
-            com.tp.donatrack.domain.persona.Persona persona = donante.getPersona();
+            Persona persona = donante.getPersona();
 
             if (persona != null && persona.getMedioPredeterminado() != null
                     && !persona.getMedioPredeterminado().isEmpty()) {
@@ -197,15 +190,14 @@ public class DonanteService {
                         .valueOf(medio.getKey().toUpperCase());
                 String contacto = medio.getValue();
 
-                Notificacion aviso = new Notificacion(
-                        "¡Tu donación llegó a destino!",
+                notifService.notificar(
+                        tipoNotificador,
+                        contacto,
                         "Queríamos avisarte que tu donación de la categoría '" + subCategoria
-                                + "' acaba de ser asignada a una entidad. ¡Muchas gracias por tu aporte!",
+                        + "' acaba de ser asignada a una entidad. ¡Muchas gracias por tu aporte!",
                         "Donación Asignada",
-                        TipoNotificacion.ASIGNACION);
-
-                notifService.notificar(aviso, tipoNotificador, contacto);
-                personaService.guardarNotificacion(persona, aviso);
+                        persona.getId()
+                );
             }
         }
     }
