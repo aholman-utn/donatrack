@@ -128,7 +128,7 @@
         "url": "http://host.docker.internal:3000/screenshot",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #FFD34B; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/ExposicionREST/insignias/racha.png' alt='racha'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #FFD34B; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/racha.png' alt='racha'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -146,7 +146,7 @@
         "url": "http://host.docker.internal:3000/screenshot",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #96D5DA; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/ExposicionREST/insignias/habil_donador.png' alt='habil_donador'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #96D5DA; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/habil_donador.png' alt='habil_donador'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -164,7 +164,7 @@
         "url": "http://host.docker.internal:3000/screenshot",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C4A9E0; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/ExposicionREST/insignias/doancion_exitosa.png' alt='habil_donador'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C4A9E0; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/doancion_exitosa.png'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -182,7 +182,7 @@
         "url": "http://host.docker.internal:3000/screenshot",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C8E0BE; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/ExposicionREST/insignias/completitud.png' alt='completitud'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C8E0BE; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/completitud.png' alt='completitud'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -355,12 +355,12 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "af785968-8b6e-4dbb-9a40-477bc89d10aa",
+  "versionId": "5e2215e6-a3cd-4728-b5cd-341cec31cdc2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b350326ce4a193af92133940de53e07941ee6ae913202d3984c661c6ddaa01f7"
