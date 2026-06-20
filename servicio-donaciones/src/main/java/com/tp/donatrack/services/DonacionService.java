@@ -22,12 +22,11 @@ public class DonacionService {
     private final com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher;
 
     public DonacionService(
-        DonacionRepository donacionRepository,
-        DonanteService donanteService,
-        EntidadBeneficiariaService entidadBeneficiariaService,
-        NotificacionService notificacionService,
-        com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher
-    ){
+            DonacionRepository donacionRepository,
+            DonanteService donanteService,
+            EntidadBeneficiariaService entidadBeneficiariaService,
+            NotificacionService notificacionService,
+            com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher) {
         this.donacionRepository = donacionRepository;
         this.donanteService = donanteService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
@@ -58,25 +57,22 @@ public class DonacionService {
         }
 
         com.tp.donatrack.domain.bien.SubCategoria sub = new com.tp.donatrack.domain.bien.SubCategoria(
-            com.tp.donatrack.domain.bien.Categoria.ALIMENTOS, 
-            "Alimentos de Prueba", 
-            com.tp.donatrack.domain.bien.Unidad.KG
-        );
+                com.tp.donatrack.domain.bien.Categoria.ALIMENTOS,
+                "Alimentos de Prueba",
+                com.tp.donatrack.domain.bien.Unidad.KG);
 
         com.tp.donatrack.domain.bien.BienPerecedero alimento = new com.tp.donatrack.domain.bien.BienPerecedero(
-            "Alimento Prueba", 
-            "Descripción Alimento Prueba", 
-            "prueba.jpg", 
-            sub, 
-            new java.util.Date()
-        );
+                "Alimento Prueba",
+                "Descripción Alimento Prueba",
+                "prueba.jpg",
+                sub,
+                new java.util.Date());
 
         Donacion donacion = new Donacion(
-            donante, 
-            "Donación de prueba en Postman", 
-            new java.util.Date(), 
-            java.util.Arrays.asList(alimento)
-        );
+                donante,
+                "Donación de prueba en Postman",
+                new java.util.Date(),
+                java.util.Arrays.asList(alimento));
 
         return donacionRepository.save(donacion);
     }
@@ -99,12 +95,11 @@ public class DonacionService {
         }
 
         segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId(), eventPublisher);
-        /*EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(
-                segmentada.getEntidadBeneficiariaAsignadaId()
-        );
-        //segmentada
+        EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(
+                segmentada.getEntidadBeneficiariaAsignadaId());
+        // segmentada
         this.notificarEntregaConfirmada(entidad);
-        */
+
     }
 
     public List<DonacionHistorialDTO> obtenerTodas() {
@@ -127,19 +122,20 @@ public class DonacionService {
             throw new IllegalArgumentException("No se encontraron donaciones para el donante con ID: " + donanteId);
         }
 
-        EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(entidadBeneficiariaId); 
+        EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(entidadBeneficiariaId);
         if (entidad == null) {
-            throw new IllegalArgumentException("No se encontró la entidad beneficiaria con ID: " + entidadBeneficiariaId);
+            throw new IllegalArgumentException(
+                    "No se encontró la entidad beneficiaria con ID: " + entidadBeneficiariaId);
         }
 
         for (Donacion d : donaciones) {
             for (com.tp.donatrack.domain.donacion.DonacionSegmentada ds : d.getDonacionesSegmentadas()) {
                 if (ds.getEstado() != com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA) {
-                    ds.confirmarEntrega(entidadBeneficiariaId, eventPublisher);                    
+                    ds.confirmarEntrega(entidadBeneficiariaId, eventPublisher);
                     this.notificarEntregaConfirmada(entidad);
 
-                    SubCategoria subCategoria = ds.getSubCategoria(); 
-                    
+                    SubCategoria subCategoria = ds.getSubCategoria();
+
                     donanteService.notificarDonacionAsignada(donanteId, subCategoria);
                 }
             }
@@ -150,20 +146,22 @@ public class DonacionService {
 
     private void notificarEntregaConfirmada(EntidadBeneficiaria entidad) {
         Persona personaEntidad = entidad.getDatosDeEntidad();
-        
-        if (personaEntidad != null && personaEntidad.getMedioPredeterminado() != null && !personaEntidad.getMedioPredeterminado().isEmpty()) {
-            
-            java.util.Map.Entry<String, String> medio = personaEntidad.getMedioPredeterminado().entrySet().iterator().next();
-            com.tp.donatrack.domain.notificador.TipoNotificador tipoNotificador = com.tp.donatrack.domain.notificador.TipoNotificador.valueOf(medio.getKey().toUpperCase());
+
+        if (personaEntidad != null && personaEntidad.getMedioPredeterminado() != null
+                && !personaEntidad.getMedioPredeterminado().isEmpty()) {
+
+            java.util.Map.Entry<String, String> medio = personaEntidad.getMedioPredeterminado().entrySet().iterator()
+                    .next();
+            com.tp.donatrack.domain.notificador.TipoNotificador tipoNotificador = com.tp.donatrack.domain.notificador.TipoNotificador
+                    .valueOf(medio.getKey().toUpperCase());
             String contacto = medio.getValue();
 
             notificacionService.notificar(
-                tipoNotificador,
-                contacto,
-                "Se ha confirmado la recepción de la donación.",
-                "Confirmación de Entrega",
-                personaEntidad.getId()
-            );
+                    tipoNotificador,
+                    contacto,
+                    "Se ha confirmado la recepción de la donación.",
+                    "Confirmación de Entrega",
+                    personaEntidad.getId());
         }
     }
 
