@@ -1,7 +1,7 @@
 package com.tp.donatrack.notificaciones.domain.notificadores.email;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
 import org.springframework.stereotype.Component;
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,8 +21,8 @@ public class NotificadorEmail implements iNotificador {
     }
 
     @Override
-    public MedioNotificador getMedio() {
-        return MedioNotificador.EMAIL;
+    public TipoNotificador getMedio() {
+        return TipoNotificador.EMAIL;
     }
 
     public void cambiarProveedor(iEmailProvider nuevoProveedor){

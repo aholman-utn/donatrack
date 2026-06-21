@@ -42,6 +42,11 @@
             <artifactId>servicio-notificaciones</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.tp.donatrack</groupId>
+            <artifactId>donatrack-commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     
     <build>

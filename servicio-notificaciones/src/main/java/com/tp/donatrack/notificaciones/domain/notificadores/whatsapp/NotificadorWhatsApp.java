@@ -1,7 +1,7 @@
 package com.tp.donatrack.notificaciones.domain.notificadores.whatsapp;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
 import org.springframework.stereotype.Component;
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +21,7 @@ public class NotificadorWhatsApp implements iNotificador {
     }
 
     @Override
-    public MedioNotificador getMedio() {
-        return MedioNotificador.WHATSAPP;
+    public TipoNotificador getMedio() {
+        return TipoNotificador.WHATSAPP;
     }
 }

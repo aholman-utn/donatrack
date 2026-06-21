@@ -1,12 +1,10 @@
 package com.tp.donatrack.notificaciones.services;
 
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.donatrack.notificaciones.domain.entities.Notificacion;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
-import com.tp.donatrack.notificaciones.dtos.NotificarServicioExterno;
 import com.tp.donatrack.notificaciones.repositories.NotificacionRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,7 +22,7 @@ public class NotificacionService {
         this.notificadores = notificadores != null ? notificadores : new ArrayList<>();
     }
 
-    public void notificar(NotificarServicioExterno body) {
+    public void notificar(NotificacionRequestDTO body) {
         iNotificador notificador = this.seleccionarNotificador(body.getMedio())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró un notificador"));
 
@@ -41,7 +39,7 @@ public class NotificacionService {
         return this.notificacionRepository.findAll();
     }
 
-    private Optional<iNotificador> seleccionarNotificador(MedioNotificador medio) {
+    private Optional<iNotificador> seleccionarNotificador(TipoNotificador medio) {
         return this.notificadores.stream()
                 .filter(n -> n.getMedio().equals(medio))
                 .findFirst();

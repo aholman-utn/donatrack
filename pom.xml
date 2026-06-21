@@ -21,7 +21,8 @@
 		<module>servicio-donaciones</module>
 		<module>servicio-incentivos</module>
 		<module>servicio-notificaciones</module>
-	</modules>
+        <module>commons</module>
+    </modules>
 
 	<properties>
 		<java.version>21</java.version>

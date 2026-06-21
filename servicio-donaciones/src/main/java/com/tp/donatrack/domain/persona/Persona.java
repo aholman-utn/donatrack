@@ -1,7 +1,7 @@
 package com.tp.donatrack.domain.persona;
 
 import com.tp.donatrack.domain.ubicacion.Direccion;
-import com.tp.donatrack.domain.notificador.TipoNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
 
 import lombok.Getter;
 import lombok.Setter;

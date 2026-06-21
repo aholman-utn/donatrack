@@ -1,18 +1,17 @@
-package com.tp.donatrack.services;
+package com.tp.commons.services.notificador;
 
-import com.tp.donatrack.domain.notificador.TipoNotificador;
-import com.tp.donatrack.dtos.NotificacionRequestDTO;
+import  com.tp.commons.domain.notificador.TipoNotificador;
+import  com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
-public class NotificacionService {
+public class NotificacionRestClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String urlServicioNotificaciones = "http://localhost:8082/api/notificaciones/notificar";
-    private static final Logger logger = LoggerFactory.getLogger(NotificacionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotificacionRestClient.class);
 
     public boolean notificar(
             TipoNotificador tipo,
@@ -29,6 +28,7 @@ public class NotificacionService {
         dto.setIdPersona(personaId);
 
         try {
+            String urlServicioNotificaciones = "http://localhost:8082/api/notificaciones/notificar";
             restTemplate.postForEntity(urlServicioNotificaciones, dto, Void.class);
             logger.info("Notificación enviada exitosamente para la persona ID: {}", personaId);
             return true;

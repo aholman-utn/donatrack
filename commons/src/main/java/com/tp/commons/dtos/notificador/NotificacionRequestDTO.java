@@ -1,16 +1,18 @@
-package com.tp.donatrack.notificaciones.dtos;
+package com.tp.commons.dtos.notificador;
 
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-public class NotificarServicioExterno {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class NotificacionRequestDTO {
     @NotNull(message="El medio de notificacion debe ser enviado")
-    MedioNotificador medio;
+    TipoNotificador medio;
 
     @NotBlank(message="El destinatario es requerido")
     String destinatario;

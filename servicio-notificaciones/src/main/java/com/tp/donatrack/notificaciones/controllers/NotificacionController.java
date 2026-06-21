@@ -1,8 +1,8 @@
 package com.tp.donatrack.notificaciones.controllers;
 
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.donatrack.notificaciones.domain.entities.Notificacion;
 import com.tp.donatrack.notificaciones.dtos.NotificacionOutputDTO;
-import com.tp.donatrack.notificaciones.dtos.NotificarServicioExterno;
 import com.tp.donatrack.notificaciones.services.NotificacionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class NotificacionController {
 
     @PostMapping("/notificar")
     public ResponseEntity<String> notificar(
-        @Valid @RequestBody NotificarServicioExterno body
+        @Valid @RequestBody NotificacionRequestDTO body
     ){
         try {
             this.notificacionService.notificar(body);

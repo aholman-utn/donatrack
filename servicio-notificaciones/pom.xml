@@ -45,7 +45,11 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.tp.donatrack</groupId>
+            <artifactId>donatrack-commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

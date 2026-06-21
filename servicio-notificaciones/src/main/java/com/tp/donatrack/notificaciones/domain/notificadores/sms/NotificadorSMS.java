@@ -1,7 +1,7 @@
 package com.tp.donatrack.notificaciones.domain.notificadores.sms;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
 import org.springframework.stereotype.Component;
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +21,7 @@ public class NotificadorSMS implements iNotificador {
     }
 
     @Override
-    public MedioNotificador getMedio() {
-        return MedioNotificador.SMS;
+    public TipoNotificador getMedio() {
+        return TipoNotificador.SMS;
     }
 }

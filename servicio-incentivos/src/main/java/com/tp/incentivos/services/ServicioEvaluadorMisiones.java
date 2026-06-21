@@ -1,6 +1,7 @@
 package com.tp.incentivos.services;
 
-import com.tp.donatrack.notificaciones.services.NotificacionService;
+import com.tp.commons.services.notificador.NotificacionRestClient;
+
 import com.tp.incentivos.domain.CategoriaDonante;
 import com.tp.incentivos.domain.Mision;
 import com.tp.incentivos.domain.Perfil;
@@ -15,11 +16,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ServicioEvaluadorMisiones {
+    private final NotificacionRestClient notificacionRestClient;
 
-    private final NotificacionService notifService;
-
-    public ServicioEvaluadorMisiones(NotificacionService notifService) {
-        this.notifService = notifService;
+    public ServicioEvaluadorMisiones(
+            NotificacionRestClient notificacionRestClient
+    ) {
+        this.notificacionRestClient = notificacionRestClient;
     }
 
     public void evaluar(Perfil perfil, InfoDonacion infoDonacion) {
@@ -50,7 +52,9 @@ public class ServicioEvaluadorMisiones {
 
             if (todasCompletas && perfil.getCategoriaDonante() != CategoriaDonante.TRANSFORMADOR) {
                 //todo: necesito el id de la persona!
-                //notifService.crearNotificacion(Long.valueOf(2),"¡Subiste de categoría", "Gracias por tu compromiso y participación. Nos complace informarte que has sido promovido a una nueva categoría debido a tu valiosa contribución. Este reconocimiento refleja el impacto positivo de tus acciones en nuestra comunidad. ¡Felicitaciones y gracias por seguir colaborando!");
+
+                //Puedo hacer get a donaciones preguntando por el id de persona.
+                //notificacionRestClient.notificar(Long.valueOf(2),"¡Subiste de categoría", "Gracias por tu compromiso y participación. Nos complace informarte que has sido promovido a una nueva categoría debido a tu valiosa contribución. Este reconocimiento refleja el impacto positivo de tus acciones en nuestra comunidad. ¡Felicitaciones y gracias por seguir colaborando!");
                 perfil.subirCategoria();
             }
         }

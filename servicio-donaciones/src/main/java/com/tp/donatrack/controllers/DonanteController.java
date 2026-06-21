@@ -1,5 +1,6 @@
 package com.tp.donatrack.controllers;
 
+import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.dtos.CrearPersonaHumanaRequest;
@@ -7,7 +8,6 @@ import com.tp.donatrack.dtos.CrearPersonaJuridicaRequest;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.routes.DonanteRoutes;
 import com.tp.donatrack.services.DonanteService;
-import com.tp.donatrack.services.NotificacionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +22,14 @@ import java.util.List;
 public class DonanteController {
 
     private final DonanteService donanteService;
-    private final NotificacionService notificacionService;
+    private final NotificacionRestClient notificacionRestClient;
 
     public DonanteController(
             DonanteService donanteService,
-            NotificacionService notificacionService
+            NotificacionRestClient notificacionRestClient
     ) {
         this.donanteService = donanteService;
-        this.notificacionService = notificacionService;
+        this.notificacionRestClient = notificacionRestClient;
     }
 
     // GET /donantes → listar todos
@@ -70,7 +70,7 @@ public class DonanteController {
             @Valid @RequestBody CrearPersonaHumanaRequest request) {
         Donante donante = donanteService.registrar(request.toDomain());
         Persona persona = donante.getPersona();
-        boolean enviada = notificacionService.notificar(
+        boolean enviada = notificacionRestClient.notificar(
                 persona.getTipoNotificadorPreferido(),
                 persona.getContactoPredeterminado(),
                 "Gracias por registrarte como donante.",
@@ -91,7 +91,7 @@ public class DonanteController {
         Donante donante = donanteService.registrar(request.toDomain());
         Persona persona = donante.getPersona();
         System.err.println("Persona: "+persona.getId());
-        boolean enviada = notificacionService.notificar(
+        boolean enviada = notificacionRestClient.notificar(
                 persona.getTipoNotificadorPreferido(),
                 persona.getContactoPredeterminado(),
                 "Gracias por registrarte como donante.",

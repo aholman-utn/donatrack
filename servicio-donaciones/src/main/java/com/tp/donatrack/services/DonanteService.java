@@ -1,14 +1,14 @@
 package com.tp.donatrack.services;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.services.notificador.NotificacionRestClient;
+
 import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
 import com.tp.donatrack.domain.persona.Persona;
-import com.tp.donatrack.dtos.DonanteInactivoDTO;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
+import com.tp.donatrack.dtos.DonanteInactivoDTO;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.domain.donante.Donante;
-import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.notificador.TipoNotificador;
-import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.domain.donante.DonanteCreadoEvent;
 import com.tp.donatrack.domain.donante.DonanteEventPublisher;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
@@ -20,13 +20,15 @@ import java.util.*;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class DonanteService {
-
-    private DonanteRepository donanteRepository;
-    private NotificacionService notifService;
+    private final DonanteRepository donanteRepository;
+    private final NotificacionRestClient notificacionRestClient;
     private final DonanteEventPublisher eventPublisher;
+    private static final Logger logger = LoggerFactory.getLogger(DonanteService.class);
 
     @Autowired
     private ImportadorCargaMasiva importadorCargaMasiva;
@@ -34,10 +36,14 @@ public class DonanteService {
     @Autowired
     private List<iLectorArchivo> lectoresDeArchivos;
 
-    public DonanteService(DonanteRepository donanteRepository, NotificacionService notifService,
-            List<iLectorArchivo> lectores, DonanteEventPublisher eventPublisher) {
+    public DonanteService(
+            DonanteRepository donanteRepository,
+            NotificacionRestClient notifService,
+            List<iLectorArchivo> lectores,
+            DonanteEventPublisher eventPublisher
+    ) {
         this.donanteRepository = donanteRepository;
-        this.notifService = notifService;
+        this.notificacionRestClient = notifService;
         this.lectoresDeArchivos = lectores;
         this.eventPublisher = eventPublisher;
     }
@@ -102,7 +108,7 @@ public class DonanteService {
             for (Donante donante : nuevos_donantes) {
                 Persona persona = donante.getPersona();
                 String email = persona.getMedioDeContacto().get("email").getFirst();
-                notifService.notificar(
+                notificacionRestClient.notificar(
                         TipoNotificador.EMAIL,
                         email,
                         "Gracias por sumarte como donante...",
@@ -126,7 +132,7 @@ public class DonanteService {
         if (nuevo_donante != null) {
             Persona persona = donante.getPersona();
             String email = persona.getMedioDeContacto().get("email").getFirst();
-            notifService.notificar(
+            notificacionRestClient.notificar(
                     TipoNotificador.EMAIL,
                     email,
                     "Gracias por sumarte como donante...",
@@ -176,29 +182,53 @@ public class DonanteService {
                 .collect(Collectors.toList());
     }
 
-    public void notificarDonacionAsignada(Integer donanteId, SubCategoria subCategoria) {
-        Donante donante = donanteRepository.findById(donanteId);
+    public void notificarEntrega(Integer donanteId) {
+        try {
+            Donante donante = donanteRepository.findById(donanteId);
 
-        if (donante != null) {
+            if (donante == null || donante.getPersona() == null) {
+                logger.warn("No se encontró el donante o la persona para el ID: {}", donanteId);
+                return;
+            }
+
             Persona persona = donante.getPersona();
 
-            if (persona != null && persona.getMedioPredeterminado() != null
-                    && !persona.getMedioPredeterminado().isEmpty()) {
-                java.util.Map.Entry<String, String> medio = persona.getMedioPredeterminado().entrySet().iterator()
-                        .next();
-                com.tp.donatrack.domain.notificador.TipoNotificador tipoNotificador = com.tp.donatrack.domain.notificador.TipoNotificador
-                        .valueOf(medio.getKey().toUpperCase());
-                String contacto = medio.getValue();
+            boolean tieneMedioConfigurado = persona.getMedioPredeterminado() != null &&
+                    !persona.getMedioPredeterminado().isEmpty();
 
-                notifService.notificar(
-                        tipoNotificador,
-                        contacto,
-                        "Queríamos avisarte que tu donación de la categoría '" + subCategoria
-                        + "' acaba de ser asignada a una entidad. ¡Muchas gracias por tu aporte!",
-                        "Donación Asignada",
-                        persona.getId()
-                );
+            if (tieneMedioConfigurado) {
+                java.util.Map<String, String> mapaMedio = persona.getMedioPredeterminado();
+
+                String tipoString = mapaMedio.get("medio");
+                String contacto = mapaMedio.get("valor");
+
+                if (tipoString != null && contacto != null) {
+                    TipoNotificador tipoNotificador = TipoNotificador.valueOf(tipoString.toUpperCase());
+
+                    logger.info("Notificando a donante ID: {} vía {}", persona.getId(), tipoNotificador);
+
+                    notificacionRestClient.notificar(
+                            tipoNotificador,
+                            contacto,
+                            "Se ha confirmado la recepción de la donación.",
+                            "Confirmación de Entrega a Entidad Beneficiaria",
+                            persona.getId()
+                    );
+                    logger.info("Notificación de donante {} enviada con éxito.", persona.getId());
+                } else {
+                    logger.warn("El JSON del medio predeterminado está incompleto para el donante {}", persona.getId());
+                }
+
+            } else {
+                logger.warn("El donante ID {} no tiene un medio predeterminado configurado. No se envió notificación.", persona.getId());
             }
+
+        } catch (IllegalArgumentException e) {
+            logger.error("ERROR DE ENUM: La clave en la base de datos no existe en TipoNotificador para el donante {}.", donanteId, e);
+        } catch (NullPointerException e) {
+            logger.error("ERROR DE REFERENCIA NULA: Chequeá que notifService esté inicializado. Falló en donante {}.", donanteId, e);
+        } catch (Exception e) {
+            logger.error("ERROR INESPERADO procesando el donante {}.", donanteId, e);
         }
     }
 }
