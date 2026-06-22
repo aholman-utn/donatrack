@@ -3,13 +3,15 @@ package com.tp.donatrack.notificaciones.domain.notificadores.whatsapp;
 import com.tp.commons.domain.notificador.TipoNotificador;
 import org.springframework.stereotype.Component;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class NotificadorWhatsApp implements iNotificador {
 
-    @Autowired
-    iWhatsAppProvider whatsAppProvider;
+    private final iWhatsAppProvider whatsAppProvider;
+
+    public NotificadorWhatsApp(iWhatsAppProvider whatsAppProvider) {
+        this.whatsAppProvider = whatsAppProvider;
+    }
 
     @Override
     public void enviarNotificacion(String numero, String mensaje, String asunto) {

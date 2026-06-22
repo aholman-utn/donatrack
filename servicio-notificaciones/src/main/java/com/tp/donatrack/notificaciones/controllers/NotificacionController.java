@@ -2,7 +2,6 @@ package com.tp.donatrack.notificaciones.controllers;
 
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.donatrack.notificaciones.domain.entities.Notificacion;
-import com.tp.donatrack.notificaciones.dtos.NotificacionOutputDTO;
 import com.tp.donatrack.notificaciones.services.NotificacionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -47,27 +46,12 @@ public class NotificacionController {
     }
 
     @GetMapping("/")
-    public List<NotificacionOutputDTO> buscarTodas() {
-        return this.notificacionService.buscarTodas().stream()
-                .map(this::mapearADTO)
-                .toList();
+    public List<Notificacion> buscarTodas() {
+        return this.notificacionService.buscarTodas();
     }
 
     @GetMapping("/personas/{idPersona}")
-    public List<NotificacionOutputDTO> buscarNotificacionesPorPersona(@PathVariable Long idPersona) {
-        return this.notificacionService.buscar(idPersona).stream()
-                .map(this::mapearADTO)
-                .toList();
-    }
-
-    private NotificacionOutputDTO mapearADTO(Notificacion notif) {
-        return new NotificacionOutputDTO(
-                notif.getId(),
-                notif.getId_persona(),
-                notif.getAsunto(),
-                notif.getMensaje(),
-                notif.getDestinatario(),
-                notif.getFecha()
-        );
+    public List<Notificacion> buscarNotificacionesPorPersona(@PathVariable Long idPersona) {
+        return this.notificacionService.buscar(idPersona);
     }
 }
