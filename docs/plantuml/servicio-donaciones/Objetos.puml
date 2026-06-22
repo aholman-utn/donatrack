@@ -1,0 +1,189 @@
+@startuml
+!pragma useIntermediatePackages false
+top to bottom direction
+skinparam linetype ortho
+
+package donatrack {
+
+    class DonatrackApplication
+
+    package config {
+        class RestTemplateConfig
+    }
+
+    package controllers {
+        class DonacionController
+        class DonanteController
+        class EntidadBeneficiariaController
+        class MatchmakingController
+        class NecesidadController
+    }
+
+    package domain.asignacion {
+        interface AlgoritmoAsignacion
+        class AlgoritmoCompatibilidadSemantica
+        class AlgoritmoPrioridadSubAtendidos
+        class ResultadoMatchmaking
+        class ServicioMatchmaking
+    }
+
+    package domain.trazabilidad {
+        class EventoTrazabilidad
+    }
+
+    package domain.bien {
+        class Bien
+        class BienDuradero
+        class BienPerecedero
+        enum Categoria
+        record ClaveAgrupacion
+        enum EstadoBien
+        class SubCategoria
+        enum Unidad
+    }
+
+    package domain.donacion {
+        class Donacion
+        record DonacionEntregadaEvent
+        interface DonacionEventPublisher
+        class DonacionSegmentada
+        enum EstadoDonacion
+        enum EstadoDonacionSegmentada
+    }
+
+    package domain.donante {
+        class Donante
+        record DonanteCreadoEvent
+        interface DonanteEventPublisher
+        class Registro
+    }
+
+    package domain.entidad {
+        class EntidadBeneficiaria
+    }
+
+    package domain.importador {
+        class importadorCargaMasiva
+    }
+
+    package domain.lectoresDeArchivos {
+        class csv.LectorCSV
+        interface iLectorArchivo
+    }
+
+    package domain.necesidad {
+        enum EstadoNecesidad
+        class NecesidadExtraordinaria
+        class NecesidadMaterial
+        class NecesidadRecurrente
+    }
+
+    package domain.persona {
+        class Persona
+        class PersonaHumana
+        class PersonaJuridica
+        class PersonaRepresentante
+        enum TipoOrganizacion
+        enum TipoPersona
+    }
+
+    package domain.ubicacion {
+        class Ciudad
+        class Direccion
+        class Pais
+        class Provincia
+    }
+
+    package dtos {
+        class ActualizarDonacionRequest
+        class AsignarDonacionDTO
+        class ContactoValorRequest
+        class CrearDonacionRequest
+        class CrearPersonaHumanaRequest
+        class CrearPersonaJuridicaRequest
+        class DireccionRequest
+        class DonacionHistorialDTO
+        class DonacionSegmentadaHistorialDTO
+        class DonanteInactivoDTO
+        class EntidadRankingDTO
+        class ImportacionResponseDTO
+        class RepresentanteRequest
+        class ResultadoMatchmakingDTO
+    }
+
+    package dtos.input.importacionCSV {
+        class RegistroDonanteDTO
+    }
+
+    package dtos.necesidad {
+        class CrearNecesidadDTO
+        class NecesidadResponseDTO
+    }
+
+    package repositories {
+        class DonacionRepository
+        class DonanteRepository
+        class EntidadBeneficiariaRepository
+        class NecesidadRepository
+    }
+
+    package routes {
+        class DonanteRoutes
+        class EntidadBeneficiariaRoutes
+        class MatchmakingRoutes
+    }
+
+    package services {
+        class DonacionService
+        class DonanteService
+        class EntidadBeneficiariaService
+        class HttpDonacionEventPublisher
+        class HttpDonanteEventPublisher
+        class MatchmakingService
+        class NecesidadService
+        class UbicacionService
+    }
+
+    package task {
+        class DonantesInactivosCron
+    }
+
+    class utils.security.CryptoUtils
+
+}
+
+'---------------------------------------------------
+' Relaciones
+'---------------------------------------------------
+
+donatrack.domain.bien.Bien                          <|--    donatrack.domain.bien.BienPerecedero
+donatrack.domain.bien.Bien                          <|-     donatrack.domain.bien.BienDuradero
+donatrack.domain.bien.BienDuradero                  --      donatrack.domain.bien.EstadoBien
+donatrack.domain.donacion.DonacionSegmentada        --      donatrack.domain.bien.Bien
+donatrack.domain.bien.Bien                          --      donatrack.domain.bien.SubCategoria
+donatrack.domain.bien.SubCategoria                  --      donatrack.domain.bien.Categoria
+donatrack.domain.bien.SubCategoria                  --      donatrack.domain.bien.Unidad
+donatrack.domain.donacion.DonacionSegmentada        --      donatrack.domain.donacion.EstadoDonacionSegmentada
+donatrack.domain.donacion.DonacionSegmentada        --      donatrack.domain.trazabilidad.EventoTrazabilidad
+donatrack.domain.donacion.DonacionSegmentada        --      donatrack.domain.trazabilidad.EventoTrazabilidad
+donatrack.domain.trazabilidad.EventoTrazabilidad    --       donatrack.domain.donacion.EstadoDonacionSegmentada
+donatrack.domain.donacion.Donacion                  --      donatrack.domain.donacion.EstadoDonacionSegmentada
+donatrack.domain.donacion.Donacion                  --      donatrack.domain.donacion.EstadoDonacion
+donatrack.domain.donacion.Donacion                  -       donatrack.domain.donante.Donante
+donatrack.domain.donante.Donante                    --      donatrack.domain.persona.Persona
+donatrack.domain.persona.Persona                    <|-    donatrack.domain.persona.PersonaHumana
+donatrack.domain.persona.Persona                    <|--    donatrack.domain.persona.PersonaJuridica
+donatrack.domain.persona.PersonaJuridica            --      donatrack.domain.persona.PersonaRepresentante
+donatrack.domain.persona.PersonaJuridica            --      donatrack.domain.entidad.EntidadBeneficiaria
+donatrack.domain.entidad.EntidadBeneficiaria        --      donatrack.domain.necesidad.NecesidadMaterial
+donatrack.domain.necesidad.NecesidadMaterial        <|--    donatrack.domain.necesidad.NecesidadRecurrente
+donatrack.domain.necesidad.NecesidadMaterial        <|--    donatrack.domain.necesidad.NecesidadExtraordinaria
+donatrack.domain.necesidad.NecesidadExtraordinaria  --      donatrack.domain.necesidad.EstadoNecesidad
+donatrack.domain.persona.PersonaJuridica            --      donatrack.domain.persona.TipoOrganizacion
+donatrack.domain.persona.Persona                    --      donatrack.domain.ubicacion.Direccion
+donatrack.domain.ubicacion.Ciudad                   o-     donatrack.domain.ubicacion.Direccion
+donatrack.domain.ubicacion.Provincia                o-     donatrack.domain.ubicacion.Ciudad
+donatrack.domain.ubicacion.Pais                     o-     donatrack.domain.ubicacion.Provincia
+donatrack.domain.bien.Bien                          ..>    donatrack.domain.bien.ClaveAgrupacion
+
+@enduml

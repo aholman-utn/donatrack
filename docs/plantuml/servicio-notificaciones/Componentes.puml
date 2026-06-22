@@ -1,0 +1,18 @@
+@startuml
+
+left to right direction
+
+component "Servicio de Notificaciones" as SN {
+    component "Controller" as SN_Controller
+    component "Service" as SN_Service
+    component "Notificador" as SN_Notificador
+    component "Repository" as SN_Repository
+}
+
+HTTP -- SN_Controller
+SN_Controller -(0- SN_Service
+SN_Service -(0- SN_Notificador
+SN_Service -(0- SN_Repository
+SN_Repository -(0-- [Base de Datos]
+
+@enduml

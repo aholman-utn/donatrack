@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+
+component "Servicio de Donaciones" as SD
+
+component "Servicio de Incentivos" as SI
+
+component "Servicio de Notificaciones" as SN
+
+component "Base de Datos" as BD
+
+'---------------------------------------------------
+' Externo
+'---------------------------------------------------
+
+HTTP --(0- SD : API-REST
+HTTP --(0- SI : API-REST
+HTTP --(0- SN : API-REST
+
+'---------------------------------------------------
+' Servicio Donaciones
+'---------------------------------------------------
+
+SD -(0-- BD
+SD -(0-- SI
+SD -(0-- SN
+
+'---------------------------------------------------
+' Servicio Incentivos
+'---------------------------------------------------
+
+SI -(0-- BD
+
+'---------------------------------------------------
+' Servicio Notificaciones
+'---------------------------------------------------
+
+SN -(0-- BD
+
+@enduml

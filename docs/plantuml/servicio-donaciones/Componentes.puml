@@ -1,0 +1,18 @@
+@startuml
+
+left to right direction
+
+component "Servicio de Donaciones" as SD {
+    component "Controller" as SD_Controller
+    component "Service" as SD_service
+    component "Repository" as SD_Repository
+}
+HTTP -- SD_Controller
+SD_Controller -(0- SD_service
+SD_service -(0- SD_Repository
+SD_Repository -(0- [Base de Datos]
+
+SD_service -(0-- [Servicio Incentivos]
+SD_service -(0-- [Servicio Donaciones]
+
+@enduml

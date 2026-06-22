@@ -1,0 +1,15 @@
+@startuml
+
+left to right direction
+
+component "Servicio de Incentivos" as SI {
+    component "Controller" as SI_Controller
+    component "Services" as SI_Service
+    component "Repository" as SI_Repository
+}
+HTTP -- SI_Controller
+SI_Controller -(0- SI_Service
+SI_Service -(0- SI_Repository
+SI_Repository -(0-- [Base de Datos]
+
+@enduml
