@@ -22,6 +22,7 @@
 		<module>servicio-incentivos</module>
 		<module>servicio-notificaciones</module>
         <module>commons</module>
+        <module>servicio-donantes</module>
     </modules>
 
 	<properties>

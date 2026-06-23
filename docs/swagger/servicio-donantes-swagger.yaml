@@ -1,0 +1,284 @@
+openapi: 3.0.3
+
+info:
+  title: DonaTrack - Servicio de Donantes
+  description: API REST del servicio de donantes de DonaTrack.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8083/
+
+tags:
+  - name: Donantes
+    description: Gestión de donantes
+
+paths:
+
+  /donantes:
+    get:
+      tags:
+        - Donantes
+      summary: Buscar donantes
+      description: Obtiene el listado de donantes registrados.
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+
+        - name: tipoPersona
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TipoPersona'
+        - name: fechaUltimaInteraccion
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-01-01"
+
+      responses:
+        '200':
+          description: OK
+
+    post:
+      tags:
+        - Donantes
+      summary: Crear donante
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearDonanteRequest'
+
+      responses:
+        '201':
+          description: Creado
+
+  /donantes/{id}:
+    delete:
+      tags:
+        - Donantes
+
+      summary: Eliminar donante
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Eliminado
+
+  /donantes/importar:
+    post:
+      tags:
+        - Donantes
+
+      summary: Importar donantes masivamente a través de un CSV
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+
+      responses:
+        '200':
+          description: Importado
+
+components:
+  schemas:
+
+    CrearDonanteRequest:
+      type: object
+      required:
+        - email
+        - password
+        - tipoPersona
+
+      properties:
+
+        email:
+          type: string
+          example: "test@hotmail.com"
+
+        password:
+          type: string
+          example: "12345"
+
+        tipoPersona:
+          $ref: '#/components/schemas/TipoPersona'
+
+        # Persona humana
+        nombre:
+          type: string
+          example: "Test"
+
+        apellido:
+          type: string
+          example: "Test"
+
+        fechaNacimiento:
+          type: string
+          format: date
+          example: "2025-01-01"
+
+        nroDocumento:
+          type: string
+          example: "11111111"
+
+        genero:
+          $ref: '#/components/schemas/Genero'
+
+
+        # Persona jurídica
+        razonSocial:
+          type: string
+          example: "Empresa SA"
+
+        tipoOrganizacion:
+          $ref: '#/components/schemas/TipoOrganizacion'
+
+        cuit:
+          type: string
+          example: "30-12345678-9"
+
+        rubro:
+          type: string
+          example: "Alimentos"
+
+    TipoPersona:
+      type: string
+      enum:
+        - HUMANA
+        - JURIDICA
+
+
+    Genero:
+      type: string
+      enum:
+        - MASCULINO
+        - FEMENINO
+        - SIN_ESPECIFICAR
+
+
+    TipoOrganizacion:
+      type: string
+      enum:
+        - ONG
+        - EMPRESA
+        - GUBERNAMENTAL
+        - INSTITUCION
+
+    TipoNotificador:
+      type: string
+      enum:
+        - EMAIL
+        - SMS
+        - WHATSAPP
+
+    Donante:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+
+        persona:
+          $ref: '#/components/schemas/Persona'
+
+        perfil:
+          $ref: '#/components/schemas/Perfil'
+
+        fechaUltimaInteraccion:
+          type: string
+          format: date-time
+
+
+    Persona:
+      type: object
+      properties:
+
+        id:
+          type: integer
+          format: int64
+
+        direccion:
+          type: object
+          nullable: true
+
+        medioDeContacto:
+          type: object
+          description: Medios de contacto agrupados por tipo
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            email:
+              - test@hotmail.com
+
+        medioPredeterminado:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            email: test@hotmail.com
+
+        fechaUltimaInteraccion:
+          type: string
+          format: date-time
+          nullable: true
+
+        nombre:
+          type: string
+
+        apellido:
+          type: string
+
+        genero:
+          $ref: '#/components/schemas/Genero'
+
+        fechaNacimiento:
+          type: string
+          format: date-time
+
+        edad:
+          type: integer
+          nullable: true
+
+        nroDocumento:
+          type: string
+
+        tipoNotificadorPreferido:
+          $ref: '#/components/schemas/TipoNotificador'
+
+        contactoPredeterminado:
+          type: string
+
+
+    Perfil:
+      type: object
+      properties:
+        nombre:
+          type: string
+          nullable: true
+
+        posicionEnElRanking:
+          type: integer
+          nullable: true
