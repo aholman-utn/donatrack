@@ -1,14 +1,20 @@
 package com.tp.donatrack.notificaciones.domain.notificadores.sms;
 
-
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
+import org.springframework.stereotype.Component;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
 
+@Component
 public class NotificadorSMS implements iNotificador {
 
-    iSMSProvider smsProvider;
+    private final iSMSProvider smsProvider;
+
+    public NotificadorSMS(iSMSProvider smsProvider) {
+        this.smsProvider = smsProvider;
+    }
+
     @Override
-    public void enviarNotificacion(String numero, String mensaje) {
+    public void enviarNotificacion(String numero, String mensaje, String asunto) {
         try {
             smsProvider.enviarSMS(numero, mensaje);
         } catch (Exception e) {
@@ -17,7 +23,7 @@ public class NotificadorSMS implements iNotificador {
     }
 
     @Override
-    public MedioNotificador getMedio() {
-        return MedioNotificador.SMS;
+    public TipoNotificador getMedio() {
+        return TipoNotificador.SMS;
     }
 }

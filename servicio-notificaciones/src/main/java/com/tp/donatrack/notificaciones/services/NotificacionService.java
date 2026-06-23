@@ -1,51 +1,58 @@
 package com.tp.donatrack.notificaciones.services;
 
-
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.donatrack.notificaciones.domain.entities.Notificacion;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
-
-import com.tp.donatrack.notificaciones.dtos.NotificacionInputDTO;
-import com.tp.donatrack.notificaciones.dtos.NotificacionOutputDTO;
-import com.tp.donatrack.notificaciones.dtos.NotificarServicioExterno;
 import com.tp.donatrack.notificaciones.repositories.NotificacionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class NotificacionService {
+    private final NotificacionRepository notificacionRepository;
+    private final List<iNotificador> notificadores;
 
-    NotificacionRepository notificacionRepository;
-    List<iNotificador> notificadores;
-    public NotificacionService(NotificacionRepository repo){
+    public NotificacionService(NotificacionRepository repo, List<iNotificador> notificadores) {
         this.notificacionRepository = repo;
+        this.notificadores = notificadores != null ? notificadores : new ArrayList<>();
     }
 
-    public void notificar(NotificarServicioExterno body){
-        iNotificador notificador = this.seleccionarNotificador(body.getMedio());
-        if(notificador!= null) {
-            notificador.enviarNotificacion(body.getDestinatario(), body.getMensaje());
-        }
+    public void notificar(NotificacionRequestDTO body) {
+        iNotificador notificador = this.seleccionarNotificador(body.getMedio())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un notificador"));
+
+        notificador.enviarNotificacion(body.getDestinatario(), body.getMensaje(), body.getAsunto());
+
+        this.crearNotificacion(body.getIdPersona(), body.getAsunto(), body.getMensaje(), body.getDestinatario());
     }
 
-    public iNotificador seleccionarNotificador(MedioNotificador medio){
-        return this.notificadores.stream().filter(notificador -> notificador.getMedio().equals(medio)).findFirst().orElse(null);
-    }
-
-    public Notificacion crearNotificacion(NotificacionInputDTO notif){
-        return this.notificacionRepository.save(notif.getId_persona(), notif.getTitulo(), notif.getCuerpo());
-    }
-
-    public Notificacion crearNotificacion(Long persona_id, String titulo, String mensaje){
-        return this.notificacionRepository.save(persona_id, titulo, mensaje);
-    }
-
-    public List<Notificacion> buscar(Long id_persona){
+    public List<Notificacion> buscar(Long id_persona) {
         return this.notificacionRepository.findByIdPersona(id_persona);
     }
 
-    public List<Notificacion> buscarTodas(){
+    public List<Notificacion> buscarTodas() {
         return this.notificacionRepository.findAll();
+    }
+
+    private Optional<iNotificador> seleccionarNotificador(TipoNotificador medio) {
+        return this.notificadores.stream()
+                .filter(n -> n.getMedio().equals(medio))
+                .findFirst();
+    }
+
+    private Notificacion crearNotificacion(Long idPersona, String asunto, String mensaje, String destinatario) {
+        Notificacion nueva = new Notificacion();
+        nueva.setId_persona(idPersona);
+        nueva.setAsunto(asunto);
+        nueva.setMensaje(mensaje);
+        nueva.setDestinatario(destinatario);
+        nueva.setFecha(LocalDateTime.now());
+
+        return this.notificacionRepository.save(nueva);
     }
 }

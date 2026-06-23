@@ -1,14 +1,20 @@
 package com.tp.donatrack.notificaciones.domain.notificadores.whatsapp;
 
-
-import com.tp.donatrack.notificaciones.domain.entities.MedioNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
+import org.springframework.stereotype.Component;
 import com.tp.donatrack.notificaciones.domain.entities.iNotificador;
 
+@Component
 public class NotificadorWhatsApp implements iNotificador {
 
-    iWhatsAppProvider whatsAppProvider;
+    private final iWhatsAppProvider whatsAppProvider;
+
+    public NotificadorWhatsApp(iWhatsAppProvider whatsAppProvider) {
+        this.whatsAppProvider = whatsAppProvider;
+    }
+
     @Override
-    public void enviarNotificacion(String numero, String mensaje) {
+    public void enviarNotificacion(String numero, String mensaje, String asunto) {
         try {
             whatsAppProvider.enviarWhatsApp(numero, mensaje);
         } catch (Exception e) {
@@ -17,7 +23,7 @@ public class NotificadorWhatsApp implements iNotificador {
     }
 
     @Override
-    public MedioNotificador getMedio() {
-        return MedioNotificador.WHATSAPP;
+    public TipoNotificador getMedio() {
+        return TipoNotificador.WHATSAPP;
     }
 }

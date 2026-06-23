@@ -22,7 +22,6 @@ public class EntidadBeneficiaria {
         return nececidades.stream().filter(NecesidadMaterial::activo).toList();
     }
 
-
     public EntidadBeneficiaria(PersonaJuridica personaJuridica) {
         this.datosDeEntidad = personaJuridica;
         //TODO: aca puedo poner una notificacion de bienvenida o similar

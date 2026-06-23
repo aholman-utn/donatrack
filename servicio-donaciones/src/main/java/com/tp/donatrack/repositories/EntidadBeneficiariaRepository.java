@@ -18,6 +18,7 @@ public class EntidadBeneficiariaRepository {
 
     public EntidadBeneficiaria create(EntidadBeneficiaria entidadBeneficiaria){
         entidadBeneficiaria.setId(secuencia.getAndIncrement());
+        entidadBeneficiaria.getDatosDeEntidad().setId((long) secuencia.getAndIncrement());
         this.entidades.add(entidadBeneficiaria);
         return entidadBeneficiaria;
     }

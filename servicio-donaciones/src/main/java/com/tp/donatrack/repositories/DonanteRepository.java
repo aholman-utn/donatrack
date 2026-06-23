@@ -19,6 +19,7 @@ public class DonanteRepository {
 
     public Donante create(Donante donante){
         donante.setId(secuencia.getAndIncrement()); //agrego el ID del donante
+        donante.getPersona().setId((long) secuencia.getAndIncrement());
         this.donantes.add(donante);
         return donante;
     }
@@ -45,7 +46,7 @@ public class DonanteRepository {
     }
 
     //TODO
-    public Donante update(Integer id){ return new Donante(); }
+    //public Donante update(Integer id){ return new Donante(); }
 
     public List<Donante> findAll(){
         return this.donantes;

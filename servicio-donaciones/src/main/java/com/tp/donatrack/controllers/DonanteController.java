@@ -1,5 +1,7 @@
 package com.tp.donatrack.controllers;
 
+import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.dtos.CrearPersonaHumanaRequest;
 import com.tp.donatrack.dtos.CrearPersonaJuridicaRequest;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -19,9 +22,14 @@ import java.util.List;
 public class DonanteController {
 
     private final DonanteService donanteService;
+    private final NotificacionRestClient notificacionRestClient;
 
-    public DonanteController(DonanteService donanteService) {
+    public DonanteController(
+            DonanteService donanteService,
+            NotificacionRestClient notificacionRestClient
+    ) {
         this.donanteService = donanteService;
+        this.notificacionRestClient = notificacionRestClient;
     }
 
     // GET /donantes → listar todos
@@ -60,8 +68,19 @@ public class DonanteController {
     @PostMapping(DonanteRoutes.HUMANO)
     public ResponseEntity<Donante> crearHumano(
             @Valid @RequestBody CrearPersonaHumanaRequest request) {
-        Donante creado = donanteService.registrar(request.toDomain());
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        Donante donante = donanteService.registrar(request.toDomain());
+        Persona persona = donante.getPersona();
+        boolean enviada = notificacionRestClient.notificar(
+                persona.getTipoNotificadorPreferido(),
+                persona.getContactoPredeterminado(),
+                "Gracias por registrarte como donante.",
+                "¡Bienvenido a Donatrack!",
+                persona.getId()
+        );
+        if (!enviada) {
+            System.err.println("La notificación de bienvenida no pudo enviarse.");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(donante);
     }
 
     // POST /donantes/juridico → crear donante jurídico
@@ -69,8 +88,21 @@ public class DonanteController {
     public ResponseEntity<Donante> crearJuridico(
             @Valid @RequestBody CrearPersonaJuridicaRequest request) {
 
-        Donante creado = donanteService.registrar(request.toDomain());
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        Donante donante = donanteService.registrar(request.toDomain());
+        Persona persona = donante.getPersona();
+        System.err.println("Persona: "+persona.getId());
+        boolean enviada = notificacionRestClient.notificar(
+                persona.getTipoNotificadorPreferido(),
+                persona.getContactoPredeterminado(),
+                "Gracias por registrarte como donante.",
+                "¡Bienvenido a Donatrack!",
+                persona.getId()
+        );
+        if (!enviada) {
+            System.err.println("La notificación de bienvenida no pudo enviarse.");
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(donante);
     }
 
     // POST /donantes/importar → importa un csv
@@ -81,7 +113,6 @@ public class DonanteController {
 
         return ResponseEntity.ok(response);
     }
-
 
     // PUT /donantes/{email}/humano → actualizar donante humano
     @PutMapping(DonanteRoutes.ACTUALIZAR_HUMANO)
@@ -110,4 +141,15 @@ public class DonanteController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/simular-inactividad")
+    public void simularInactividad(@PathVariable Integer id) {
+        Donante donante = donanteService.buscarDonantePorId(id);
+        
+        if (donante != null) {
+            donante.getPersona().setFechaUltimaInteraccion(LocalDateTime.now().minusDays(32));
+            System.out.println("Fecha seteada para: " + donante.getId());
+        } else {
+            throw new RuntimeException("Donante no encontrado");
+        }
+    }
 }

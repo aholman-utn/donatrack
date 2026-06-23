@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.notificador;
+package com.tp.commons.domain.notificador;
 
 public enum TipoNotificador {
     EMAIL,
