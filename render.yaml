@@ -1,0 +1,39 @@
+# Render Blueprint - DonaTrack
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: donatrack-donaciones
+    runtime: docker
+    dockerfilePath: ./Dockerfile.donaciones
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  - type: web
+    name: donatrack-incentivos
+    runtime: docker
+    dockerfilePath: ./Dockerfile.incentivos
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8081
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  - type: web
+    name: donatrack-notificaciones
+    runtime: docker
+    dockerfilePath: ./Dockerfile.notificaciones
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8082
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod

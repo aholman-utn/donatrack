@@ -1,0 +1,21 @@
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+
+COPY pom.xml ./pom.xml
+COPY commons ./commons
+COPY servicio-incentivos ./servicio-incentivos
+COPY mvnw ./mvnw
+COPY .mvn ./.mvn
+
+RUN chmod +x mvnw
+RUN ./mvnw clean package -pl commons -am -DskipTests -q
+RUN ./mvnw clean package -pl servicio-incentivos -am -DskipTests -q
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/servicio-incentivos/target/*.jar app.jar
+
+ENV PORT=8081
+EXPOSE ${PORT}
+
+ENTRYPOINT ["java", "-Dserver.port=${PORT}", "-jar", "app.jar"]
