@@ -39,7 +39,7 @@ public class DonanteController {
 
     @PatchMapping("/{id}")
     public DonanteOutputDTO update(@RequestBody ActualizarDonanteInputDTO dto, @PathVariable Long id){
-        return this.donanteService.update(dto);
+        return this.donanteService.update(id,dto);
     }
 
     @DeleteMapping("/{id}")

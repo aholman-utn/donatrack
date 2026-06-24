@@ -20,11 +20,12 @@ public class DonanteRepository {
         this.donantes = new ArrayList<>();
     }
 
-    private final AtomicInteger secuencia = new AtomicInteger(1);
+    private final AtomicInteger secuencia = new AtomicInteger(0);
 
     public Donante create(Donante donante){
-        donante.setId((long) secuencia.getAndIncrement()); //agrego el ID del donante
-        donante.getPersona().setId((long) secuencia.getAndIncrement());
+        donante.setId((long) secuencia.get()); //agrego el ID del donante
+        donante.getPersona().setId((long) secuencia.get());
+        secuencia.getAndIncrement();
         this.donantes.add(donante);
         return donante;
     }
@@ -50,9 +51,18 @@ public class DonanteRepository {
                 .orElse(null);
     }
 
-    //TODO:esta parte la hacia emilio
-    public Donante update(Donante donante) {
-        return null;
+    public Donante update(Long id, Donante donanteActualizado) {
+
+        Donante existente = this.donantes.stream()
+                .filter(d -> d.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Donante no encontrado"));
+
+        existente.setEmail(donanteActualizado.getEmail());
+        existente.setPassword(donanteActualizado.getPassword());
+        existente.setPersona(donanteActualizado.getPersona());
+
+        return existente;
     }
 
     public List<Donante> findAll(DonanteFiltroDTO filtro) {
@@ -76,7 +86,7 @@ public class DonanteRepository {
             if (filtro.getFechaUltimaInteraccion() != null) {
                 stream = stream.filter(
                         d -> Objects.equals(
-                                d.getFechaUltimaInteraccion(),
+                                d.getPersona().getFechaUltimaInteraccion(),
                                 filtro.getFechaUltimaInteraccion()
                         )
                 );

@@ -13,5 +13,4 @@ public class DonanteOutputDTO {
     private Long id;
     private Persona persona;
     private Perfil perfil;
-    private LocalDateTime fechaUltimaInteraccion;
 }

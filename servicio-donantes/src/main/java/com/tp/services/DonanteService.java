@@ -123,15 +123,45 @@ public class DonanteService {
         Donante nuevo_donante = new Donante();
         nuevo_donante.setPersona(persona);
         nuevo_donante.setPerfil(perfil);
-        nuevo_donante.setFechaUltimaInteraccion(LocalDateTime.now());
         String password_hasheado = CryptoUtils.hashear(dto.getPassword());
         nuevo_donante.setPassword(password_hasheado);
         Donante response = this.donanteRepository.create(nuevo_donante);
         return donanteToOutput(response);
     }
 
-    public DonanteOutputDTO update(ActualizarDonanteInputDTO dto){
-        return null;
+    public DonanteOutputDTO update(Long id, ActualizarDonanteInputDTO dto){
+        Donante donante_buscado = this.donanteRepository.findById(id);
+        Persona persona = donante_buscado.getPersona();
+
+        //si hay campos para actualizar los actualizo
+        if(dto.getMediosDeContacto()!=null){
+            persona.setMedioDeContacto(dto.getMediosDeContacto());
+        }
+        if(persona instanceof PersonaHumana){
+            if(dto.getNombre()!=null) {
+                ((PersonaHumana) persona).setNombre(dto.getNombre());
+            }
+            if(dto.getGenero()!=null){
+                ((PersonaHumana) persona).setGenero(dto.getGenero());
+            }
+        }
+        if(dto.getMediosDeContacto()!=null){
+            persona.setMedioDeContacto(dto.getMediosDeContacto());
+        }
+        if(dto.getDireccion()!=null){
+            persona.setDireccion(dto.getDireccion());
+        }
+        if(dto.getMedioPredeterminado()!=null){
+            persona.setMedioPredeterminado(dto.getMedioPredeterminado());
+        }
+        if(dto.getNuevo_password()!=null){
+            String hash = CryptoUtils.hashear(dto.getPassword());
+            if(hash.equals(donante_buscado.getPassword())){
+                donante_buscado.setPassword(dto.getNuevo_password());
+            }
+        }
+        Donante donante_actualizado = this.donanteRepository.update(id, donante_buscado);
+        return donanteToOutput(donante_actualizado);
     }
 
     public DonanteOutputDTO delete(Long id){
@@ -140,7 +170,6 @@ public class DonanteService {
         output.setId(eliminado.getId());
         output.setPersona(eliminado.getPersona());
         output.setPerfil(eliminado.getPerfil());
-        output.setFechaUltimaInteraccion(eliminado.getFechaUltimaInteraccion());
         return output;
     }
 
@@ -154,7 +183,6 @@ public class DonanteService {
         DonanteOutputDTO output = new DonanteOutputDTO();
         output.setId(donante.getId());
         output.setPerfil(donante.getPerfil());
-        output.setFechaUltimaInteraccion(donante.getFechaUltimaInteraccion());
         output.setPersona(donante.getPersona());
         return output;
     }
@@ -169,13 +197,16 @@ public class DonanteService {
                     dto.getFechaNacimiento(),
                     null,
                     dto.getNroDocumento());
+            persona.setTipoDoc(TipoDoc.DNI);
         } else {
             PersonaJuridica personaJuridica = new PersonaJuridica();
             personaJuridica.setRazonSocial(dto.getRazonSocial());
+            personaJuridica.setTipoDoc(TipoDoc.CUIT);
             personaJuridica.setTipo(dto.getTipoOrganizacion());
             personaJuridica.setCuit(dto.getCuit());
             persona = personaJuridica;
         }
+        persona.registrarInteraccion();
         Map<String, String> medioPredeterminado = new HashMap<>();
         Map<String, List<String>> mediosDeContacto = new HashMap<>();
         List<String> emails = new ArrayList<>();

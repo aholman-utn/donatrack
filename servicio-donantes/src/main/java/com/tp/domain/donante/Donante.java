@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 public class Donante {
     private Long id;
     private Persona persona;
+    private String email;
     private String password;
     private Perfil perfil;
-    private LocalDateTime fechaUltimaInteraccion;
 
     public Donante(Persona persona) {
         this.persona = persona;
@@ -32,7 +32,6 @@ public class Donante {
         return "Donante Anónimo";
     }
 
-    public void registrarInteraccion(){
-        this.fechaUltimaInteraccion=LocalDateTime.now();
-    }
+
+
 }

@@ -19,14 +19,16 @@ public abstract class Persona {
     private Map<String, List<String>> medioDeContacto = new HashMap<>();
     private Map<String, String> medioPredeterminado;
     private LocalDateTime fechaUltimaInteraccion;
-
+    private TipoDoc tipoDoc;
     public Map<String, List<String>> agregarMedioDeContacto(String key, String value) {
         List<String> values = this.medioDeContacto.get(key);
 
         if (values == null) {
             values = new ArrayList<>();
         }
-        values.add(value);
+        if (!values.contains(value)) {
+            values.add(value);
+        }
         this.medioDeContacto.put(key, values);
         return this.medioDeContacto;
     }

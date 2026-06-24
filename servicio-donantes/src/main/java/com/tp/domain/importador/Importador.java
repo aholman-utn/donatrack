@@ -2,6 +2,7 @@ package com.tp.domain.importador;
 
 import com.tp.domain.donante.Donante;
 import com.tp.domain.donante.persona.*;
+import com.tp.dtos.input.ActualizarDonanteInputDTO;
 import com.tp.dtos.input.Registro;
 import com.tp.repositories.DonanteRepository;
 import com.tp.utils.CryptoUtils;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Importador {
@@ -25,7 +28,6 @@ public class Importador {
         List<Donante> nuevosDonantes = new ArrayList<>();
 
         for (Registro registro : registros) {
-
             Donante existe = donanteRepository.findByEmail(registro.getEmail());
 
             if (existe == null) {
@@ -38,10 +40,9 @@ public class Importador {
                 nuevosDonantes.add(nuevo_donante);
             } else {
                 // Si ya EXISTE, aplicamos la lógica de negocio de actualización en memoria
-                actualizarCamposDonante(existe, registro);
+                actualizarCamposDonante(registro, existe);
             }
         }
-
         return nuevosDonantes;
     }
 
@@ -71,25 +72,46 @@ public class Importador {
             String documentoLimpio = registro.getDocumento().replaceAll("[^0-9]", "");
 
             persona = new PersonaHumana(nombrePersona, Genero.SIN_ESPECIFICAR, apellido, null, 0, documentoLimpio);
+            persona.setTipoDoc(TipoDoc.DNI);
         } else {
             PersonaJuridica pj = new PersonaJuridica();
             pj.setRazonSocial(registro.getNombre());
             pj.setTipo(detectarTipo(registro.getNombre()));
             pj.setRubro("Sin especificar");
+            pj.setTipoDoc(TipoDoc.CUIT);
             persona = pj;
         }
 
+        Map<String,String> medioPredeterminado = new HashMap<>();
+        medioPredeterminado.put("email", registro.getEmail());
         persona.agregarMedioDeContacto("email", registro.getEmail());
         persona.agregarMedioDeContacto("telefono", registro.getTelefono());
+        persona.setMedioPredeterminado(medioPredeterminado);
+        persona.registrarInteraccion();
+
         donante.setPersona(persona);
 
         return donante;
     }
 
-    private void actualizarCamposDonante(Donante donante, Registro dto) {
+    private void actualizarCamposDonante(Registro registro, Donante donante_existente) {
+        System.out.println("El donante " + registro.getNombre() + " ya se encuentra registrado. Acutalizando...");
+        String[] nombreSplit = registro.getNombre().split(" ", 2);
+        String nombrePersona = nombreSplit[0];
+        String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
 
-        System.out.println("El donante " + donante.getPersona().getMedioDeContacto().get("email").get(0) + " ya se encuentra registrado. Acutalizando...");
-        this.donanteRepository.update(donante);
+        donante_existente.setEmail(registro.getEmail());
+        donante_existente.getPersona().setTipoDoc(TipoDoc.valueOf(registro.getTipoDoc()));
+        donante_existente.getPersona().agregarMedioDeContacto("telefono",registro.getTelefono());
+
+        if(donante_existente.getPersona() instanceof PersonaHumana){
+            ((PersonaHumana) donante_existente.getPersona()).setNombre(nombrePersona);
+            ((PersonaHumana) donante_existente.getPersona()).setApellido(apellido);
+        } else {
+            ((PersonaJuridica) donante_existente.getPersona()).setRazonSocial(registro.getNombre());
+            ((PersonaJuridica) donante_existente.getPersona()).setCuit(registro.getDocumento());
+        }
+        this.donanteRepository.update(donante_existente.getId(),donante_existente);
     }
 
     private TipoOrganizacion detectarTipo(String razonSocial) {
