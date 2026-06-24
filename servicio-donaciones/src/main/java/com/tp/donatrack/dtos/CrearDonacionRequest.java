@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CrearDonacionRequest {
-    private Integer donanteId;
+    private Long donanteId;
     private String descripcion;
     private List<BienRequest> bienes = new ArrayList<>();
 

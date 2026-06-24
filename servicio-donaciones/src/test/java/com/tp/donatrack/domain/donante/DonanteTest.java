@@ -15,22 +15,24 @@ public class DonanteTest {
         PersonaHumana persona = new PersonaHumana();
         persona.setNombre("Leandro");
         persona.setApellido("Perez");
+        persona.setId(1L);
 
-        donante.setId(1);
         donante.setPersona(persona);
 
-        Assertions.assertEquals(1, donante.getId());
+        Assertions.assertEquals(1L, donante.getPersona().getId());
         Assertions.assertNotNull(donante.getPersona(), "La persona no debería ser nula");
         Assertions.assertEquals("Leandro", ((PersonaHumana) donante.getPersona()).getNombre());
     }
 
     @Test
-    @DisplayName("El ID del donante debe actualizarse mediante el setter")
+    @DisplayName("El ID del donante debe actualizarse mediante el setter de la persona")
     public void elIdDelDonanteDebeSerModificable() {
         Donante donante = new Donante();
-        donante.setId(500);
+        PersonaHumana persona = new PersonaHumana();
+        donante.setPersona(persona);
+        donante.getPersona().setId(500L);
 
-        Assertions.assertEquals(500, donante.getId());
+        Assertions.assertEquals(500L, donante.getPersona().getId());
     }
 
     @Test

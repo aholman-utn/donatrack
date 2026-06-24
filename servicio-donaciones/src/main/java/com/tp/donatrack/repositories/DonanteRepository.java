@@ -4,7 +4,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class DonanteRepository {
@@ -15,11 +15,10 @@ public class DonanteRepository {
         this.donantes = new ArrayList<>();
     }
 
-    private final AtomicInteger secuencia = new AtomicInteger(1);
-
     public Donante create(Donante donante){
-        donante.setId(secuencia.getAndIncrement()); //agrego el ID del donante
-        donante.getPersona().setId((long) secuencia.getAndIncrement());
+        if (donante.getPersona() != null && donante.getPersona().getId() == null) {
+            donante.getPersona().setId(com.tp.donatrack.domain.persona.Persona.nextId());
+        }
         this.donantes.add(donante);
         return donante;
     }
@@ -38,9 +37,9 @@ public class DonanteRepository {
                 .orElse(null);
     }
 
-    public Donante findById(Integer id) {
+    public Donante findById(Long id) {
         return this.donantes.stream()
-                .filter(donante -> donante.getId() != null && donante.getId().equals(id))
+                .filter(donante -> donante.getPersona() != null && donante.getPersona().getId() != null && donante.getPersona().getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -58,7 +57,7 @@ public class DonanteRepository {
 
     public void clear() {
         this.donantes.clear();
-        this.secuencia.set(1);
+        com.tp.donatrack.domain.persona.Persona.resetIdGenerator();
     }
 
 }

@@ -53,7 +53,7 @@ public class DonanteService {
         Donante donante = new Donante(persona);
         Donante nuevoDonante = donanteRepository.create(donante);
         if (nuevoDonante != null) {
-            eventPublisher.publicar(new DonanteCreadoEvent(nuevoDonante.getId(), nuevoDonante.getNombreCompleto()));
+            eventPublisher.publicar(new DonanteCreadoEvent(nuevoDonante.getPersona().getId(), nuevoDonante.getNombreCompleto()));
         }
         return nuevoDonante;
     }
@@ -83,7 +83,7 @@ public class DonanteService {
         return this.donanteRepository.find(email);
     }
 
-    public Donante buscarDonantePorId(Integer id) {
+    public Donante buscarDonantePorId(Long id) {
         return this.donanteRepository.findById(id);
     }
 
@@ -139,7 +139,7 @@ public class DonanteService {
                     "¡Bienvenido a Donatrack!",
                     persona.getId()
             );
-            eventPublisher.publicar(new DonanteCreadoEvent(nuevo_donante.getId(), nuevo_donante.getNombreCompleto()));
+            eventPublisher.publicar(new DonanteCreadoEvent(nuevo_donante.getPersona().getId(), nuevo_donante.getNombreCompleto()));
         }
         return nuevo_donante;
     }
@@ -182,7 +182,7 @@ public class DonanteService {
                 .collect(Collectors.toList());
     }
 
-    public void notificarEntrega(Integer donanteId) {
+    public void notificarEntrega(Long donanteId) {
         try {
             Donante donante = donanteRepository.findById(donanteId);
 

@@ -15,6 +15,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public abstract class Persona {
+    private static final java.util.concurrent.atomic.AtomicLong ID_GENERATOR = new java.util.concurrent.atomic.AtomicLong(1);
+
+    public static Long nextId() {
+        return ID_GENERATOR.getAndIncrement();
+    }
+
+    public static void resetIdGenerator() {
+        ID_GENERATOR.set(1);
+    }
+
     private Long id;
     private Direccion direccion;
     private Map<String, List<String>> medioDeContacto = new HashMap<>();

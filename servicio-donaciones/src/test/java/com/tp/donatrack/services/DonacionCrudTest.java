@@ -39,11 +39,11 @@ class DonacionCrudTest {
         PersonaHumana persona = new PersonaHumana("Juan", "MASCULINO", "Perez", new java.util.Date(), 25, "12345678");
         persona.agregarMedioDeContacto("email", "juan@mail.com");
         com.tp.donatrack.domain.donante.Donante donante = donanteService.registrar(persona);
-        assertNotNull(donante.getId());
+        assertNotNull(donante.getPersona().getId());
 
         // 1. Crear donación
         CrearDonacionRequest request = new CrearDonacionRequest();
-        request.setDonanteId(donante.getId());
+        request.setDonanteId(donante.getPersona().getId());
         request.setDescripcion("Donación de prueba CRUD");
         
         CrearDonacionRequest.BienRequest bien = new CrearDonacionRequest.BienRequest();

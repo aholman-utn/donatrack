@@ -5,6 +5,6 @@ package com.tp.donatrack.domain.donante;
  * Se utiliza para notificar al servicio de incentivos y otros subsistemas.
  */
 public record DonanteCreadoEvent(
-        Integer donanteId,
+        Long donanteId,
         String nombreUsuario) {
 }

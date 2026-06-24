@@ -35,9 +35,9 @@ public class DonacionRepository {
         this.donaciones.remove(donacion);
     }
 
-    public List<Donacion> findByDonanteId(Integer donanteId) {
+    public List<Donacion> findByDonanteId(Long donanteId) {
         return this.donaciones.stream()
-                .filter(d -> d.getDonante() != null && d.getDonante().getId().equals(donanteId))
+                .filter(d -> d.getDonante() != null && d.getDonante().getPersona() != null && d.getDonante().getPersona().getId().equals(donanteId))
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +60,7 @@ public class DonacionRepository {
                 .orElse(null);
     }
 
-    public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Integer donanteId) {
+    public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Long donanteId) {
         return findByDonanteId(donanteId).stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
                 .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.EN_DEPOSITO)

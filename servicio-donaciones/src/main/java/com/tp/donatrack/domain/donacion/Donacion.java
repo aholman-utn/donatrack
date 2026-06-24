@@ -48,7 +48,7 @@ public class Donacion {
                 entry.getValue().size(), 
                 entry.getKey().subCategoria(),
                 entry.getValue(),
-                this.donante != null ? this.donante.getId() : null
+                this.donante != null ? this.donante.getPersona().getId() : null
             ))
             .collect(Collectors.toList());
     }

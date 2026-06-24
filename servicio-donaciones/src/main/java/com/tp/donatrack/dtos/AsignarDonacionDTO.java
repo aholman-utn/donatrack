@@ -17,5 +17,5 @@ public class AsignarDonacionDTO {
     private Integer donacionSegmentadaId;
 
     @NotNull(message = "El ID de la entidad beneficiaria es obligatorio")
-    private Integer entidadBeneficiariaId;
+    private Long entidadBeneficiariaId;
 }

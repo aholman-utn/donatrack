@@ -35,6 +35,9 @@ class DonacionTest {
     @BeforeEach
     void setUp() {
         donanteMock = new Donante();
+        com.tp.donatrack.domain.persona.PersonaHumana persona = new com.tp.donatrack.domain.persona.PersonaHumana();
+        persona.setId(1L);
+        donanteMock.setPersona(persona);
         perecederos = new SubCategoria(Categoria.ALIMENTOS, "Perecederos", Unidad.UNIDADES);
         duraderos = new SubCategoria(Categoria.MOBILIARIO, "Duraderos", Unidad.UNIDADES);
 
@@ -130,6 +133,9 @@ class DonacionTest {
     @DisplayName("Debe agrupar por misma subcategoría y separar si difieren en criterio (fecha/estado)")
     void segmentar_separaPorCriterioPolimorfico() {
         Donante donanteMock = new Donante();
+        com.tp.donatrack.domain.persona.PersonaHumana persona2 = new com.tp.donatrack.domain.persona.PersonaHumana();
+        persona2.setId(2L);
+        donanteMock.setPersona(persona2);
         SubCategoria alimentos = new SubCategoria(Categoria.ALIMENTOS, "Alimentos", Unidad.KG);
         SubCategoria muebles = new SubCategoria(Categoria.MOBILIARIO, "Muebles", Unidad.UNIDADES);
 

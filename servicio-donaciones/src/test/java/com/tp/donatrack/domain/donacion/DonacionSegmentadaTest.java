@@ -32,7 +32,9 @@ public class DonacionSegmentadaTest {
 
     @BeforeEach
     void setUp() {
-        unaEntidadBeneficiaria = new EntidadBeneficiaria();
+        com.tp.donatrack.domain.persona.PersonaJuridica datos = new com.tp.donatrack.domain.persona.PersonaJuridica();
+        datos.setId(10L);
+        unaEntidadBeneficiaria = new EntidadBeneficiaria(datos);
         unaCategoria = Categoria.ALIMENTOS;
         unaSubCategoria = new SubCategoria(
             unaCategoria, 
@@ -41,6 +43,9 @@ public class DonacionSegmentadaTest {
         );
         
         Donante donante = new Donante();
+        com.tp.donatrack.domain.persona.PersonaHumana persona = new com.tp.donatrack.domain.persona.PersonaHumana();
+        persona.setId(1L);
+        donante.setPersona(persona);
 
         Date fechaVenc = new Date();
         BienPerecedero arroz = new BienPerecedero(

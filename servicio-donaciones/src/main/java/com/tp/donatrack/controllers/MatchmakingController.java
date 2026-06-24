@@ -43,7 +43,7 @@ public class MatchmakingController {
      * GET /matchmaking/ranking/donante/{donanteId}
      */
     @GetMapping(MatchmakingRoutes.RANKING + "/donante/{donanteId}")
-    public ResponseEntity<?> obtenerRankingPorDonante(@PathVariable Integer donanteId) {
+    public ResponseEntity<?> obtenerRankingPorDonante(@PathVariable Long donanteId) {
         try {
             List<ResultadoMatchmakingDTO> resultados = matchmakingService.obtenerRankingPorDonante(donanteId);
             return ResponseEntity.ok(resultados);

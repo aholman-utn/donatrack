@@ -46,7 +46,7 @@ class EventoTrazabilidadTest {
         donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada por algoritmo");
         donacion.listarParaEntrega("Logística");
         donacion.iniciarTraslado("Chofer Pérez");
-        donacion.confirmarEntrega(123);
+        donacion.confirmarEntrega(123L);
 
         assertEquals(EstadoDonacionSegmentada.ENTREGADA, donacion.getEstado());
         assertEquals(5, donacion.getHistorial().size());

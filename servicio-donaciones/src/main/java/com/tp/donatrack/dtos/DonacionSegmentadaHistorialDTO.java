@@ -17,5 +17,5 @@ public class DonacionSegmentadaHistorialDTO {
     private String subCategoria;
     private int cantidad;
     private EstadoDonacionSegmentada estado;
-    private Integer entidadBeneficiariaAsignadaId;
+    private Long entidadBeneficiariaAsignadaId;
 }

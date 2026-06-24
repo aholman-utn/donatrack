@@ -14,6 +14,8 @@ import java.util.Map;
 @Setter
 public class CrearPersonaJuridicaRequest {
 
+    private Long id;
+
     @NotBlank(message = "La razón social es obligatoria")
     private String razonSocial;
 
@@ -28,6 +30,7 @@ public class CrearPersonaJuridicaRequest {
 
     public PersonaJuridica toDomain() {
         PersonaJuridica p = new PersonaJuridica();
+        p.setId(id);
         p.setRazonSocial(razonSocial);
         p.setTipo(tipo);
         p.setRubro(rubro);

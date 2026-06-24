@@ -107,7 +107,7 @@ public class DonacionService {
         donacionRepository.delete(donacion);
     }
 
-    public List<DonacionHistorialDTO> obtenerHistorialPorDonante(Integer donanteId) {
+    public List<DonacionHistorialDTO> obtenerHistorialPorDonante(Long donanteId) {
         List<Donacion> donaciones = donacionRepository.findByDonanteId(donanteId);
         return donaciones.stream()
                 .map(this::mapToDTO)

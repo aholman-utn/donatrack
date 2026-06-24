@@ -13,6 +13,8 @@ import java.util.Map;
 @Setter
 public class CrearPersonaHumanaRequest {
 
+    private Long id;
+
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
@@ -30,6 +32,7 @@ public class CrearPersonaHumanaRequest {
 
     public PersonaHumana toDomain() {
         PersonaHumana p = new PersonaHumana();
+        p.setId(id);
         p.setNombre(nombre);
         p.setApellido(apellido);
         p.setGenero(genero);

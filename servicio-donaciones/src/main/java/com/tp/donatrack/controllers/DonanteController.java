@@ -142,12 +142,12 @@ public class DonanteController {
     }
 
     @PostMapping("/{id}/simular-inactividad")
-    public void simularInactividad(@PathVariable Integer id) {
+    public void simularInactividad(@PathVariable Long id) {
         Donante donante = donanteService.buscarDonantePorId(id);
         
         if (donante != null) {
             donante.getPersona().setFechaUltimaInteraccion(LocalDateTime.now().minusDays(32));
-            System.out.println("Fecha seteada para: " + donante.getId());
+            System.out.println("Fecha seteada para: " + donante.getPersona().getId());
         } else {
             throw new RuntimeException("Donante no encontrado");
         }

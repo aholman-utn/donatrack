@@ -29,7 +29,7 @@ public class NecesidadService {
 
     public NecesidadResponseDTO crearNecesidad(CrearNecesidadDTO dto) {
         // Validar Entidad
-        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(Math.toIntExact(dto.getEntidadBeneficiariaId()));
+        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(dto.getEntidadBeneficiariaId());
         if (entidad == null) {
             throw new IllegalArgumentException("Entidad beneficiaria no encontrada con ID: " + dto.getEntidadBeneficiariaId());
         }
@@ -98,7 +98,7 @@ public class NecesidadService {
                 .orElseThrow(() -> new IllegalArgumentException("Necesidad no encontrada con ID: " + id));
 
         // Desvincular en memoria de la entidad beneficiaria
-        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(Math.toIntExact(necesidad.getEntidadBeneficiariaId()));
+        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(necesidad.getEntidadBeneficiariaId());
         if (entidad != null) {
             entidad.removerNecesidad(necesidad);
         }

@@ -35,7 +35,7 @@ public class EndidadBeneficiariaController {
     }
 
     @GetMapping(EntidadBeneficiariaRoutes.POR_ID)
-    public ResponseEntity<EntidadBeneficiaria> buscarEntidad(@PathVariable Integer id) {
+    public ResponseEntity<EntidadBeneficiaria> buscarEntidad(@PathVariable Long id) {
         EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(id);
         if (entidad == null) {
             return ResponseEntity.notFound().build();
@@ -45,8 +45,8 @@ public class EndidadBeneficiariaController {
 
     @PutMapping(EntidadBeneficiariaRoutes.POR_ID)
     public ResponseEntity<EntidadBeneficiaria> actualizarDatosPerosnales(
-            @PathVariable Integer id,
-            @Valid @RequestBody CrearPersonaJuridicaRequest request) {
+         @PathVariable Long id,
+         @Valid @RequestBody CrearPersonaJuridicaRequest request) {
 
         EntidadBeneficiaria actualizado = entidadBeneficiariaService.actualizarDatosPerosnales(id, request.toDomain());
         return ResponseEntity.ok(actualizado);
@@ -55,7 +55,7 @@ public class EndidadBeneficiariaController {
     //TODO: actualizarNecesidades -> necesito crear el DTO
 
     @DeleteMapping(EntidadBeneficiariaRoutes.POR_ID)
-    public ResponseEntity<EntidadBeneficiaria> eliminar(@PathVariable Integer id) {
+    public ResponseEntity<EntidadBeneficiaria> eliminar(@PathVariable Long id) {
         entidadBeneficiariaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

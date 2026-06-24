@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class EntidadRankingDTO {
-    private Integer id;
+    private Long id;
     private String razonSocial;
     private int cantNecesidadesActivas;
 }

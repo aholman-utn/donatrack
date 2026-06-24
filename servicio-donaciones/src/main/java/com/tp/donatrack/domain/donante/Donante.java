@@ -10,7 +10,6 @@ import com.tp.donatrack.domain.persona.PersonaJuridica;
 @Setter
 //Donante no deberia heredar Persona ? porque tiene un atributo que es persona ?
 public class Donante {
-    private Integer id;
     private Persona persona;
     private String password;
     public Donante(Persona persona) {

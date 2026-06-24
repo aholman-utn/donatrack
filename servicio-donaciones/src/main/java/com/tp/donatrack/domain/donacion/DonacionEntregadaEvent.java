@@ -10,8 +10,8 @@ import java.time.LocalDate;
  * Incentivos, Notificaciones).
  */
 public record DonacionEntregadaEvent(
-                Integer donanteId,
-                Integer entidadBeneficiariaId,
+                Long donanteId,
+                Long entidadBeneficiariaId,
                 Categoria categoriaDonacion,
                 LocalDate fechaDonacion) {
 }

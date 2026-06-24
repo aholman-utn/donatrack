@@ -37,26 +37,26 @@ public class EntidadBeneficiariaService {
         return entidadBeneficiariaRepository.findAll();
     }
 
-    public EntidadBeneficiaria buscarEntidad(Integer id) {
+    public EntidadBeneficiaria buscarEntidad(Long id) {
         return entidadBeneficiariaRepository.find(id);
     }
 
     // UPDATE
-    public EntidadBeneficiaria actualizarDatosPerosnales(Integer id, PersonaJuridica personaJuridica) {
+    public EntidadBeneficiaria actualizarDatosPerosnales(Long id, PersonaJuridica personaJuridica) {
         EntidadBeneficiaria entidad = buscarEntidad(id);
         entidad.setDatosDeEntidad(personaJuridica);
         return entidadBeneficiariaRepository.create(entidad);
     }
 
     // DELETE
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         EntidadBeneficiaria entidadAeliminar = buscarEntidad(id);
         if (entidadAeliminar != null) {
             entidadBeneficiariaRepository.delete(entidadAeliminar);
         }
     }
 
-    public void notificarEntrega(Integer entidadId) {
+    public void notificarEntrega(Long entidadId) {
         try {
             EntidadBeneficiaria entidad = this.buscarEntidad(entidadId);
 

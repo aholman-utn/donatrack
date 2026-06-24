@@ -16,7 +16,6 @@ import lombok.Setter;
 public class EntidadBeneficiaria {
     private PersonaJuridica datosDeEntidad;
     private List<NecesidadMaterial> nececidades = new ArrayList<>();
-    private Integer id;
 
     private List<NecesidadMaterial> necesidadesActivas() {
         return nececidades.stream().filter(NecesidadMaterial::activo).toList();

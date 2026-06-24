@@ -21,7 +21,7 @@ public class DonacionController {
 
     @GetMapping
     public ResponseEntity<List<DonacionHistorialDTO>> listarDonaciones(
-            @RequestParam(required = false) Integer donanteId) {
+            @RequestParam(required = false) Long donanteId) {
         if (donanteId != null) {
             return ResponseEntity.ok(donacionService.obtenerHistorialPorDonante(donanteId));
         }

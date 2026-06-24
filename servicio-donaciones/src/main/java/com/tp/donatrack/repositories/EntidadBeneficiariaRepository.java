@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class EntidadBeneficiariaRepository {
@@ -14,19 +14,19 @@ public class EntidadBeneficiariaRepository {
         this.entidades = new ArrayList<>();
     }
 
-    private final AtomicInteger secuencia = new AtomicInteger(1);
-
     public EntidadBeneficiaria create(EntidadBeneficiaria entidadBeneficiaria){
-        entidadBeneficiaria.setId(secuencia.getAndIncrement());
-        entidadBeneficiaria.getDatosDeEntidad().setId((long) secuencia.getAndIncrement());
+        if (entidadBeneficiaria.getDatosDeEntidad() != null && entidadBeneficiaria.getDatosDeEntidad().getId() == null) {
+            entidadBeneficiaria.getDatosDeEntidad().setId(com.tp.donatrack.domain.persona.Persona.nextId());
+        }
         this.entidades.add(entidadBeneficiaria);
         return entidadBeneficiaria;
     }
 
     public List<EntidadBeneficiaria> findAll() {return this.entidades;}
 
-    public EntidadBeneficiaria find(Integer id) {
-        return this.entidades.stream().filter(entidad -> entidad.getId().equals(id))
+    public EntidadBeneficiaria find(Long id) {
+        return this.entidades.stream()
+                .filter(entidad -> entidad.getDatosDeEntidad() != null && entidad.getDatosDeEntidad().getId() != null && entidad.getDatosDeEntidad().getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -35,7 +35,7 @@ public class EntidadBeneficiariaRepository {
 
     public void clear() {
         this.entidades.clear();
-        this.secuencia.set(1);
+        com.tp.donatrack.domain.persona.Persona.resetIdGenerator();
     }
 
 }

@@ -59,7 +59,7 @@ public class MatchmakingService {
     /**
      * Retorna el ranking para todas las donaciones en depósito de un donante.
      */
-    public List<ResultadoMatchmakingDTO> obtenerRankingPorDonante(Integer donanteId) {
+    public List<ResultadoMatchmakingDTO> obtenerRankingPorDonante(Long donanteId) {
         List<DonacionSegmentada> segmentadasEnDeposito = donacionRepository
                 .findSegmentadasEnDepositoByDonanteId(donanteId);
         if (segmentadasEnDeposito.isEmpty()) {
@@ -80,7 +80,7 @@ public class MatchmakingService {
     /**
      * Asigna una donación segmentada a la entidad beneficiaria elegida del ranking.
      */
-    public void asignarDonacion(Integer donacionSegmentadaId, Integer entidadBeneficiariaId) {
+    public void asignarDonacion(Integer donacionSegmentadaId, Long entidadBeneficiariaId) {
         DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
@@ -115,7 +115,7 @@ public class MatchmakingService {
     private List<EntidadRankingDTO> mapearEntidades(List<EntidadBeneficiaria> entidades) {
         return entidades.stream()
                 .map(e -> EntidadRankingDTO.builder()
-                        .id(e.getId())
+                        .id(e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getId() : null)
                         .razonSocial(
                                 e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getRazonSocial() : "Sin nombre")
                         .cantNecesidadesActivas(e.getCantNececidadesActivas())

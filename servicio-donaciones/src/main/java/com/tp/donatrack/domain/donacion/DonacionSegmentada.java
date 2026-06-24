@@ -22,8 +22,8 @@ public class DonacionSegmentada {
     private List<Bien> bienes;
     private EstadoDonacionSegmentada estado;
     private final List<EventoTrazabilidad> historial = new ArrayList<>();
-    private Integer donanteId;
-    private Integer entidadBeneficiariaAsignadaId;
+    private Long donanteId;
+    private Long entidadBeneficiariaAsignadaId;
 
     public DonacionSegmentada(
             int cantidad,
@@ -36,7 +36,7 @@ public class DonacionSegmentada {
             int cantidad,
             SubCategoria subCategoria,
             List<Bien> bienes,
-            Integer donanteId) {
+            Long donanteId) {
         this.cantidad = cantidad;
         this.subCategoria = subCategoria;
         this.bienes = bienes;
@@ -54,7 +54,7 @@ public class DonacionSegmentada {
 
     public void asignar(EntidadBeneficiaria entidad, String actor) {
         entidad.implementarDonacion(this);
-        this.entidadBeneficiariaAsignadaId = entidad.getId();
+        this.entidadBeneficiariaAsignadaId = entidad.getDatosDeEntidad().getId();
         transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, actor, "Donación asignada a entidad beneficiaria");
     }
 
@@ -72,11 +72,11 @@ public class DonacionSegmentada {
         transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
     }
 
-    public void confirmarEntrega(Integer entidadBeneficiariaId) {
+    public void confirmarEntrega(Long entidadBeneficiariaId) {
         confirmarEntrega(entidadBeneficiariaId, null);
     }
 
-    public void confirmarEntrega(Integer entidadBeneficiariaId, DonacionEventPublisher eventPublisher) {
+    public void confirmarEntrega(Long entidadBeneficiariaId, DonacionEventPublisher eventPublisher) {
         transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId),
                 "Entidad beneficiaria confirmó la recepción");
         if (eventPublisher != null && this.donanteId != null) {
