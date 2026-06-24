@@ -1,5 +1,7 @@
 package com.tp.domain.importador;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.domain.donante.Donante;
 import com.tp.domain.donante.persona.*;
 import com.tp.dtos.input.ActualizarDonanteInputDTO;
@@ -18,9 +20,10 @@ import java.util.Map;
 public class Importador {
 
     private final DonanteRepository donanteRepository;
-
-    public Importador(DonanteRepository repo){
+    private final NotificacionRestClient notificador;
+    public Importador(DonanteRepository repo, NotificacionRestClient notificador){
         this.donanteRepository=repo;
+        this.notificador=notificador;
     }
 
     public List<Donante> iniciar_migracion(List<Registro> registros) {
@@ -38,11 +41,14 @@ public class Importador {
                 donanteRepository.create(nuevo_donante);
                 nuevo_donante.setPassword(password);
                 nuevosDonantes.add(nuevo_donante);
+                //notifico
+                notificador.notificar(TipoNotificador.EMAIL,registro.getEmail(),"Bienvenido a Donatrack. Usuario: " + registro.getEmail() + ", password: " + password, "Cuenta creada en Donatrack", nuevo_donante.getPersona().getId());
             } else {
                 // Si ya EXISTE, aplicamos la lógica de negocio de actualización en memoria
                 actualizarCamposDonante(registro, existe);
             }
         }
+
         return nuevosDonantes;
     }
 
