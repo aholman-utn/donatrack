@@ -1,7 +1,6 @@
 package com.tp.dtos.output;
 
-
-import com.tp.domain.donante.persona.TipoNotificador;
+import com.tp.commons.domain.notificador.TipoNotificador;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,5 +1,6 @@
 package com.tp.domain.donante.persona;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.domain.donante.persona.ubicacion.Direccion;
 import lombok.Getter;
 import lombok.Setter;

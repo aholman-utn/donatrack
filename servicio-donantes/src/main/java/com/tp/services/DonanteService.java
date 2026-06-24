@@ -1,5 +1,6 @@
 package com.tp.services;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.domain.donante.Donante;
 import com.tp.domain.donante.Perfil;
 import com.tp.domain.donante.persona.*;
