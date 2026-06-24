@@ -42,6 +42,7 @@ public class Importador {
                 nuevo_donante.setPassword(password);
                 nuevosDonantes.add(nuevo_donante);
                 //notifico
+                System.out.println("Enviando credenciales de acceso a " + registro.getEmail()+".....");
                 notificador.notificar(TipoNotificador.EMAIL,registro.getEmail(),"Bienvenido a Donatrack. Usuario: " + registro.getEmail() + ", password: " + password, "Cuenta creada en Donatrack", nuevo_donante.getPersona().getId());
             } else {
                 // Si ya EXISTE, aplicamos la lógica de negocio de actualización en memoria
