@@ -87,6 +87,25 @@ El proyecto usa **JUnit 5** con `maven-surefire-junit5-tree-reporter` para una s
 ```
 
 ---
+# Para ejecutar los servicios
+./mvnw spring-boot:run -pl servicio-donaciones                                  
+./mvnw spring-boot:run -pl servicio-incentivos                                  
+./mvnw spring-boot:run -pl servicio-notificaciones                                  
+
+## Capas
+### 🛂 Controller.
+**Responsabilidades:**
+- Recibir peticiones HTTP y devolver respuestas HTTP.
+- Validar y transformar los datos de entrada (DTO → dominio).
+- Delegar la lógica al Service.
+
+**Lo que NO hace:**
+- No contiene lógica de negocio.
+- No accede directamente al repositorio.
+
+Las rutas están centralizadas en DonanteRoutes para tenerlas en un solo lugar
+
+---
 
 ## 📁 Estructura del proyecto
 
@@ -156,6 +175,7 @@ O simplemente hacé doble clic en `bocetos/index.html` desde el explorador de ar
 - **Lombok** (generación de getters/setters/constructores)
 - **JUnit 5** (testing)
 - **Maven** (gestión de dependencias y build)
+- **Springdoc OpenAPI** (documentación de API REST con Swagger UI)
 
 ## API disponible
 
@@ -299,3 +319,33 @@ Configuracion actual:
 - Maximo tamano de archivo multipart: `10MB`
 - Maximo tamano de request multipart: `10MB`
 
+---
+
+## 📡 API REST - Swagger UI
+
+El proyecto expone su documentación de API automáticamente mediante Swagger UI.
+
+### Levantar el servicio
+
+```bash
+export JAVA_HOME=~/.jdks/corretto-21.0.9
+export PATH=$JAVA_HOME/bin:$PATH
+./mvnw spring-boot:run -pl servicio-donaciones
+```
+
+### Acceder a Swagger
+
+Una vez levantado el servicio, abrí en el navegador:
+
+| Recurso | URL |
+|---------|-----|
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
+| OpenAPI JSON | http://localhost:8080/v3/api-docs |
+
+### Puertos por servicio
+
+| Servicio | Puerto |
+|----------|--------|
+| servicio-donaciones | 8080 |
+| servicio-incentivos | 8081 |
+| servicio-notificaciones | 8082 |

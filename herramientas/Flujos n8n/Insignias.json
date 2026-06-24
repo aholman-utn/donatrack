@@ -1,0 +1,371 @@
+{
+  "name": "Insignias",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nueva_insignia",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        2656
+      ],
+      "id": "e07d54e5-29f1-43df-8d18-2f07abd5c9ff",
+      "name": "Webhook2",
+      "webhookId": "f3644eaa-b6ad-4ec7-afd7-898345b18474"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.nombreMision }}",
+                    "rightValue": "=Racha",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "dc1f2bb5-10a4-41ef-be29-71be1946914d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bd1a379b-e113-4bf9-893d-a033fd8e035b",
+                    "leftValue": "={{ $json.body.nombreMision }}",
+                    "rightValue": "Completitud",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f99af809-f7ce-4f8e-ae9a-09461afe7837",
+                    "leftValue": "={{ $json.body.nombreMision }}",
+                    "rightValue": "Habil Donador",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "aaff367f-8c1e-48b9-8b74-73da3fe76a20",
+                    "leftValue": "={{ $json.body.nombreMision }}",
+                    "rightValue": "Donacion Exitosa",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        2624
+      ],
+      "id": "ef3c3631-a9d6-444d-9fe7-312595f3d9be",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/screenshot",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #FFD34B; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/racha.png' alt='racha'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        512,
+        2416
+      ],
+      "id": "63a5ad4a-9196-4f21-8a13-6f0f445a94e2",
+      "name": "Gen img Racha2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/screenshot",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #96D5DA; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/habil_donador.png' alt='habil_donador'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        512,
+        2736
+      ],
+      "id": "6c40a4bb-ee95-4eee-8d0a-ec87e0a91ad5",
+      "name": "Gen Img Habil Donador2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/screenshot",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C4A9E0; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/doancion_exitosa.png'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        512,
+        2896
+      ],
+      "id": "8abb05ab-1232-46e6-8ad5-b7879cb28eb5",
+      "name": "Gen Img Donacion Exitosa2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/screenshot",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"html\": `<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap'); .contenedor-iconos { display: flex; align-items: center; justify-content: center; margin: 50px auto; } .badge-wrapper { position: relative; width: 350px; } .badge-wrapper img { width: 100%; height: auto; display: block; } .badge-nombre { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); width: 70%; text-align: center; color: #C8E0BE; font-family: 'Montserrat'; font-weight: 900; font-size: 24px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }</style></head><body><div class='contenedor-iconos'><div class='badge-wrapper'><img src='https://raw.githubusercontent.com/aholman-utn/donatrack/refs/heads/main/insignias/completitud.png' alt='completitud'><span class='badge-nombre'>${$json.body.user}</span></div></div></body></html>`,\n  \"options\": {\n    \"type\": \"png\",\n    \"omitBackground\": true\n  }\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        512,
+        2576
+      ],
+      "id": "ff6b40b7-e8b2-4630-86d5-ec6b7331135b",
+      "name": "Gen Img Completitud2"
+    },
+    {
+      "parameters": {
+        "person": "MlEcbVsLio",
+        "text": "=¡Felicitaciones a {{ $json.body.user }}! 🎉 Acaba de conseguir la insignia {{ $json.body.nombreMision }} en #DonaTrack tras cumplir el logro: {{ $json.body.description }}. ¡Gracias por tu compromiso solidario! ❤️",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {
+          "visibility": "PUBLIC"
+        }
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        848,
+        2656
+      ],
+      "id": "29d5ee10-0adf-43f3-be5f-d20eb7971570",
+      "name": "Create a post2",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "CJBPwXeXLKEFQ9Wc",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c497e6a6-8c7e-415e-b869-ae585a269088",
+              "name": "body.user",
+              "value": "={{ $json.body.user }}",
+              "type": "string"
+            },
+            {
+              "id": "71dde59d-f8a0-4e63-abb9-724bd122c69f",
+              "name": "body.nombreMision",
+              "value": "={{ $json.body.nombreMision }}",
+              "type": "string"
+            },
+            {
+              "id": "fc594713-8a76-4a4b-be69-0f86521d0740",
+              "name": "body.description",
+              "value": "={{ $json.body.descripcion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        2656
+      ],
+      "id": "0e0055b5-a6b1-4db6-a404-01b34189daf3",
+      "name": "Limpieza de Datos"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Limpieza de Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Gen img Racha2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gen Img Completitud2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gen Img Habil Donador2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gen Img Donacion Exitosa2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen img Racha2": {
+      "main": [
+        [
+          {
+            "node": "Create a post2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Img Habil Donador2": {
+      "main": [
+        [
+          {
+            "node": "Create a post2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Img Donacion Exitosa2": {
+      "main": [
+        [
+          {
+            "node": "Create a post2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Img Completitud2": {
+      "main": [
+        [
+          {
+            "node": "Create a post2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpieza de Datos": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5e2215e6-a3cd-4728-b5cd-341cec31cdc2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b350326ce4a193af92133940de53e07941ee6ae913202d3984c661c6ddaa01f7"
+  },
+  "nodeGroups": [],
+  "id": "prttLnmIpAH1lE7M",
+  "tags": []
+}

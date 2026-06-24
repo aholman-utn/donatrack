@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n_DonaTrack
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  browserless:
+    image: browserless/chrome:latest
+    container_name: mi-renderizador-local
+    ports:
+      - "3000:3000"
+    environment:
+      - MAX_CONCURRENT_SESSIONS=10
+
+volumes:
+  n8n_data:

@@ -1,0 +1,165 @@
+openapi: 3.0.3
+info:
+  title: DonaTrack - Servicio de Notificaciones
+  description: |
+    API REST del servicio de notificaciones de DonaTrack.
+    Gestiona el envío de notificaciones a través de diferentes medios
+    (Email, SMS, WhatsApp) y el registro/consulta de notificaciones internas.
+  version: 1.0.0
+  contact:
+    name: Equipo DonaTrack
+
+servers:
+  - url: http://localhost:8082
+    description: Servidor local de desarrollo
+
+tags:
+  - name: Notificaciones
+    description: Envío, creación y consulta de notificaciones
+
+paths:
+  # ─────────────────────────────────────────────
+  #  NOTIFICACIONES
+  # ─────────────────────────────────────────────
+  /api/notificaciones/notificar:
+    post:
+      tags: [Notificaciones]
+      summary: Enviar notificación por servicio externo
+      description: |
+        Envía una notificación a través de un proveedor externo
+        (Email, SMS o WhatsApp) al destinatario indicado.
+      operationId: notificar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificarServicioExterno'
+            example:
+              medio: "EMAIL"
+              destinatario: "usuario@mail.com"
+              mensaje: "Tu donación fue entregada exitosamente."
+      responses:
+        '200':
+          description: Notificación enviada exitosamente
+        '400':
+          description: Error de validación
+
+  /api/notificaciones/:
+    post:
+      tags: [Notificaciones]
+      summary: Crear notificación interna
+      description: Registra una nueva notificación en el sistema para una persona.
+      operationId: crearNotificacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificacionInputDTO'
+            example:
+              id_persona: 1
+              titulo: "Donación asignada"
+              cuerpo: "Tu donación fue asignada a la entidad Comedor Los Pibes."
+      responses:
+        '200':
+          description: Notificación creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificacionOutputDTO'
+
+    get:
+      tags: [Notificaciones]
+      summary: Listar todas las notificaciones
+      description: Devuelve todas las notificaciones registradas en el sistema.
+      operationId: buscarTodasLasNotificaciones
+      responses:
+        '200':
+          description: Lista de notificaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificacionOutputDTO'
+
+  /api/notificaciones/personas/{idPersona}:
+    get:
+      tags: [Notificaciones]
+      summary: Buscar notificaciones por persona
+      description: Devuelve todas las notificaciones asociadas a una persona específica.
+      operationId: buscarNotificacionesPorPersona
+      parameters:
+        - name: idPersona
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lista de notificaciones de la persona
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificacionOutputDTO'
+
+# ═══════════════════════════════════════════════
+#  SCHEMAS
+# ═══════════════════════════════════════════════
+components:
+  schemas:
+    # ── Enumeraciones ──────────────────────────
+    MedioNotificador:
+      type: string
+      enum: [EMAIL, SMS, WHATSAPP]
+
+    # ── DTOs ───────────────────────────────────
+    NotificarServicioExterno:
+      type: object
+      required: [medio, destinatario, mensaje]
+      properties:
+        medio:
+          $ref: '#/components/schemas/MedioNotificador'
+          description: Medio de notificación (obligatorio)
+        destinatario:
+          type: string
+          description: Destinatario de la notificación (obligatorio)
+        mensaje:
+          type: string
+          description: Contenido del mensaje (obligatorio)
+
+    NotificacionInputDTO:
+      type: object
+      properties:
+        id_persona:
+          type: integer
+          format: int64
+          description: ID de la persona destinataria
+        titulo:
+          type: string
+          description: Título de la notificación
+        cuerpo:
+          type: string
+          description: Cuerpo/contenido de la notificación
+
+    NotificacionOutputDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        id_persona:
+          type: integer
+          format: int64
+        titulo:
+          type: string
+        cuerpo:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+          description: Fecha y hora de la notificación

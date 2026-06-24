@@ -1,0 +1,1178 @@
+{
+  "info": {
+    "_postman_id": "0d6a388e-6ec1-415b-9939-83b389e02968",
+    "name": "DonaTrack",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44722010",
+    "_collection_link": "https://go.postman.co/collection/44722010-0d6a388e-6ec1-415b-9939-83b389e02968?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Donantes",
+      "item": [
+        {
+          "name": "Donante Juridico",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Fundación Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/juridico",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "juridico"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Donante Humano",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"carlos\",\n  \"apellido\": \"pangaro\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"12345678\",\n  \"direccion\": {\n    \"calle1\": \"una calle\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 2,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"carlos@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"carlos@mail.com\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "humano"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Donante Por Mail",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/contacto@fundacion.org",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "contacto@fundacion.org"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Donantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Por Mail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/carlos@mail.com",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "carlos@mail.com"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Datos",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"carlitos\",\n  \"apellido\": \"pangaro\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"87654321\",\n  \"direccion\": {\n    \"calle1\": \"Calle actualizada\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 123,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"B\",\n    \"ciudadNombre\": \"Bariloche\",\n    \"provinciaNombre\": \"Rio Negro\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"carlos@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"carlos@mail.com\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/carlos@mail.com/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "carlos@mail.com",
+                "humano"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entidades Beneficiarias",
+      "item": [
+        {
+          "name": "Entidad Beneficiaria",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Entidades",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Entidad",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Datos",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Datos Copy",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Entidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/entidadBeneficiaria/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "entidadBeneficiaria",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Necesidades",
+      "item": [
+        {
+          "name": "Crear Necesidad",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Arroz\",\n  \"cantidad\": 50,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Necesidad por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Necesidades por Entidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/entidad/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "entidad",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Necesidad",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Fideos\",\n  \"cantidad\": 100,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Necesidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/necesidades/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "necesidades",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Donaciones",
+      "item": [
+        {
+          "name": "Crear Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Entregar Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donacionSegmentadaId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones/entregar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "entregar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donaciones",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Donaciones por Donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donaciones?donanteId=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones"
+              ],
+              "query": [
+                {
+                  "key": "donanteId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Donacion por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donaciones/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Donacion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Donación actualizada de alimentos y vestimenta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Donacion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donaciones/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Matchmaking",
+      "item": [
+        {
+          "name": "Cargar Escenario Matchmaking (Semilla)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/seed-test",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "seed-test"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking por Donacion Segmentada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/ranking?donacionSegmentadaId=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "ranking"
+              ],
+              "query": [
+                {
+                  "key": "donacionSegmentadaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ranking por Donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/ranking/donante/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "ranking",
+                "donante",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donacionSegmentadaId\": 1,\n  \"entidadBeneficiariaId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/matchmaking/asignar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "matchmaking",
+                "asignar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Servicio - Incentivos",
+      "item": [
+        {
+          "name": "Perfil de donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener misiones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/misiones/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "misiones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener metricas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/metricas/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "metricas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ranking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/ranking",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "ranking"
+              ]
+            },
+            "description": "\\[ { \"posicion\": 1,\n\n\"donanteId\": 1,\n\n\"totalDonacionesExitosas\": 4,\n\n\"categoriaDonante\": \"COLABORADOR\",\n\n\"totalMisionesCompletadas\": 1 },\n\n---\n\n{ \"posicion\": 2, \"donanteId\": 2, \"totalDonacionesExitosas\": 3, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 3, \"donanteId\": 4, \"totalDonacionesExitosas\": 1, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 4, \"donanteId\": 3, \"totalDonacionesExitosas\": 2, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 }\\]"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener insignias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/insignias/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "insignias",
+                "1"
+              ]
+            },
+            "description": "{ \"insignias\": \\[ { \"titulo\": \"Donacion Exitosa\", \"descripcion\": \"Completaste tus primeras 3 donaciones exitosas\" } \\], \"totalInsignias\": 1}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prueba conexión entre servicios de Donaciones e Incentivos",
+      "item": [
+        {
+          "name": "1) Creacion del donante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Lucas\",\n  \"apellido\": \".p\",\n  \"nroDocumento\": 12345678,\n  \"mediosDeContacto\": [\n    { \"medio\": \"EMAIL\", \"valor\": \"pepe@mail.com\" }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"pepe@mail.com\"\n  }\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/humano",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "humano"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2) Creacion de la donacion con ID del donante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3) Entregar Donacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donacionSegmentadaId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donaciones/entregar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donaciones",
+                "entregar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4) Obtengo perfil desde el servicio de incentivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/perfil/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "perfil",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "nueva Insignia",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\"user\": \"Lauta\",\n\"nombreMision\": \"Donacion Exitosa\",\n\"descripcion\": \"Realizar una donacion de forma exitosa\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5678/webhook-test/nueva_insignia",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5678",
+          "path": [
+            "webhook-test",
+            "nueva_insignia"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Enviar Whatsapp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"WHATSAPP\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje de Whatsapp.\",\n  \"idPersona\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Enviar SMS",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"SMS\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje SMS.\",\n  \"idPersona\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Enviar Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"EMAIL\",\n  \"destinatario\": \"contact@gmail.com\",\n  \"mensaje\": \"Hola, este es un email..\",\n  \"asunto\": \"Asunto para todos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Simular inactividad de usuarios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/donantes/1/simular-inactividad",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "donantes",
+                "1",
+                "simular-inactividad"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener todas las notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                ""
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Obtener notificaciones de una persona",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/personas/2",
+              "protocol": "http",
+              "host": [
+                "localhost:8082"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "personas",
+                "2"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

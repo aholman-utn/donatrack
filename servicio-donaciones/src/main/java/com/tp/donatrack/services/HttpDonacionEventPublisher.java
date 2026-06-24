@@ -1,0 +1,52 @@
+package com.tp.donatrack.services;
+
+import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
+import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
+import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.repositories.DonanteRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+public class HttpDonacionEventPublisher implements DonacionEventPublisher {
+
+    private final RestTemplate restTemplate;
+    private final String incentivosUrl;
+    private final DonanteRepository donanteRepository;
+
+    public HttpDonacionEventPublisher(
+            RestTemplate restTemplate,
+            @Value("${services.incentivos.url}") String incentivosUrl,
+            DonanteRepository donanteRepository) {
+        this.restTemplate = restTemplate;
+        this.incentivosUrl = incentivosUrl;
+        this.donanteRepository = donanteRepository;
+    }
+
+    @Override
+    public void publicar(DonacionEntregadaEvent event) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("donanteId", event.donanteId());
+        requestBody.put("entidadBeneficiariaId", event.entidadBeneficiariaId());
+        requestBody.put("categoriaDonacion", event.categoriaDonacion());
+        requestBody.put("fechaDonacion", LocalDate.now());
+
+        Donante donante = donanteRepository.findById(event.donanteId());
+        if (donante != null) {
+            requestBody.put("nombreUsuario", donante.getNombreCompleto());
+        }
+
+        try {
+            restTemplate.postForEntity(incentivosUrl, requestBody, Void.class);
+        } catch (Exception e) {
+            // Se captura la excepcion para que no corte el flujo principal si el
+            // microservicio esta caido
+            System.err.println("Error al notificar al servicio de incentivos: " + e.getMessage());
+        }
+    }
+}
