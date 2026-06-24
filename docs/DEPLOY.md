@@ -60,6 +60,52 @@ Configurar en el dashboard de Render si es necesario:
 - **750 horas/mes** de uso gratuito (suficiente para los 3 servicios)
 - Sin dominio personalizado en plan free
 
+## Instructivo para compañeros (un servicio por persona)
+
+Como el plan gratuito de Render solo permite **1 web service por cuenta**, cada compañero debe desplegar un servicio diferente:
+
+| Compañero | Servicio | Dockerfile Path |
+|-----------|----------|-----------------|
+| Compañero 1 | Donaciones | `./Dockerfile.donaciones` |
+| Compañero 2 | Incentivos | `./Dockerfile.incentivos` |
+| Compañero 3 | Notificaciones | `./Dockerfile.notificaciones` |
+
+### Paso a paso para cada compañero
+
+1. **Crear cuenta** en https://render.com (gratis, sin tarjeta)
+2. Clic en **New** → **Web Service**
+3. Seleccionar **Build and deploy from a Git repository** → Next
+4. Conectar GitHub y seleccionar el repo `aholman-utn/donatrack`
+5. Configurar:
+   - **Name**: `donatrack-donaciones` (o `incentivos` / `notificaciones`)
+   - **Branch**: `main`
+   - **Runtime**: `Docker`
+   - **Dockerfile Path**: ver tabla de arriba
+   - **Instance Type**: `Free`
+6. **Environment Variables**: dejar vacío
+7. Clic en **Deploy Web Service**
+8. Esperar ~5 minutos a que buildee
+9. Render te da una URL pública tipo `https://donatrack-donaciones.onrender.com`
+
+### Verificar que funciona
+
+Abrir en el navegador:
+```
+https://[tu-url].onrender.com/swagger-ui/index.html
+```
+
+Si tarda en cargar la primera vez (~30 seg), es normal — el servicio estaba dormido.
+
+### Después del deploy: conectar servicios entre sí
+
+Una vez que los 3 estén desplegados, el compañero que tiene **Donaciones** debe agregar esta variable de entorno en Render:
+
+| Key | Value |
+|-----|-------|
+| `SERVICES_INCENTIVOS_URL` | `https://donatrack-incentivos.onrender.com/perfil/entrega` |
+
+(Ir a Dashboard → servicio donaciones → Environment → Add Environment Variable)
+
 ## Docker local (para probar antes de subir)
 
 ```bash
