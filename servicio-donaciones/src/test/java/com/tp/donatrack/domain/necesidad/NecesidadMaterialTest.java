@@ -14,12 +14,12 @@ class NecesidadMaterialTest {
 
     private NecesidadExtraordinaria necesidad;
     private SubCategoria subCategoria;
-    private Categoria categoria;
+    private CategoriaBien categoria;
     private DonacionSegmentada donacion;
 
     @BeforeEach
     void setUp() {
-        categoria = Categoria.MOBILIARIO;
+        categoria = CategoriaBien.MOBILIARIO;
         subCategoria = new SubCategoria(categoria, "Sillas", Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 3, new Date(), "Inundación");
     }

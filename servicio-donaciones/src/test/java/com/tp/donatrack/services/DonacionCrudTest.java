@@ -53,7 +53,7 @@ class DonacionCrudTest {
         bien.setEstadoBien(com.tp.donatrack.domain.bien.EstadoBien.NUEVO);
         
         CrearDonacionRequest.SubCategoriaRequest sub = new CrearDonacionRequest.SubCategoriaRequest();
-        sub.setCategoria(com.tp.donatrack.domain.bien.Categoria.MOBILIARIO);
+        sub.setCategoria(com.tp.donatrack.domain.bien.CategoriaBien.MOBILIARIO);
         sub.setDescripcion("Mesas");
         sub.setUnidad(com.tp.donatrack.domain.bien.Unidad.UNIDADES);
         bien.setSubCategoria(sub);

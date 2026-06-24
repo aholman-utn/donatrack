@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.tp.donatrack.domain.bien.Categoria;
+import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.bien.Unidad;
 
@@ -18,7 +18,7 @@ class NecesidadExtraordinariaTest {
 
     @BeforeEach
     void setUp() {
-        Categoria categoria = Categoria.ALIMENTOS;
+        CategoriaBien categoria = CategoriaBien.ALIMENTOS;
         subCategoria = new SubCategoria(categoria, "Alimento no perecedero", Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 5, new Date(), "Terremoto");
     }

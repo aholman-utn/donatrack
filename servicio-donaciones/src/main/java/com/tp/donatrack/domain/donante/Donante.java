@@ -1,22 +1,29 @@
 package com.tp.donatrack.domain.donante;
 
 import com.tp.donatrack.domain.persona.Persona;
-import lombok.Getter;
-import lombok.Setter;
-
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
+import lombok.*;
+
 @Getter
 @Setter
-//Donante no deberia heredar Persona ? porque tiene un atributo que es persona ?
+@AllArgsConstructor
+@Builder
 public class Donante {
     private Persona persona;
     private String password;
+
+    @Builder.Default
+    private PerfilDonante perfil = new PerfilDonante();
+
     public Donante(Persona persona) {
         this.persona = persona;
+        this.perfil = new PerfilDonante();
     }
 
-    public Donante() {} //constructor sin atributos, en el futuro quizas deberia poner el ID
+    public Donante() {
+        this.perfil = new PerfilDonante();
+    }
 
     public String getNombreCompleto() {
         if (this.persona instanceof PersonaHumana ph) {

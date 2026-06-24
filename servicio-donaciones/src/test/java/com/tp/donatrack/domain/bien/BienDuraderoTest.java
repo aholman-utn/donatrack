@@ -10,7 +10,7 @@ public class BienDuraderoTest {
     @DisplayName("Debe crear un Bien Duradero (Placard) con su categoría Muebles")
     public void debeCrearPlacardCorrectamente() {
 
-        SubCategoria placardSub = new SubCategoria(Categoria.MOBILIARIO, "Placard", Unidad.UNIDADES);
+        SubCategoria placardSub = new SubCategoria(CategoriaBien.MOBILIARIO, "Placard", Unidad.UNIDADES);
 
         BienDuradero miPlacard = new BienDuradero(
             "Placard 2 cuerpos", 

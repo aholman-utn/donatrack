@@ -1,6 +1,6 @@
 package com.tp.donatrack.domain.bien;
 
-public enum Categoria {
+public enum CategoriaBien {
     MOBILIARIO,
     ALIMENTOS,
     VESTIMENTA,

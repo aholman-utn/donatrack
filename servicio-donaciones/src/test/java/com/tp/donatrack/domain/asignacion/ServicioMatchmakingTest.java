@@ -29,8 +29,8 @@ class ServicioMatchmakingTest {
     @BeforeEach
     void setUp() {
         servicio = new ServicioMatchmaking();
-        sillas = new SubCategoria(Categoria.MOBILIARIO, "Sillas", Unidad.UNIDADES);
-        fideos = new SubCategoria(Categoria.ALIMENTOS, "Fideos secos", Unidad.UNIDADES);
+        sillas = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
+        fideos = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos secos", Unidad.UNIDADES);
 
         escuela = crearEntidad("Escuela N°10");
         escuela.agregarNecesidad(new NecesidadExtraordinaria(sillas, 30, new Date(), "Inundación"));
@@ -126,8 +126,8 @@ class ServicioMatchmakingTest {
     @Test
     @DisplayName("Escenario 10 Entidades: Evalua algoritmos y filtra coincidencias (Ganadoras)")
     void deberiaProponerHastaDiezEntidadesYFiltrarCoincidencias() {
-        SubCategoria arroz = new SubCategoria(Categoria.ALIMENTOS, "Arroz", Unidad.KG);
-        SubCategoria sillasCat = new SubCategoria(Categoria.MOBILIARIO, "Sillas", Unidad.UNIDADES);
+        SubCategoria arroz = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
+        SubCategoria sillasCat = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
 
         List<EntidadBeneficiaria> entidades = new ArrayList<>();
 

@@ -8,12 +8,12 @@ import java.util.Objects;
 @Getter
 @Setter
 public class SubCategoria {
-    private Categoria categoria;
+    private CategoriaBien categoria;
     private String descripcion;
     private Unidad unidad;
 
     public SubCategoria(
-        Categoria categoria, 
+        CategoriaBien categoria, 
         String descripcion, 
         Unidad unidad
     ) {

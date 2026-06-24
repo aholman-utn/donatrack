@@ -64,7 +64,7 @@ public class CrearDonacionRequest {
     @Getter
     @Setter
     public static class SubCategoriaRequest {
-        private Categoria categoria;
+        private CategoriaBien categoria;
         private String descripcion;
         private Unidad unidad;
     }

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.tp.donatrack.domain.bien.Categoria;
+import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.bien.Unidad;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
@@ -24,7 +24,7 @@ class EntidadBeneficiariaTest {
     @BeforeEach
     void setUp() {
         entidad = new EntidadBeneficiaria();
-        Categoria categoria = Categoria.ALIMENTOS;
+        CategoriaBien categoria = CategoriaBien.ALIMENTOS;
         subCategoria = new SubCategoria(categoria, "Alimento no perecedero", Unidad.UNIDADES);
         donacionSegmentada = new DonacionSegmentada(1, subCategoria, null);
     }

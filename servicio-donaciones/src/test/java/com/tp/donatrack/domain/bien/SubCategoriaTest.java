@@ -8,7 +8,7 @@ public class SubCategoriaTest {
 
     @Test
     public void testCrearSubcategoria() {
-        Categoria cat = Categoria.VESTIMENTA;
+        CategoriaBien cat = CategoriaBien.VESTIMENTA;
         Unidad uni = Unidad.UNIDADES;
         String desc = "Muebles";
 

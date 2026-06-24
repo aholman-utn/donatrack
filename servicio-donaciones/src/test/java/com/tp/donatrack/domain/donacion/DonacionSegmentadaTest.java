@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.tp.donatrack.domain.bien.Bien;
 import com.tp.donatrack.domain.bien.BienPerecedero;
-import com.tp.donatrack.domain.bien.Categoria;
+import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.bien.EstadoBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class DonacionSegmentadaTest { 
     private EntidadBeneficiaria unaEntidadBeneficiaria;
     private SubCategoria unaSubCategoria;
-    private Categoria unaCategoria;
+    private CategoriaBien unaCategoria;
     private Donacion donacion;
     private NecesidadRecurrente unaNecesidadRecurrente;
     private Date unaFecha;
@@ -35,7 +35,7 @@ public class DonacionSegmentadaTest {
         com.tp.donatrack.domain.persona.PersonaJuridica datos = new com.tp.donatrack.domain.persona.PersonaJuridica();
         datos.setId(10L);
         unaEntidadBeneficiaria = new EntidadBeneficiaria(datos);
-        unaCategoria = Categoria.ALIMENTOS;
+        unaCategoria = CategoriaBien.ALIMENTOS;
         unaSubCategoria = new SubCategoria(
             unaCategoria, 
             "Arroz", 
