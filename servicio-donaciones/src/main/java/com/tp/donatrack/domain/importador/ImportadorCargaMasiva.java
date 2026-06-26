@@ -85,8 +85,57 @@ public class ImportadorCargaMasiva {
     }
 
     private void actualizarCamposDonante(Donante donante, RegistroDonanteDTO dto) {
-        //TODO: falta hacer esta parte
-        System.out.println("El donante " + donante.getPersona().getMedioDeContacto().get("email").get(0) + " ya se encuentra registrado. Acutalizando...");
+        Persona personaActual = donante.getPersona();
+        String tipoActual = personaActual instanceof PersonaHumana ? TipoPersona.HUMANA.name() : TipoPersona.JURIDICA.name();
+        boolean cambioTipoPersona = !tipoActual.equalsIgnoreCase(dto.getTipoPersona());
+
+        if (cambioTipoPersona) {
+            // Si cambió el tipo de persona, se reemplaza la persona entera
+            Persona nuevaPersona;
+
+            if (dto.getTipoPersona().equalsIgnoreCase(TipoPersona.HUMANA.name())) {
+                String[] nombreSplit = dto.getNombre().split(" ", 2);
+                String nombrePersona = nombreSplit[0];
+                String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
+                String documentoLimpio = dto.getDocumento().replaceAll("[^0-9]", "");
+
+                nuevaPersona = new PersonaHumana(nombrePersona, "Sin especificar", apellido, null, 0, documentoLimpio);
+            } else {
+                PersonaJuridica pj = new PersonaJuridica();
+                pj.setRazonSocial(dto.getNombre());
+                pj.setTipo(detectarTipo(dto.getNombre()));
+                pj.setRubro("Sin especificar");
+                nuevaPersona = pj;
+            }
+
+            // Preservar el ID y datos que no vienen del CSV
+            nuevaPersona.setId(personaActual.getId());
+            nuevaPersona.setDireccion(personaActual.getDireccion());
+            nuevaPersona.setMedioPredeterminado(personaActual.getMedioPredeterminado());
+            nuevaPersona.setFechaUltimaInteraccion(personaActual.getFechaUltimaInteraccion());
+
+            // Setear los medios de contacto del CSV
+            nuevaPersona.agregarMedioDeContacto("email", dto.getEmail());
+            nuevaPersona.agregarMedioDeContacto("telefono", dto.getTelefono());
+
+            donante.setPersona(nuevaPersona);
+        } else {
+            // Mismo tipo de persona: actualizar campos individuales
+            if (personaActual instanceof PersonaHumana ph) {
+                String[] nombreSplit = dto.getNombre().split(" ", 2);
+                ph.setNombre(nombreSplit[0]);
+                ph.setApellido(nombreSplit.length > 1 ? nombreSplit[1] : "");
+                ph.setNroDocumento(dto.getDocumento().replaceAll("[^0-9]", ""));
+            } else if (personaActual instanceof PersonaJuridica pj) {
+                pj.setRazonSocial(dto.getNombre());
+                pj.setTipo(detectarTipo(dto.getNombre()));
+            }
+
+            // Actualizar teléfono: reemplazar la lista existente
+            personaActual.getMedioDeContacto().put("telefono", List.of(dto.getTelefono()));
+        }
+
+        System.out.println("El donante " + dto.getEmail() + " ya se encontraba registrado. Actualizado correctamente.");
     }
 
     private TipoOrganizacion detectarTipo(String razonSocial) {
