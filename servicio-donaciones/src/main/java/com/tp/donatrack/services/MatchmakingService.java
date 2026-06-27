@@ -39,7 +39,7 @@ public class MatchmakingService {
     /**
      * Ejecuta el matchmaking para una donación segmentada específica.
      */
-    public ResultadoMatchmakingDTO obtenerRanking(Integer donacionSegmentadaId) {
+    public ResultadoMatchmakingDTO obtenerRanking(Long donacionSegmentadaId) {
         DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
@@ -80,7 +80,7 @@ public class MatchmakingService {
     /**
      * Asigna una donación segmentada a la entidad beneficiaria elegida del ranking.
      */
-    public void asignarDonacion(Integer donacionSegmentadaId, Long entidadBeneficiariaId) {
+    public void asignarDonacion(Long donacionSegmentadaId, Long entidadBeneficiariaId) {
         DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
@@ -100,7 +100,7 @@ public class MatchmakingService {
 
     private ResultadoMatchmakingDTO mapearResultado(DonacionSegmentada segmentada, ResultadoMatchmaking resultado) {
         return ResultadoMatchmakingDTO.builder()
-                .donacionSegmentadaId(segmentada.getId())
+                .donacionSegmentadaId(Math.toIntExact(segmentada.getId()))
                 .subCategoria(segmentada.getSubCategoria() != null ? segmentada.getSubCategoria().getDescripcion()
                         : "Sin Categoría")
                 .cantidadBienes(segmentada.getCantidad())

@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DonanteRepository {
 
     //por ahora, en memoria
+    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
     private final List<Donante> donantes;
     public DonanteRepository() {
         this.donantes = new ArrayList<>();
@@ -18,6 +19,7 @@ public class DonanteRepository {
     public Donante create(Donante donante){
         if (donante.getPersona() != null && donante.getPersona().getId() == null) {
             donante.getPersona().setId(com.tp.donatrack.domain.persona.Persona.nextId());
+            donante.setDonanteId(ID_GENERATOR.getAndIncrement());
         }
         this.donantes.add(donante);
         return donante;

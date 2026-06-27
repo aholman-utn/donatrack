@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.donante;
 
+import com.tp.commons.domain.donantes.Nivel;
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,16 +15,25 @@ public class PerfilDonante {
     @Builder.Default
     private boolean visibilidadInsignia = true;
 
-    @Builder.Default
-    private List<ItemDonacion> historialDonaciones = new ArrayList<>();
+    private Long misionActualId;
+
+    private List<String> insignasGanadas = new ArrayList<>();
+
+    private Double progreso;
+
+    private Metrica metricas;
 
     @Builder.Default
-    private CategoriaDonante categoriaDonante = CategoriaDonante.COLABORADOR;
+    private Nivel categoriaDonante = Nivel.COLABORADOR;
+
+    @Builder.Default
+    private List<ItemDonacion> historialDonaciones = new ArrayList<>();
 
     public PerfilDonante() {
         this.visibilidadInsignia = true;
         this.historialDonaciones = new ArrayList<>();
-        this.categoriaDonante = CategoriaDonante.COLABORADOR;
+        this.categoriaDonante = Nivel.COLABORADOR;
+        this.progreso = (double) 0;
     }
 
     public void registrarEntrega(Long entidadBeneficiariaId, CategoriaBien categoria) {
@@ -48,10 +58,10 @@ public class PerfilDonante {
             return;
         }
         int size = this.historialDonaciones.size();
-        if (this.categoriaDonante == CategoriaDonante.COLABORADOR && size >= 5) {
-            this.categoriaDonante = CategoriaDonante.SOSTENEDOR;
-        } else if (this.categoriaDonante == CategoriaDonante.SOSTENEDOR && size >= 15) {
-            this.categoriaDonante = CategoriaDonante.TRANSFORMADOR;
+        if (this.categoriaDonante == Nivel.COLABORADOR && size >= 5) {
+            this.categoriaDonante = Nivel.SOSTENEDOR;
+        } else if (this.categoriaDonante == Nivel.SOSTENEDOR && size >= 15) {
+            this.categoriaDonante = Nivel.TRANSFORMADOR;
         }
     }
 }

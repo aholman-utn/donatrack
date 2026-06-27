@@ -1,16 +1,17 @@
 package com.tp.incentivos.domain;
-
+/*
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tp.commons.domain.donantes.Nivel;
+import com.tp.incentivos.domain.misiones.*;
 import lombok.*;
 
-/**
+
  * Perfil de incentivos de un donante.
  * Almacena métricas de donación, categoría actual, misiones en curso e
  * insignias ganadas.
- */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,7 +23,7 @@ public class Perfil {
     private int totalDonacionesExitosas;
     private List<Integer> entidadesAyudadasIds;
     private List<CategoriaBien> categoriasAyudadas;
-    private CategoriaDonante categoriaDonante;
+    private Nivel categoriaDonante;
     private List<Mision> misionesActuales;
     private List<Insignia> insigniasGanadas;
     private List<RegistroDonacionMensual> historialMensual;
@@ -146,3 +147,4 @@ public class Perfil {
                 .count();
     }
 }
+*/

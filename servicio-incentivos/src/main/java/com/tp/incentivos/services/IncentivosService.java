@@ -1,39 +1,24 @@
 package com.tp.incentivos.services;
 
 import com.tp.incentivos.domain.*;
+import com.tp.incentivos.domain.misiones.Mision;
 import com.tp.incentivos.dtos.*;
 import com.tp.incentivos.repositories.IncentivosRepository;
+import com.tp.incentivos.repositories.MisionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class IncentivosService {
-
-    private final IncentivosRepository repository;
-    private final ServicioEvaluadorMisiones evaluadorMisiones;
-    private final ServicioRanking servicioRanking;
-
+    private final MisionRepository misionRepository;
     public IncentivosService(
-            IncentivosRepository repository,
-            ServicioEvaluadorMisiones evaluadorMisiones,
-            ServicioRanking servicioRanking) {
-        this.repository = repository;
-        this.evaluadorMisiones = evaluadorMisiones;
-        this.servicioRanking = servicioRanking;
-    }
-
-    public void crearPerfilInicial(CrearPerfilDTO dto) {
-        Perfil perfil = repository.findByDonanteId(dto.getDonanteId());
-        if (perfil == null) {
-            perfil = new Perfil(dto.getDonanteId());
-            perfil.setNombreUsuario(dto.getNombreUsuario());
-            repository.create(perfil);
-        }
+            MisionRepository misionRepository
+    ) {
+        this.misionRepository = misionRepository;
     }
 
     /**
@@ -46,8 +31,36 @@ public class IncentivosService {
      * 6. Persiste el perfil.
      */
     public void procesarNuevaEntrega(EntregaDonacionDTO dto) {
-        Integer donanteId = dto.getDonanteId();
+        Long donanteId = dto.getDonanteId();
+        Long donacionSegmendatadId = dto.getDonacionSegmentadaId();
+        Long ultimaMisionId = dto.getUltimaMisionId();
+        double progreso = dto.getProgreso();
 
+        Mision mision = this.misionRepository.findById(ultimaMisionId)
+                .orElseThrow(() -> new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId));
+
+        boolean cumplida = mision.estaCumplida(dto);
+
+        // Imprimiendo los valores
+        System.out.println("Donante ID: " + donanteId);
+        System.out.println("Donación Segmentada ID: " + donacionSegmendatadId);
+        System.out.println("Última Misión ID: " + ultimaMisionId);
+        System.out.println("Progreso: " + progreso);
+        /*
+            1. Le pedimos al servicio de donaciones el rol y la ultima mision del del donante
+            2. Vemos si con estos datos cumple para subir de misión
+            3. SI sube de misión actualizamos la info del donante (POST donaciones)
+            4. SI no sube no hago nada
+         */
+
+        //1. POST Crear perfilDonante en donante (Servicio donaciones)
+        // Ultima mision y progreso actual del donante
+        //Vemos que mision matchea en base al rol del usuario
+        // 1. Actualizamos el progreso
+        // Vemos
+
+
+        /*
         Perfil perfil = repository.findByDonanteId(donanteId);
         if (perfil == null) {
             perfil = new Perfil(donanteId);
@@ -77,158 +90,7 @@ public class IncentivosService {
 
         evaluadorMisiones.evaluar(perfil, infoDonacion);
         repository.create(perfil);
-    }
 
-    public PerfilIncentivosDTO obtenerPerfil(Integer donanteId) {
-        Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
-        }
-
-        Mision misionActual = perfil.getMisionActual();
-
-        return PerfilIncentivosDTO.builder()
-                .donanteId(perfil.getDonanteId())
-                .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
-                .entidadesAyudadasCount((int) perfil.getEntidadesAyudadasIds().stream().distinct().count())
-                .entidadesAyudadasIds(perfil.getEntidadesAyudadasIds())
-                .categoriaDonante(perfil.getCategoriaDonante().name())
-                .posicionRanking(servicioRanking.calcularPosicion(donanteId))
-                .comparacionesMensuales(mapearHistorialMensual(perfil))
-                .insigniasGanadas(mapearInsignias(perfil))
-                .misionActual(misionActual != null ? mapearMision(misionActual) : null)
-                .todasLasMisiones(mapearTodasLasMisiones(perfil))
-                .build();
-    }
-
-    public MisionesDonanteDTO obtenerMisiones(Integer donanteId) {
-        Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
-        }
-
-        Mision misionActual = perfil.getMisionActual();
-        List<MisionDTO> proximasMisiones = new ArrayList<>();
-        List<MisionDTO> misionesCompletadas = new ArrayList<>();
-
-        boolean encontroActual = false;
-        for (Mision m : perfil.getMisionesActuales()) {
-            if (m.isCompletada()) {
-                misionesCompletadas.add(mapearMision(m));
-            } else if (!encontroActual) {
-                encontroActual = true; // esta es la misión actual, la salteamos
-            } else {
-                proximasMisiones.add(mapearMision(m));
-            }
-        }
-
-        return MisionesDonanteDTO.builder()
-                .misionActual(misionActual != null ? mapearMision(misionActual) : null)
-                .proximasMisiones(proximasMisiones)
-                .misionesCompletadas(misionesCompletadas)
-                .build();
-    }
-
-    public InsigniasDonanteDTO obtenerInsignias(Integer donanteId) {
-        Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
-        }
-
-        List<InsigniaDTO> insignias = mapearInsignias(perfil);
-
-        return InsigniasDonanteDTO.builder()
-                .insignias(insignias)
-                .totalInsignias(perfil.getInsigniasGanadas().size())
-                .build();
-    }
-
-    /**
-     * Retorna las métricas de actividad de un donante (acumuladas y del período
-     * actual).
-     */
-    public MetricasActividadDTO obtenerMetricas(Integer donanteId) {
-        Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            throw new IllegalArgumentException("Perfil no encontrado para el donante: " + donanteId);
-        }
-
-        LocalDate ahora = LocalDate.now();
-        int mesActual = ahora.getMonthValue();
-        int anioActual = ahora.getYear();
-
-        int donacionesMesActual = perfil.getHistorialMensual().stream()
-                .filter(r -> r.getAnio() == anioActual && r.getMes() == mesActual)
-                .findFirst()
-                .map(RegistroDonacionMensual::getTotalDonaciones)
-                .orElse(0);
-
-        return MetricasActividadDTO.builder()
-                .donanteId(donanteId)
-                .categoriaDonante(perfil.getCategoriaDonante().name())
-                .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
-                .entidadesAyudadasCount((int) perfil.getEntidadesAyudadasIds().stream().distinct().count())
-                .entidadesAyudadasIds(perfil.getEntidadesAyudadasIds())
-                .posicionRanking(servicioRanking.calcularPosicion(donanteId))
-                .donacionesMesActual(donacionesMesActual)
-                .mesPeriodoActual(mesActual)
-                .anioPeriodoActual(anioActual)
-                .comparacionesMensuales(mapearHistorialMensual(perfil))
-                .build();
-    }
-
-    // ── Métodos privados auxiliares ───────────────────────────────────────────
-
-    private void actualizarHistorialMensual(Perfil perfil, LocalDate fecha) {
-        int anio = fecha.getYear();
-        int mes = fecha.getMonthValue();
-
-        perfil.getHistorialMensual().stream()
-                .filter(r -> r.getAnio() == anio && r.getMes() == mes)
-                .findFirst()
-                .ifPresentOrElse(
-                        RegistroDonacionMensual::registrar,
-                        () -> {
-                            RegistroDonacionMensual nuevo = new RegistroDonacionMensual(anio, mes);
-                            nuevo.registrar();
-                            perfil.getHistorialMensual().add(nuevo);
-                        });
-    }
-
-    private List<RegistroDonacionMensualDTO> mapearHistorialMensual(Perfil perfil) {
-        List<RegistroDonacionMensualDTO> resultado = new ArrayList<>();
-        for (RegistroDonacionMensual r : perfil.getHistorialMensual()) {
-            resultado.add(new RegistroDonacionMensualDTO(r.getAnio(), r.getMes(), r.getTotalDonaciones()));
-        }
-        return resultado;
-    }
-
-    private List<InsigniaDTO> mapearInsignias(Perfil perfil) {
-        List<InsigniaDTO> resultado = new ArrayList<>();
-        if (Boolean.TRUE.equals(perfil.getVisibilidadInsignia())) {
-            for (Insignia i : perfil.getInsigniasGanadas()) {
-                resultado.add(new InsigniaDTO(i.getTitulo(), i.getDescripcion()));
-            }
-        }
-        return resultado;
-    }
-
-    private MisionDTO mapearMision(Mision mision) {
-        return new MisionDTO(
-                mision.getTitulo(),
-                mision.getDescripcion(),
-                mision.getClass().getSimpleName(),
-                mision.getProgresoActual(),
-                mision.getObjetivo(),
-                mision.isCompletada(),
-                mision.getFechaObtencion());
-    }
-
-    private List<MisionDTO> mapearTodasLasMisiones(Perfil perfil) {
-        List<MisionDTO> resultado = new ArrayList<>();
-        for (Mision m : perfil.getMisionesActuales()) {
-            resultado.add(mapearMision(m));
-        }
-        return resultado;
+         */
     }
 }

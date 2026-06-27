@@ -14,7 +14,7 @@ import lombok.*;
 public class AsignarDonacionDTO {
 
     @NotNull(message = "El ID de la donación segmentada es obligatorio")
-    private Integer donacionSegmentadaId;
+    private Long donacionSegmentadaId;
 
     @NotNull(message = "El ID de la entidad beneficiaria es obligatorio")
     private Long entidadBeneficiariaId;

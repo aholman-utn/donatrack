@@ -26,7 +26,7 @@ public class MatchmakingController {
      * GET /matchmaking/ranking?donacionSegmentadaId=1
      */
     @GetMapping(MatchmakingRoutes.RANKING)
-    public ResponseEntity<?> obtenerRanking(@RequestParam Integer donacionSegmentadaId) {
+    public ResponseEntity<?> obtenerRanking(@RequestParam Long donacionSegmentadaId) {
         try {
             ResultadoMatchmakingDTO resultado = matchmakingService.obtenerRanking(donacionSegmentadaId);
             return ResponseEntity.ok(resultado);

@@ -1,9 +1,12 @@
 package com.tp.donatrack.services;
 
+import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
 import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.repositories.DonanteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +21,7 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
     private final RestTemplate restTemplate;
     private final String incentivosUrl;
     private final DonanteRepository donanteRepository;
+    private static final Logger logger = LoggerFactory.getLogger(HttpDonacionEventPublisher.class);
 
     public HttpDonacionEventPublisher(
             RestTemplate restTemplate,
@@ -31,22 +35,15 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
     @Override
     public void publicar(DonacionEntregadaEvent event) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("donanteId", event.donanteId());
-        requestBody.put("entidadBeneficiariaId", event.entidadBeneficiariaId());
-        requestBody.put("categoriaDonacion", event.categoriaDonacion());
-        requestBody.put("fechaDonacion", LocalDate.now());
 
-        Donante donante = donanteRepository.findById(event.donanteId());
-        if (donante != null) {
-            requestBody.put("nombreUsuario", donante.getNombreCompleto());
-        }
-
+        requestBody.put("donacionSegmentadaId", event.dto().getDonacionSegmentadaId());
+        requestBody.put("donanteId", event.dto().getDonanteId());
+        requestBody.put("ultimaMisionId", event.dto().getMisionId());
+        requestBody.put("progreso", event.dto().getProgreso());
         try {
             restTemplate.postForEntity(incentivosUrl, requestBody, Void.class);
         } catch (Exception e) {
-            // Se captura la excepcion para que no corte el flujo principal si el
-            // microservicio esta caido
-            System.err.println("Error al notificar al servicio de incentivos: " + e.getMessage());
+            logger.error("Error al conectase con servicio de incentivos: {}", e.getMessage());
         }
     }
 }

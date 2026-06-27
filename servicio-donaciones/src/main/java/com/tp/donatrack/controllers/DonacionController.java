@@ -84,6 +84,6 @@ public class DonacionController {
     @lombok.Getter
     @lombok.Setter
     public static class EntregaRequest {
-        private Integer donacionSegmentadaId;
+        private Long donacionSegmentadaId;
     }
 }

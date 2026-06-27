@@ -1,6 +1,5 @@
 package com.tp.incentivos.repositories;
 
-import com.tp.incentivos.domain.Perfil;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 
 @Repository
 public class IncentivosRepository {
+    /*
     private final List<Perfil> perfiles = new ArrayList<>();
 
     public Perfil findByDonanteId(Integer donanteId) {
@@ -23,4 +23,5 @@ public class IncentivosRepository {
     public Collection<Perfil> findAll() {
         return perfiles;
     }
+     */
 }

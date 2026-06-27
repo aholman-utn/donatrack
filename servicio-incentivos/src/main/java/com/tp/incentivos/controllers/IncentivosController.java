@@ -31,7 +31,7 @@ public class IncentivosController {
 
     @PostMapping
     public ResponseEntity<Void> crearPerfil(@Valid @RequestBody CrearPerfilDTO dto) {
-        service.crearPerfilInicial(dto);
+        //service.crearPerfilInicial(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -54,44 +54,52 @@ public class IncentivosController {
     /**
      * Retorna el perfil completo de incentivos de un donante.
      * GET /incentivos/perfil/{donanteId}
-     */
+
     @GetMapping("/{donanteId}")
     public ResponseEntity<PerfilIncentivosDTO> obtenerPerfil(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerPerfil(donanteId));
     }
+     */
 
+    /*
     @GetMapping("/misiones/{donanteId}")
     public ResponseEntity<MisionesDonanteDTO> obtenerMisiones(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerMisiones(donanteId));
     }
+     */
 
+        /*
     @GetMapping("/insignias/{donanteId}")
     public ResponseEntity<InsigniasDonanteDTO> obtenerInsignias(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerInsignias(donanteId));
     }
+   */
 
+    /*
     @GetMapping("/metricas/{donanteId}")
     public ResponseEntity<MetricasActividadDTO> obtenerMetricas(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(service.obtenerMetricas(donanteId));
     }
+     */
 
     /**
      * Retorna el ranking global de donantes ordenado por donaciones exitosas
      * (DESC).
      * GET /incentivos/ranking
-     */
+
     @GetMapping("/ranking")
     public ResponseEntity<List<RankingItemDTO>> obtenerRanking() {
         return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto());
     }
+     */
 
     /**
      * Retorna la posición en el ranking de un donante específico.
      * GET /incentivos/ranking/{donanteId}
-     */
+
     @GetMapping("/ranking/{donanteId}")
     public ResponseEntity<RankingItemDTO> obtenerPosicionDonante(@PathVariable Integer donanteId) {
         return ResponseEntity.ok(servicioRanking.obtenerPosicionDonante(donanteId));
     }
-
+     */
 }

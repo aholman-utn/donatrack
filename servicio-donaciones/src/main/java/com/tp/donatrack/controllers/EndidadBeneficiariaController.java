@@ -10,11 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping(EntidadBeneficiariaRoutes.BASE)
 public class EndidadBeneficiariaController {
-
     private final EntidadBeneficiariaService entidadBeneficiariaService;
 
     public EndidadBeneficiariaController(EntidadBeneficiariaService entidadBeneficiariaService) {
@@ -26,6 +26,7 @@ public class EndidadBeneficiariaController {
             @Valid @RequestBody CrearPersonaJuridicaRequest request) {
 
         EntidadBeneficiaria entidad = entidadBeneficiariaService.registrar(request.toDomain());
+        System.out.println("Entidad " + entidad.getEntidadBeneficiariaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(entidad);
     }
 

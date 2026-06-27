@@ -48,7 +48,7 @@ public class TrazabilidadService {
         for (DonacionSegmentada segmentada : segmentos) {
             trazabilidades.add(
                     TrazaSegmentoDTO.builder()
-                            .id(segmentada.getId())
+                            .id(Math.toIntExact(segmentada.getId()))
                             .eventos(segmentada.getHistorial())
                             .build());
         }

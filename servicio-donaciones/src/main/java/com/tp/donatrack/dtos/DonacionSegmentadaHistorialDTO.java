@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class DonacionSegmentadaHistorialDTO {
-    private Integer id;
+    private Long id;
     private String subCategoria;
     private int cantidad;
     private EstadoDonacionSegmentada estado;

@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.donante;
 
+import com.tp.commons.domain.donantes.Nivel;
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
@@ -63,20 +64,20 @@ public class DonanteTest {
         // Constructor vacío
         Donante d1 = new Donante();
         Assertions.assertNotNull(d1.getPerfil());
-        Assertions.assertEquals(CategoriaDonante.COLABORADOR, d1.getPerfil().getCategoriaDonante());
+        Assertions.assertEquals(Nivel.COLABORADOR, d1.getPerfil().getCategoriaDonante());
         Assertions.assertTrue(d1.getPerfil().isVisibilidadInsignia());
 
         // Constructor con persona
         PersonaHumana ph = new PersonaHumana();
         Donante d2 = new Donante(ph);
         Assertions.assertNotNull(d2.getPerfil());
-        Assertions.assertEquals(CategoriaDonante.COLABORADOR, d2.getPerfil().getCategoriaDonante());
+        Assertions.assertEquals(Nivel.COLABORADOR, d2.getPerfil().getCategoriaDonante());
         Assertions.assertTrue(d2.getPerfil().isVisibilidadInsignia());
 
         // Patrón Builder
         Donante d3 = Donante.builder().build();
         Assertions.assertNotNull(d3.getPerfil());
-        Assertions.assertEquals(CategoriaDonante.COLABORADOR, d3.getPerfil().getCategoriaDonante());
+        Assertions.assertEquals(Nivel.COLABORADOR, d3.getPerfil().getCategoriaDonante());
         Assertions.assertTrue(d3.getPerfil().isVisibilidadInsignia());
     }
 
@@ -98,30 +99,30 @@ public class DonanteTest {
     @DisplayName("Debe transicionar la categoría del donante según el tamaño de su historial de donaciones")
     public void testSubirCategoriaDonante() {
         PerfilDonante perfil = new PerfilDonante();
-        Assertions.assertEquals(CategoriaDonante.COLABORADOR, perfil.getCategoriaDonante());
+        Assertions.assertEquals(Nivel.COLABORADOR, perfil.getCategoriaDonante());
 
         // Agregar 4 donaciones (insuficiente para SOSTENEDOR)
         for (int i = 0; i < 4; i++) {
             perfil.registrarEntrega(1L, CategoriaBien.HIGIENE);
         }
         perfil.subirCategoria();
-        Assertions.assertEquals(CategoriaDonante.COLABORADOR, perfil.getCategoriaDonante());
+        Assertions.assertEquals(Nivel.COLABORADOR, perfil.getCategoriaDonante());
 
         // Agregar la 5ta donación -> debe subir a SOSTENEDOR
         perfil.registrarEntrega(1L, CategoriaBien.HIGIENE);
         perfil.subirCategoria();
-        Assertions.assertEquals(CategoriaDonante.SOSTENEDOR, perfil.getCategoriaDonante());
+        Assertions.assertEquals(Nivel.SOSTENEDOR, perfil.getCategoriaDonante());
 
         // Agregar hasta 14 donaciones en total (insuficiente para TRANSFORMADOR)
         for (int i = 0; i < 9; i++) {
             perfil.registrarEntrega(1L, CategoriaBien.MOBILIARIO);
         }
         perfil.subirCategoria();
-        Assertions.assertEquals(CategoriaDonante.SOSTENEDOR, perfil.getCategoriaDonante());
+        Assertions.assertEquals(Nivel.SOSTENEDOR, perfil.getCategoriaDonante());
 
         // Agregar la 15ta donación total -> debe subir a TRANSFORMADOR
         perfil.registrarEntrega(1L, CategoriaBien.VESTIMENTA);
         perfil.subirCategoria();
-        Assertions.assertEquals(CategoriaDonante.TRANSFORMADOR, perfil.getCategoriaDonante());
+        Assertions.assertEquals(Nivel.TRANSFORMADOR, perfil.getCategoriaDonante());
     }
-}
+}

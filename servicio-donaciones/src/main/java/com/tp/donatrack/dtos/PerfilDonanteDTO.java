@@ -1,7 +1,8 @@
 package com.tp.donatrack.dtos;
 
-import com.tp.donatrack.domain.donante.CategoriaDonante;
 import java.util.List;
+
+import com.tp.commons.domain.donantes.Nivel;
 import lombok.*;
 
 @Getter
@@ -12,5 +13,5 @@ import lombok.*;
 public class PerfilDonanteDTO {
     private boolean visibilidadInsignia;
     private List<ItemDonacionDTO> historialDonaciones;
-    private CategoriaDonante categoriaDonante;
+    private Nivel categoriaDonante;
 }

@@ -5,6 +5,7 @@ import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.bien.Bien;
 import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
 
+import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DonacionSegmentada {
-    private Integer id;
+    private Long id;
     private int cantidad;
     private SubCategoria subCategoria;
     private List<Bien> bienes;
@@ -75,16 +76,11 @@ public class DonacionSegmentada {
     }
 
     public void confirmarEntrega(Long entidadBeneficiariaId) {
-        confirmarEntrega(entidadBeneficiariaId, null);
-    }
-
-    public void confirmarEntrega(Long entidadBeneficiariaId, DonacionEventPublisher eventPublisher) {
-        transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId),
-                "Entidad beneficiaria confirmó la recepción");
-        if (eventPublisher != null && this.donanteId != null) {
-            eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, entidadBeneficiariaId,
-                    this.subCategoria.getCategoria(), LocalDate.now()));
-        }
+        transicionar(
+            EstadoDonacionSegmentada.ENTREGADA,
+            String.valueOf(entidadBeneficiariaId),
+            "Entidad beneficiaria confirmó la recepción"
+        );
     }
 
     public void registrarEntregaFallida(String actor, String justificacion) {

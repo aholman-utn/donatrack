@@ -25,7 +25,7 @@ public class DonacionRepository {
         }
         for (DonacionSegmentada ds : donacion.getDonacionesSegmentadas()) {
             if (ds.getId() == null) {
-                ds.setId(idsSegmentada.getAndIncrement());
+                ds.setId((long) idsSegmentada.getAndIncrement());
             }
         }
         return donacion;
@@ -52,7 +52,7 @@ public class DonacionRepository {
         return new ArrayList<>(this.donaciones);
     }
 
-    public DonacionSegmentada findSegmentadaById(Integer segmentadaId) {
+    public DonacionSegmentada findSegmentadaById(Long segmentadaId) {
         return this.donaciones.stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
                 .filter(ds -> ds.getId() != null && ds.getId().equals(segmentadaId))

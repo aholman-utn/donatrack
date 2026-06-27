@@ -1,6 +1,5 @@
 package com.tp.incentivos.services;
 
-import com.tp.incentivos.domain.Perfil;
 import com.tp.incentivos.dtos.RankingItemDTO;
 import com.tp.incentivos.repositories.IncentivosRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 public class ServicioRanking {
-
+/**
     private final IncentivosRepository repository;
 
     public ServicioRanking(IncentivosRepository repository) {
@@ -87,4 +86,5 @@ public class ServicioRanking {
     public int calcularPosicion(Integer donanteId, boolean mesActual) {
         return obtenerPosicionDonante(donanteId, mesActual).getPosicion();
     }
+ */
 }

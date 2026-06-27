@@ -1,6 +1,7 @@
 package com.tp.donatrack.repositories;
 
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
+import com.tp.donatrack.domain.persona.Persona;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class EntidadBeneficiariaRepository {
+    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
     private final List<EntidadBeneficiaria> entidades;
     public EntidadBeneficiariaRepository() {
         this.entidades = new ArrayList<>();
@@ -16,7 +18,8 @@ public class EntidadBeneficiariaRepository {
 
     public EntidadBeneficiaria create(EntidadBeneficiaria entidadBeneficiaria){
         if (entidadBeneficiaria.getDatosDeEntidad() != null && entidadBeneficiaria.getDatosDeEntidad().getId() == null) {
-            entidadBeneficiaria.getDatosDeEntidad().setId(com.tp.donatrack.domain.persona.Persona.nextId());
+            entidadBeneficiaria.getDatosDeEntidad().setId(Persona.nextId());
+            entidadBeneficiaria.setEntidadBeneficiariaId(ID_GENERATOR.getAndIncrement());
         }
         this.entidades.add(entidadBeneficiaria);
         return entidadBeneficiaria;

@@ -2,13 +2,10 @@ package com.tp.incentivos.services;
 
 import com.tp.commons.services.notificador.NotificacionRestClient;
 
-import com.tp.incentivos.domain.CategoriaDonante;
-import com.tp.incentivos.domain.Mision;
-import com.tp.incentivos.domain.Perfil;
+import com.tp.incentivos.domain.misiones.Mision;
 import com.tp.incentivos.domain.InfoDonacion;
 import org.springframework.stereotype.Service;
-
-/**
+/*
  * Servicio encargado de evaluar el progreso de las misiones tras cada entrega.
  * Solo evalúa la misión activa actual; al completarse, desbloquea la siguiente.
  * Si todas las misiones de la categoría se completan, sube al donante de
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ServicioEvaluadorMisiones {
+     /*
     private final NotificacionRestClient notificacionRestClient;
 
     public ServicioEvaluadorMisiones(
@@ -59,4 +57,5 @@ public class ServicioEvaluadorMisiones {
             }
         }
     }
+    */
 }

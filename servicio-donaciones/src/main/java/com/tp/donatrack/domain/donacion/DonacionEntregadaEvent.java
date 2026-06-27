@@ -1,6 +1,8 @@
 package com.tp.donatrack.domain.donacion;
 
 import com.tp.donatrack.domain.bien.CategoriaBien;
+import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
+
 import java.time.LocalDate;
 
 /**
@@ -10,8 +12,6 @@ import java.time.LocalDate;
  * Incentivos, Notificaciones).
  */
 public record DonacionEntregadaEvent(
-                Long donanteId,
-                Long entidadBeneficiariaId,
-                CategoriaBien categoriaDonacion,
-                LocalDate fechaDonacion) {
+        DonacionEntregadaEventDTO dto
+    ) {
 }

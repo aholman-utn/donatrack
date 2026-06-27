@@ -1,0 +1,12 @@
+package com.tp.donatrack.dtos;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class DonacionEntregadaEventDTO {
+    private Long donacionSegmentadaId;
+    private Long donanteId;
+    private Long misionId;
+    private double progreso;
+}
