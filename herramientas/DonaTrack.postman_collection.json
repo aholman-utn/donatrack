@@ -954,6 +954,389 @@
       ]
     },
     {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Enviar Whatsapp",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"WHATSAPP\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje de Whatsapp.\",\n  \"idPersona\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar SMS",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"SMS\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje SMS.\",\n  \"idPersona\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar Email",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medio\": \"EMAIL\",\n  \"destinatario\": \"contact@gmail.com\",\n  \"mensaje\": \"Hola, este es un email..\",\n  \"asunto\": \"Asunto para todos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Simular inactividad de usuarios",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/donantes/1/simular-inactividad",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "1",
+                "simular-inactividad"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener todas las notificaciones",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "notificaciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener notificaciones de una persona",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/notificaciones/personas/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "notificaciones",
+                "personas",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trazabilidad",
+      "item": [
+        {
+          "name": "Trazabilizar una Donacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Trazabilizar una Donacion Segmentada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transicionar uan Donacion Segmentada",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nuevoEstado\": \"EN_TRASLADO\",\r\n  \"actor\": \"ServicioDonaciones\",\r\n  \"descripcion\": \"La donación fue retirada del depósito y se encuentra en camino al punto de entrega.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1/transicionar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1",
+                "transicionar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lista para entregar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1/transicionar/lista_entregar?actor=Admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1",
+                "transicionar",
+                "lista_entregar"
+              ],
+              "query": [
+                {
+                  "key": "actor",
+                  "value": "Admin"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar como vencida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1/transicionar/marcar_vencida?actor=Admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1",
+                "transicionar",
+                "marcar_vencida"
+              ],
+              "query": [
+                {
+                  "key": "actor",
+                  "value": "Admin"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "En traslado",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1/transicionar/en_traslado?actor=Actor",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1",
+                "transicionar",
+                "en_traslado"
+              ],
+              "query": [
+                {
+                  "key": "actor",
+                  "value": "Actor"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Entrega fallida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/trazabilidad/1/1/transicionar/entrega_fallida?actor=Admin&justificacion=Nadie recibio el paquete",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "trazabilidad",
+                "1",
+                "1",
+                "transicionar",
+                "entrega_fallida"
+              ],
+              "query": [
+                {
+                  "key": "actor",
+                  "value": "Admin"
+                },
+                {
+                  "key": "justificacion",
+                  "value": "Nadie recibio el paquete"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "nueva Insignia",
       "request": {
         "method": "POST",
@@ -981,198 +1364,6 @@
         }
       },
       "response": []
-    },
-    {
-      "name": "Notificaciones",
-      "item": [
-        {
-          "name": "Enviar Whatsapp",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8082/api/notificaciones/notificar",
-              "protocol": "http",
-              "host": [
-                "localhost:8082"
-              ],
-              "path": [
-                "api",
-                "notificaciones",
-                "notificar"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"medio\": \"WHATSAPP\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje de Whatsapp.\",\n  \"idPersona\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Enviar SMS",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8082/api/notificaciones/notificar",
-              "protocol": "http",
-              "host": [
-                "localhost:8082"
-              ],
-              "path": [
-                "api",
-                "notificaciones",
-                "notificar"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"medio\": \"SMS\",\n  \"destinatario\": \"1161230142\",\n  \"mensaje\": \"Hola, este es un mensaje SMS.\",\n  \"idPersona\": 2\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Enviar Email",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8082/api/notificaciones/notificar",
-              "protocol": "http",
-              "host": [
-                "localhost:8082"
-              ],
-              "path": [
-                "api",
-                "notificaciones",
-                "notificar"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"medio\": \"EMAIL\",\n  \"destinatario\": \"contact@gmail.com\",\n  \"mensaje\": \"Hola, este es un email..\",\n  \"asunto\": \"Asunto para todos\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Simular inactividad de usuarios",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/donantes/1/simular-inactividad",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "donantes",
-                "1",
-                "simular-inactividad"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Obtener todas las notificaciones",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8082/api/notificaciones/",
-              "protocol": "http",
-              "host": [
-                "localhost:8082"
-              ],
-              "path": [
-                "api",
-                "notificaciones",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Obtener notificaciones de una persona",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8082/api/notificaciones/personas/2",
-              "protocol": "http",
-              "host": [
-                "localhost:8082"
-              ],
-              "path": [
-                "api",
-                "notificaciones",
-                "personas",
-                "2"
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        }
-      ]
     }
   ]
 }

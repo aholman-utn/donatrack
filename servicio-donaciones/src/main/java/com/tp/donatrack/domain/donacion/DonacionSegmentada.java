@@ -48,8 +48,10 @@ public class DonacionSegmentada {
 
     public void transicionar(EstadoDonacionSegmentada nuevoEstado, String actor, String descripcion) {
         EstadoDonacionSegmentada anterior = this.estado;
-        this.estado = nuevoEstado;
-        registrarEvento(anterior, nuevoEstado, actor, descripcion);
+        if (transicionPosible(anterior, nuevoEstado)) {
+            this.estado = nuevoEstado;
+            registrarEvento(anterior, nuevoEstado, actor, descripcion);
+        }
     }
 
     public void asignar(EntidadBeneficiaria entidad, String actor) {
@@ -93,6 +95,7 @@ public class DonacionSegmentada {
     }
 
     public void marcarVencida(String actor) {
+        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene bienes perdecederos)
         transicionar(EstadoDonacionSegmentada.VENCIDA, actor, "Donación marcada como vencida por administrador");
     }
 
@@ -104,6 +107,22 @@ public class DonacionSegmentada {
         if (historial.isEmpty())
             return null;
         return historial.get(historial.size() - 1);
+    }
+
+    public boolean transicionPosible(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo) {
+        return switch (anterior) {
+            case EN_DEPOSITO ->
+                    nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
+                            || nuevo == EstadoDonacionSegmentada.VENCIDA;
+            case ASIGNACION_REALIZADA -> nuevo == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR;
+            case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
+            case EN_TRASLADO ->
+                    nuevo == EstadoDonacionSegmentada.ENTREGADA
+                            || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
+            case ENTREGA_FALLIDA -> nuevo == EstadoDonacionSegmentada.EN_DEPOSITO;
+            case ENTREGADA, VENCIDA -> false; // Estados finales
+            default -> false;
+        };
     }
 
     private void registrarEvento(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor,
