@@ -52,8 +52,6 @@ public class EndidadBeneficiariaController {
         return ResponseEntity.ok(actualizado);
     }
 
-    //TODO: actualizarNecesidades -> necesito crear el DTO
-
     @DeleteMapping(EntidadBeneficiariaRoutes.POR_ID)
     public ResponseEntity<EntidadBeneficiaria> eliminar(@PathVariable Long id) {
         entidadBeneficiariaService.eliminar(id);
