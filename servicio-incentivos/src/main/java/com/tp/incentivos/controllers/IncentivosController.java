@@ -19,7 +19,7 @@ import java.util.Map;
 import com.tp.incentivos.dtos.CrearPerfilDTO;
 
 @RestController
-@RequestMapping("/perfil")
+@RequestMapping("/incentivos")
 public class IncentivosController {
 
     private final IncentivosService service;
@@ -38,7 +38,7 @@ public class IncentivosController {
     /**
      * Recibe notificación del servicio-donaciones cuando una donación es entregada.
      * Procesa el impacto en métricas y misiones del donante.
-     * POST /perfil/entrega
+     * POST /incentivos/entrega
      */
     @PostMapping("/entrega")
     public ResponseEntity<EvaluacionMisionResponseDTO> procesarEntrega(@Valid @RequestBody EntregaDonacionDTO dto) {
@@ -47,46 +47,13 @@ public class IncentivosController {
     }
 
     /**
-     * Retorna el perfil completo de incentivos de un donante.
-     * GET /incentivos/perfil/{donanteId}
-
-    @GetMapping("/{donanteId}")
-    public ResponseEntity<PerfilIncentivosDTO> obtenerPerfil(@PathVariable Integer donanteId) {
-        return ResponseEntity.ok(service.obtenerPerfil(donanteId));
-    }
-     */
-
-    /*
-    @GetMapping("/misiones/{donanteId}")
-    public ResponseEntity<MisionesDonanteDTO> obtenerMisiones(@PathVariable Integer donanteId) {
-        return ResponseEntity.ok(service.obtenerMisiones(donanteId));
-    }
-     */
-
-        /*
-    @GetMapping("/insignias/{donanteId}")
-    public ResponseEntity<InsigniasDonanteDTO> obtenerInsignias(@PathVariable Integer donanteId) {
-        return ResponseEntity.ok(service.obtenerInsignias(donanteId));
-    }
-   */
-
-    /*
-    @GetMapping("/metricas/{donanteId}")
-    public ResponseEntity<MetricasActividadDTO> obtenerMetricas(@PathVariable Integer donanteId) {
-        return ResponseEntity.ok(service.obtenerMetricas(donanteId));
-    }
-     */
-
-    /**
-     * Retorna el ranking global de donantes ordenado por donaciones exitosas
-     * (DESC).
+     * Retorna el ranking global de donantes.
      * GET /incentivos/ranking
-
+     */
     @GetMapping("/ranking")
     public ResponseEntity<List<RankingItemDTO>> obtenerRanking() {
         return ResponseEntity.ok(servicioRanking.obtenerRankingCompleto());
     }
-     */
 
     /**
      * Retorna la posición en el ranking de un donante específico.

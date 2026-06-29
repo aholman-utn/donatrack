@@ -11,6 +11,8 @@ import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
 import com.tp.donatrack.dtos.DonanteInactivoDTO;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
+import com.tp.donatrack.dtos.*;
+import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.donante.DonanteCreadoEvent;
 import com.tp.donatrack.domain.donante.DonanteEventPublisher;
@@ -265,8 +267,88 @@ public class DonanteService {
         return builder.build();
     }
 
+    @Autowired
+    private DonacionRepository donacionRepository;
+
     public void registrarEntregaEnPerfil(Long donanteId, DonacionSegmentada segmentada) {
         Donante donante = this.buscarDonantePorId(donanteId);
         donante.getPerfil().registrarEntrega(segmentada.getSubCategoria().getCategoria());
+    }
+
+    public MetricasActividadDTO obtenerMetricas(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null) throw new RuntimeException("Donante no encontrado");
+        PerfilDonante perfil = donante.getPerfil();
+
+        List<DonacionSegmentada> segmentadas = donacionRepository.findByDonanteId(donanteId).stream()
+                .flatMap(d -> d.getDonacionesSegmentadas().stream())
+                .collect(Collectors.toList());
+
+        List<Long> entidadesIds = segmentadas.stream()
+                .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA)
+                .map(DonacionSegmentada::getEntidadBeneficiariaAsignadaId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        int totalExitosas = perfil.calcularCantidadDonacionesEntregadas();
+
+        int donacionesMesActual = (int) perfil.getHistorialDonaciones().stream()
+                .filter(item -> item.getFecha().getMonthValue() == java.time.LocalDate.now().getMonthValue() &&
+                        item.getFecha().getYear() == java.time.LocalDate.now().getYear())
+                .count();
+
+        Map<String, Integer> agrupado = perfil.getHistorialDonaciones().stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getFecha().getYear() + "-" + item.getFecha().getMonthValue(),
+                        Collectors.summingInt(x -> 1)
+                ));
+
+        List<RegistroDonacionMensualDTO> comparaciones = agrupado.entrySet().stream()
+                .map(e -> {
+                    String[] parts = e.getKey().split("-");
+                    return RegistroDonacionMensualDTO.builder()
+                            .anio(Integer.parseInt(parts[0]))
+                            .mes(Integer.parseInt(parts[1]))
+                            .totalDonaciones(e.getValue())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        int misionesCompletadas = perfil.getMetricasPerfil() != null
+                && perfil.getMetricasPerfil().getMisionesCompletadas() != null
+                ? perfil.getMetricasPerfil().getMisionesCompletadas().size()
+                : 0;
+
+        return MetricasActividadDTO.builder()
+                .donanteId(donanteId.intValue())
+                .categoriaDonante(perfil.getNivelDonante().name())
+                .totalDonacionesExitosas(totalExitosas)
+                .entidadesAyudadasCount(entidadesIds.size())
+                .entidadesAyudadasIds(entidadesIds.stream().map(Long::intValue).collect(Collectors.toList()))
+                .donacionesMesActual(donacionesMesActual)
+                .mesPeriodoActual(java.time.LocalDate.now().getMonthValue())
+                .anioPeriodoActual(java.time.LocalDate.now().getYear())
+                .comparacionesMensuales(comparaciones)
+                .misionesCompletadasCount(misionesCompletadas)
+                .build();
+    }
+
+    public PerfilDonanteDTO obtenerPerfilDonante(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null) throw new RuntimeException("Donante no encontrado");
+        PerfilDonante perfil = donante.getPerfil();
+
+        return PerfilDonanteDTO.builder()
+                .visibilidadInsignia(perfil.isVisibilidadInsignia())
+                .categoriaDonante(perfil.getNivelDonante())
+                .misionActualId(perfil.getMisionActualId())
+                .progreso(perfil.getProgreso())
+                .insigniasGanadas(perfil.getInsigniasGanadas())
+                .misionesCompletadasIds(perfil.getMetricasPerfil() != null
+                        && perfil.getMetricasPerfil().getMisionesCompletadas() != null
+                        ? perfil.getMetricasPerfil().getMisionesCompletadas()
+                        : new ArrayList<>())
+                .build();
     }
 }

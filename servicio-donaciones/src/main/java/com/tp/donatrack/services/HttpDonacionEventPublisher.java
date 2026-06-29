@@ -41,6 +41,8 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
         requestBody.put("donanteId", event.dto().getDonanteId());
         requestBody.put("ultimaMisionId", event.dto().getUltimaMisionId());
         requestBody.put("progreso", event.dto().getProgreso());
+        requestBody.put("categoriaDonante", event.dto().getCategoriaDonante());
+        requestBody.put("nombreDonante", event.dto().getNombreDonante());
 
         try {
             // Log para ver qué estamos enviando
@@ -69,8 +71,16 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
                 donante.getPerfil().setMisionActualId(response.getSiguienteMisionId());
 
                 if (response.getInsigniaGanada() != null) {
-                    logger.info("Donante ganó insignia: {}", response.getInsigniaGanada());
-                    donante.getPerfil().getInsignasGanadas().add(response.getInsigniaGanada());
+                    logger.info("Donante ganó insignia: {}", response.getInsigniaGanada().getTitulo());
+                    donante.getPerfil().getInsigniasGanadas().add(response.getInsigniaGanada().getTitulo());
+                }
+
+                // Registrar misión completada en métricas
+                if (response.isMisionCumplida() && event.dto().getUltimaMisionId() != null) {
+                    if (donante.getPerfil().getMetricasPerfil().getMisionesCompletadas() == null) {
+                        donante.getPerfil().getMetricasPerfil().setMisionesCompletadas(new java.util.ArrayList<>());
+                    }
+                    donante.getPerfil().getMetricasPerfil().getMisionesCompletadas().add(event.dto().getUltimaMisionId());
                 }
 
                 if (response.isSubioDeCategoria() && response.getNuevoNivel() != null) {

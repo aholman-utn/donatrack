@@ -19,4 +19,8 @@ public class EntregaDonacionDTO {
 
     @NotNull(message = "El progreso no puede ser nulo")
     private double progreso;
+
+    private com.tp.commons.domain.donantes.Nivel categoriaDonante;
+    
+    private String nombreDonante;
 }

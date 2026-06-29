@@ -1,7 +1,6 @@
 package com.tp.donatrack.domain.donante;
 
 import com.tp.commons.domain.donantes.Nivel;
-import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,12 +19,16 @@ public class PerfilDonante {
 
     private Long misionActualId;
 
-    private List<Insignia> insignasGanadas = new ArrayList<>();
+    @Builder.Default
+    private List<String> insigniasGanadas = new ArrayList<>();
 
     private Double progreso;
 
     @Builder.Default
     private Nivel nivelDonante = Nivel.COLABORADOR;
+
+    @Builder.Default
+    private Metrica metricasPerfil = new Metrica();
 
     @Builder.Default
     private List<ItemDonacionSegmentada> historialDonaciones = new ArrayList<>();
@@ -35,6 +38,8 @@ public class PerfilDonante {
         this.nivelDonante = Nivel.COLABORADOR;
         this.progreso = (double) 0;
         this.historialDonaciones = new ArrayList<>();
+        this.insigniasGanadas = new ArrayList<>();
+        this.metricasPerfil = new Metrica();
     }
 
     public void registrarEntrega(CategoriaBien categoria) {

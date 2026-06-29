@@ -5,6 +5,7 @@ import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.dtos.CrearPersonaHumanaRequest;
 import com.tp.donatrack.dtos.CrearPersonaJuridicaRequest;
+import com.tp.donatrack.dtos.*;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.routes.DonanteRoutes;
 import com.tp.donatrack.services.DonanteService;
@@ -151,5 +152,17 @@ public class DonanteController {
         } else {
             throw new RuntimeException("Donante no encontrado");
         }
+    }
+
+    // GET /donantes/perfil/{donanteId}
+    @GetMapping("/perfil/{donanteId}")
+    public ResponseEntity<com.tp.donatrack.dtos.PerfilDonanteDTO> obtenerPerfil(@PathVariable Long donanteId) {
+        return ResponseEntity.ok(donanteService.obtenerPerfilDonante(donanteId));
+    }
+
+    // GET /donantes/metricas/{donanteId}
+    @GetMapping("/metricas/{donanteId}")
+    public ResponseEntity<com.tp.donatrack.dtos.MetricasActividadDTO> obtenerMetricas(@PathVariable Long donanteId) {
+        return ResponseEntity.ok(donanteService.obtenerMetricas(donanteId));
     }
 }

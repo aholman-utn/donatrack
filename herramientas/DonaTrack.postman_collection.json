@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Fundación Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Fundaci\u00f3n Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -186,6 +186,48 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Perfil de donante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/perfil/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "perfil",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener metricas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/metricas/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "metricas",
+                "1"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -199,7 +241,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -230,7 +272,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria",
@@ -256,7 +298,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria/3",
@@ -280,7 +322,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -309,7 +351,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -338,7 +380,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria/1",
@@ -495,7 +537,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donaci\u00f3n de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algod\u00f3n talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -616,7 +658,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"descripcion\": \"Donación actualizada de alimentos y vestimenta\"\n}",
+              "raw": "{\n  \"descripcion\": \"Donaci\u00f3n actualizada de alimentos y vestimenta\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -766,62 +808,29 @@
       "name": "Servicio - Incentivos",
       "item": [
         {
-          "name": "Perfil de donante",
+          "name": "Simular Entrega (Webhook Interno)",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donacionSegmentadaId\": 1,\n  \"donanteId\": 1,\n  \"ultimaMisionId\": 1,\n  \"progreso\": 0.0,\n  \"categoriaDonante\": \"COLABORADOR\",\n  \"nombreDonante\": \"Lucas Pangaro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "http://localhost:8081/perfil/1",
+              "raw": "http://localhost:8081/incentivos/entrega",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8081",
               "path": [
-                "perfil",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener misiones",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/perfil/misiones/1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "perfil",
-                "misiones",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener metricas",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/perfil/metricas/1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "perfil",
-                "metricas",
-                "1"
+                "incentivos",
+                "entrega"
               ]
             }
           },
@@ -833,47 +842,25 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8081/perfil/ranking",
+              "raw": "http://localhost:8081/incentivos/ranking",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8081",
               "path": [
-                "perfil",
+                "incentivos",
                 "ranking"
               ]
             },
             "description": "\\[ { \"posicion\": 1,\n\n\"donanteId\": 1,\n\n\"totalDonacionesExitosas\": 4,\n\n\"categoriaDonante\": \"COLABORADOR\",\n\n\"totalMisionesCompletadas\": 1 },\n\n---\n\n{ \"posicion\": 2, \"donanteId\": 2, \"totalDonacionesExitosas\": 3, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 3, \"donanteId\": 4, \"totalDonacionesExitosas\": 1, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 },\n\n{ \"posicion\": 4, \"donanteId\": 3, \"totalDonacionesExitosas\": 2, \"categoriaDonante\": \"COLABORADOR\", \"totalMisionesCompletadas\": 1 }\\]"
           },
           "response": []
-        },
-        {
-          "name": "Obtener insignias",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/perfil/insignias/1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "perfil",
-                "insignias",
-                "1"
-              ]
-            },
-            "description": "{ \"insignias\": \\[ { \"titulo\": \"Donacion Exitosa\", \"descripcion\": \"Completaste tus primeras 3 donaciones exitosas\" } \\], \"totalInsignias\": 1}"
-          },
-          "response": []
         }
       ]
     },
     {
-      "name": "Prueba conexión entre servicios de Donaciones e Incentivos",
+      "name": "Prueba conexi\u00f3n entre servicios de Donaciones e Incentivos",
       "item": [
         {
           "name": "1) Creacion del donante",
@@ -911,7 +898,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donaci\u00f3n de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algod\u00f3n talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -962,18 +949,19 @@
           "response": []
         },
         {
-          "name": "4) Obtengo perfil desde el servicio de incentivos",
+          "name": "4) Obtengo perfil desde el servicio de donaciones",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8081/perfil/1",
+              "raw": "http://localhost:8080/donantes/perfil/1",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8081",
+              "port": "8080",
               "path": [
+                "donantes",
                 "perfil",
                 "1"
               ]
@@ -1220,7 +1208,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nuevoEstado\": \"EN_TRASLADO\",\r\n  \"actor\": \"ServicioDonaciones\",\r\n  \"descripcion\": \"La donación fue retirada del depósito y se encuentra en camino al punto de entrega.\"\r\n}",
+              "raw": "{\r\n  \"nuevoEstado\": \"EN_TRASLADO\",\r\n  \"actor\": \"ServicioDonaciones\",\r\n  \"descripcion\": \"La donaci\u00f3n fue retirada del dep\u00f3sito y se encuentra en camino al punto de entrega.\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -62,13 +62,37 @@ public class IncentivosService {
 
             logger.info("Misión completada. Siguiente misión ID: {}", siguienteMisionId);
 
-            //TODO activar n8n
+            boolean subioDeCategoria = false;
+            com.tp.commons.domain.donantes.Nivel nuevoNivel = dto.getCategoriaDonante();
+
+            if (siguienteMisionId == null) {
+                if (nuevoNivel == com.tp.commons.domain.donantes.Nivel.COLABORADOR) {
+                    nuevoNivel = com.tp.commons.domain.donantes.Nivel.SOSTENEDOR;
+                    subioDeCategoria = true;
+                } else if (nuevoNivel == com.tp.commons.domain.donantes.Nivel.SOSTENEDOR) {
+                    nuevoNivel = com.tp.commons.domain.donantes.Nivel.TRANSFORMADOR;
+                    subioDeCategoria = true;
+                }
+            }
+
+            try {
+                org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+                java.util.Map<String, String> body = new java.util.HashMap<>();
+                body.put("user", dto.getNombreDonante());
+                body.put("nombreMision", misionActual.getTitulo());
+                body.put("descripcion", misionActual.getDescripcion());
+                restTemplate.postForObject("http://localhost:5678/webhook/nueva_insignia", body, String.class);
+            } catch (Exception e) {
+                logger.error("Error al notificar a n8n: {}", e.getMessage());
+            }
 
             return EvaluacionMisionResponseDTO.builder()
                     .misionCumplida(true)
                     .nuevoProgreso(0.0)
                     .insigniaGanada(misionActual.getInsigniaAsociada())
                     .siguienteMisionId(siguienteMisionId)
+                    .subioDeCategoria(subioDeCategoria)
+                    .nuevoNivel(nuevoNivel)
                     .build();
         }
 

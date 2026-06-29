@@ -33,4 +33,16 @@ public class DonacionesRestClient {
 
         return restTemplate.getForObject(url, IndicadoresDonanteDTO.class);
     }
+
+    public List<java.util.Map<String, Object>> obtenerTodosDonantes() {
+        String url = UriComponentsBuilder.fromHttpUrl(donacionesUrl)
+                .path("/donantes")
+                .build()
+                .toUriString();
+        java.util.Map<String, Object>[] array = restTemplate.getForObject(url, java.util.Map[].class);
+        if (array == null) {
+            return List.of();
+        }
+        return java.util.Arrays.asList(array);
+    }
 }

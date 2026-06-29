@@ -1,91 +1,69 @@
 package com.tp.incentivos.services;
 
 import com.tp.incentivos.dtos.RankingItemDTO;
-import com.tp.incentivos.repositories.IncentivosRepository;
+import com.tp.incentivos.clients.DonacionesRestClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Servicio encargado de calcular el ranking global de donantes.
- * El ranking se calcula on-the-fly sobre el repositorio en memoria,
- * ordenando por totalDonacionesExitosas de forma descendente.
  */
 @Service
 public class ServicioRanking {
-    private final IncentivosRepository repository;
+    private final DonacionesRestClient donacionesRestClient;
 
-    public ServicioRanking(IncentivosRepository repository) {
-        this.repository = repository;
+    public ServicioRanking(DonacionesRestClient donacionesRestClient) {
+        this.donacionesRestClient = donacionesRestClient;
     }
-    /*
+
     public List<RankingItemDTO> obtenerRankingCompleto() {
-        return obtenerRankingCompleto(false);
-    }
-
-    public List<RankingItemDTO> obtenerRankingCompleto(boolean mesActual) {
-        List<Perfil> unicos = new ArrayList<>();
-        java.util.Set<Integer> idsVistos = new java.util.HashSet<>();
-        for (Perfil perfil : repository.findAll()) {
-            if (perfil != null && idsVistos.add(perfil.getDonanteId())) {
-                unicos.add(perfil);
-            }
-        }
-
-        if (mesActual) {
-            unicos.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountMesActual).reversed());
-        } else {
-            unicos.sort(Comparator.comparingLong(Perfil::getMisionesCompletadasCountHistorico).reversed());
-        }
-
+        List<Map<String, Object>> donantes = donacionesRestClient.obtenerTodosDonantes();
+        
         List<RankingItemDTO> ranking = new ArrayList<>();
-        AtomicInteger posicion = new AtomicInteger(1);
-
-        for (Perfil perfil : unicos) {
-            int misionesCount = (int) (mesActual ? perfil.getMisionesCompletadasCountMesActual()
-                    : perfil.getMisionesCompletadasCountHistorico());
+        
+        for (Map<String, Object> donanteMap : donantes) {
+            Map<String, Object> persona = (Map<String, Object>) donanteMap.get("persona");
+            Integer donanteId = persona != null ? (Integer) persona.get("id") : null;
+            if (donanteId == null) continue;
+            
+            Map<String, Object> perfil = (Map<String, Object>) donanteMap.get("perfil");
+            
+            String categoriaDonante = "COLABORADOR";
+            int totalMisionesCompletadas = 0;
+            
+            if (perfil != null) {
+                categoriaDonante = (String) perfil.getOrDefault("nivelDonante", "COLABORADOR");
+                
+                Object misionActualIdObj = perfil.get("misionActualId");
+                if (misionActualIdObj != null) {
+                    int misionActualId = (int) (misionActualIdObj instanceof Number ? ((Number) misionActualIdObj).intValue() : Integer.parseInt(misionActualIdObj.toString()));
+                    totalMisionesCompletadas = misionActualId - 1;
+                } else if (categoriaDonante.equals("TRANSFORMADOR")) {
+                    // Si es transformador y ya no tiene mision actual, cumplio las 4.
+                    totalMisionesCompletadas = 4;
+                }
+            }
+            
             ranking.add(RankingItemDTO.builder()
-                    .posicion(posicion.getAndIncrement())
-                    .donanteId(perfil.getDonanteId())
-                    .totalDonacionesExitosas(perfil.getTotalDonacionesExitosas())
-                    .categoriaDonante(perfil.getCategoriaDonante().name())
-                    .totalMisionesCompletadas(misionesCount)
+                    .donanteId(donanteId)
+                    .categoriaDonante(categoriaDonante)
+                    .totalMisionesCompletadas(totalMisionesCompletadas)
                     .build());
+        }
+
+        ranking.sort(Comparator.comparingInt(RankingItemDTO::getTotalMisionesCompletadas).reversed());
+
+        AtomicInteger posicion = new AtomicInteger(1);
+        for (RankingItemDTO item : ranking) {
+            item.setPosicion(posicion.getAndIncrement());
         }
 
         return ranking;
     }
-
-    public RankingItemDTO obtenerPosicionDonante(Integer donanteId) {
-        return obtenerPosicionDonante(donanteId, false);
-    }
-
-    public RankingItemDTO obtenerPosicionDonante(Integer donanteId, boolean mesActual) {
-        List<RankingItemDTO> rankingCompleto = obtenerRankingCompleto(mesActual);
-
-        return rankingCompleto.stream()
-                .filter(item -> item.getDonanteId().equals(donanteId))
-                .findFirst()
-                .orElse(RankingItemDTO.builder()
-                        .posicion(-1)
-                        .donanteId(donanteId)
-                        .totalDonacionesExitosas(0)
-                        .categoriaDonante("SIN_PERFIL")
-                        .totalMisionesCompletadas(0)
-                        .build());
-    }
-    */
-
-    public int calcularPosicion(Integer donanteId) {
-        //return calcularPosicion(donanteId, false);
-        return 0;
-    }
-    /*
-    public int calcularPosicion(Integer donanteId, boolean mesActual) {
-        return obtenerPosicionDonante(donanteId, mesActual).getPosicion();
-    }
-    */
 }

@@ -83,6 +83,8 @@ public class DonacionService {
             donacionEntregada.setProgreso(donante.getPerfil().getProgreso());
             donacionEntregada.setDonanteId(donante.getPersona().getId());
             donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
+            donacionEntregada.setCategoriaDonante(donante.getPerfil().getNivelDonante());
+            donacionEntregada.setNombreDonante(donante.getNombreCompleto());
             eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
         }
     }

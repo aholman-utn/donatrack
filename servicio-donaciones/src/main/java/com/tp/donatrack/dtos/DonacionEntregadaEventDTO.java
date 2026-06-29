@@ -9,4 +9,6 @@ public class DonacionEntregadaEventDTO {
     private Long donanteId;
     private Long ultimaMisionId;
     private double progreso;
+    private com.tp.commons.domain.donantes.Nivel categoriaDonante;
+    private String nombreDonante;
 }
