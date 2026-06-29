@@ -7,6 +7,6 @@ import lombok.Setter;
 public class DonacionEntregadaEventDTO {
     private Long donacionSegmentadaId;
     private Long donanteId;
-    private Long misionId;
+    private Long ultimaMisionId;
     private double progreso;
 }

@@ -1,10 +1,13 @@
 package com.tp.donatrack.domain.donante;
 
 import com.tp.commons.domain.donantes.Nivel;
+import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.*;
 
 @Getter
@@ -17,51 +20,73 @@ public class PerfilDonante {
 
     private Long misionActualId;
 
-    private List<String> insignasGanadas = new ArrayList<>();
+    private List<Insignia> insignasGanadas = new ArrayList<>();
 
     private Double progreso;
 
-    private Metrica metricas;
+    @Builder.Default
+    private Nivel nivelDonante = Nivel.COLABORADOR;
 
     @Builder.Default
-    private Nivel categoriaDonante = Nivel.COLABORADOR;
-
-    @Builder.Default
-    private List<ItemDonacion> historialDonaciones = new ArrayList<>();
+    private List<ItemDonacionSegmentada> historialDonaciones = new ArrayList<>();
 
     public PerfilDonante() {
         this.visibilidadInsignia = true;
-        this.historialDonaciones = new ArrayList<>();
-        this.categoriaDonante = Nivel.COLABORADOR;
+        this.nivelDonante = Nivel.COLABORADOR;
         this.progreso = (double) 0;
+        this.historialDonaciones = new ArrayList<>();
     }
 
-    public void registrarEntrega(Long entidadBeneficiariaId, CategoriaBien categoria) {
+    public void registrarEntrega(CategoriaBien categoria) {
         if (this.historialDonaciones == null) {
             this.historialDonaciones = new ArrayList<>();
         }
-        ItemDonacion item = ItemDonacion.builder()
+        ItemDonacionSegmentada item = ItemDonacionSegmentada.builder()
                 .fecha(LocalDate.now())
                 .categoria(categoria)
                 .build();
         this.historialDonaciones.add(item);
+
+        //if (this.metricas == null) this.metricas = new Metrica();
+        //this.metricas.setTotalDonacionesExitosas(this.metricas.getTotalDonacionesExitosas() + 1);
     }
 
-    public void registrarCategoria(CategoriaBien categoria) {
-        if (categoria != null) {
-            registrarEntrega(null, categoria);
+    public int contarCategoriasUnicas() {
+        if (this.historialDonaciones == null || this.historialDonaciones.isEmpty()) {
+            return 0;
         }
+        return Math.toIntExact(this.historialDonaciones.stream()
+                .map(ItemDonacionSegmentada::getCategoria)
+                .distinct()
+                .count());
     }
 
-    public void subirCategoria() {
-        if (this.historialDonaciones == null) {
-            return;
+    public int calcularRachaMeses() {
+        if (this.historialDonaciones == null || this.historialDonaciones.isEmpty()) {
+            return 0;
         }
-        int size = this.historialDonaciones.size();
-        if (this.categoriaDonante == Nivel.COLABORADOR && size >= 5) {
-            this.categoriaDonante = Nivel.SOSTENEDOR;
-        } else if (this.categoriaDonante == Nivel.SOSTENEDOR && size >= 15) {
-            this.categoriaDonante = Nivel.TRANSFORMADOR;
+
+        List<LocalDate> fechas = this.historialDonaciones.stream()
+                .map(ItemDonacionSegmentada::getFecha)
+                .sorted()
+                .collect(Collectors.toList());
+
+        int racha = 1;
+        for (int i = 0; i < fechas.size() - 1; i++) {
+            LocalDate actual = fechas.get(i);
+            LocalDate siguiente = fechas.get(i + 1);
+
+            if (actual.getMonthValue() == siguiente.getMonthValue() - 1 ||
+                    (actual.getMonthValue() == 12 && siguiente.getMonthValue() == 1)) {
+                racha++;
+            } else {
+                racha = 1;
+            }
         }
+        return racha;
+    }
+
+    public int calcularCantidadDonacionesEntregadas(){
+        return this.historialDonaciones.size();
     }
 }

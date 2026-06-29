@@ -1,4 +1,4 @@
-package com.tp.incentivos.domain;
+package com.tp.commons.domain.incentivos;
 
 import java.util.Date;
 import lombok.*;

@@ -1,6 +1,7 @@
 package com.tp.incentivos.domain.misiones;
 
-import com.tp.incentivos.domain.Insignia;
+import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
 import lombok.Getter;
 
@@ -21,17 +22,18 @@ public class MisionDonacionesExitosas extends Mision {
     }
 
     @Override
-    public int getObjetivo() {
-        return 0;
-    }
-
-    @Override
     public boolean tieneSiguiente(){
         return false;
     }
 
     @Override
-    public boolean estaCumplida(EntregaDonacionDTO datos) {
-        return false;
+    public double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO indicadores) {
+        return dto.getProgreso() + 1;
+    }
+
+    @Override
+    public boolean estaCumplida(EntregaDonacionDTO datos, IndicadoresDonanteDTO metricas) {
+        double entregasTotales = datos.getProgreso() + 1;
+        return entregasTotales >= this.objetivo;
     }
 }

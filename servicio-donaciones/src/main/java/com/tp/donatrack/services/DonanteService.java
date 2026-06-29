@@ -1,8 +1,11 @@
 package com.tp.donatrack.services;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
 import com.tp.commons.services.notificador.NotificacionRestClient;
 
+import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donante.PerfilDonante;
 import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
@@ -230,5 +233,40 @@ public class DonanteService {
         } catch (Exception e) {
             logger.error("ERROR INESPERADO procesando el donante {}.", donanteId, e);
         }
+    }
+
+    public IndicadoresDonanteDTO calcularIndicadores(Long donanteId, DonacionSegmentada segmentada, List<String> indicadores) {
+        Donante donante = donanteRepository.findById(donanteId);
+
+        if (donante == null) {
+            throw new RuntimeException("Donante no encontrado");
+        }
+
+        PerfilDonante perfil = donante.getPerfil();
+
+        IndicadoresDonanteDTO.IndicadoresDonanteDTOBuilder builder = IndicadoresDonanteDTO.builder();
+
+        if (indicadores.contains("CANTIDAD_BIENES")) {
+            builder.cantidadBienesTotal(segmentada.getCantidad());
+        }
+
+        if (indicadores.contains("CATEGORIAS_DISTINTAS")) {
+            builder.cantidadCategoriasUnicas(perfil.contarCategoriasUnicas());
+        }
+
+        if (indicadores.contains("MESES_CONSECUTIVOS")) {
+            builder.mesesConsecutivosRacha(perfil.calcularRachaMeses());
+        }
+
+        if (indicadores.contains("ENTREGAS_EXITOSAS_TOTALES")) {
+            builder.cantidadDonacionesEntregadas(perfil.calcularCantidadDonacionesEntregadas());
+        }
+
+        return builder.build();
+    }
+
+    public void registrarEntregaEnPerfil(Long donanteId, DonacionSegmentada segmentada) {
+        Donante donante = this.buscarDonantePorId(donanteId);
+        donante.getPerfil().registrarEntrega(segmentada.getSubCategoria().getCategoria());
     }
 }

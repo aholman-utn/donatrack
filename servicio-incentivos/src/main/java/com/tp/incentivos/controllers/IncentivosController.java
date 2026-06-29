@@ -1,5 +1,6 @@
 package com.tp.incentivos.controllers;
 
+import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
 import com.tp.incentivos.dtos.InsigniasDonanteDTO;
 import com.tp.incentivos.dtos.MetricasActividadDTO;
@@ -29,12 +30,6 @@ public class IncentivosController {
         this.servicioRanking = servicioRanking;
     }
 
-    @PostMapping
-    public ResponseEntity<Void> crearPerfil(@Valid @RequestBody CrearPerfilDTO dto) {
-        //service.crearPerfilInicial(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleNotFound(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -46,9 +41,9 @@ public class IncentivosController {
      * POST /perfil/entrega
      */
     @PostMapping("/entrega")
-    public ResponseEntity<Void> procesarEntrega(@Valid @RequestBody EntregaDonacionDTO dto) {
-        service.procesarNuevaEntrega(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<EvaluacionMisionResponseDTO> procesarEntrega(@Valid @RequestBody EntregaDonacionDTO dto) {
+        EvaluacionMisionResponseDTO resultado = service.procesarNuevaEntrega(dto);
+        return ResponseEntity.ok(resultado);
     }
 
     /**

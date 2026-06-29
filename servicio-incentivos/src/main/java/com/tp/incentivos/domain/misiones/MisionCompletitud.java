@@ -1,11 +1,15 @@
 package com.tp.incentivos.domain.misiones;
 
-import com.tp.incentivos.domain.Insignia;
+import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class MisionCompletitud extends Mision {
+
     public MisionCompletitud(
             int objetivo,
             String titulo,
@@ -14,23 +18,20 @@ public class MisionCompletitud extends Mision {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
+
         this.insigniaAsociada = new Insignia(
-            "Completitud",
-            "Ayudaste en 2 categorías diferentes de donación"
+                "Completitud",
+                "Ayudaste en " + objetivo + " categorías diferentes de donación"
         );
     }
 
-    public int getObjetivo(){
-        return 0;
+    @Override
+    public double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO metricas) {
+        return (double) (100 * metricas.getCantidadCategoriasUnicas()) / this.objetivo;
     }
 
     @Override
-    public boolean tieneSiguiente(){
-        return true;
-    }
-
-    @Override
-    public boolean estaCumplida(EntregaDonacionDTO datos) {
-        return true;
+    public boolean estaCumplida(EntregaDonacionDTO dto, IndicadoresDonanteDTO metricas) {
+        return metricas.getCantidadCategoriasUnicas() >= this.objetivo;
     }
 }

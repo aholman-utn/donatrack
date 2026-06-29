@@ -21,6 +21,7 @@ public class Donacion {
     private Donante donante;
     private String descripcion;
     private Date fechaIngreso;
+    private List<Bien> bienes;
     private List<DonacionSegmentada> donacionesSegmentadas = new ArrayList<>();
 
     public Donacion(
@@ -36,6 +37,7 @@ public class Donacion {
         this.donante = donante;
         this.descripcion = descripcion;
         this.fechaIngreso = fechaIngreso;
+        this.bienes = bienes;
         this.donacionesSegmentadas = this.segmentar(bienes);
     }
 

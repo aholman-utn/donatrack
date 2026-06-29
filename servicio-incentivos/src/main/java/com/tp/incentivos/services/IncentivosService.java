@@ -1,96 +1,90 @@
 package com.tp.incentivos.services;
 
-import com.tp.incentivos.domain.*;
+import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
+import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.incentivos.clients.DonacionesRestClient;
 import com.tp.incentivos.domain.misiones.Mision;
 import com.tp.incentivos.dtos.*;
-import com.tp.incentivos.repositories.IncentivosRepository;
 import com.tp.incentivos.repositories.MisionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class IncentivosService {
     private final MisionRepository misionRepository;
+    private final DonacionesRestClient donacionesRestClient;
+    private static final Logger logger = LoggerFactory.getLogger(IncentivosService.class);
+
     public IncentivosService(
-            MisionRepository misionRepository
+            MisionRepository misionRepository,
+            DonacionesRestClient donacionesRestClient
     ) {
         this.misionRepository = misionRepository;
+        this.donacionesRestClient = donacionesRestClient;
     }
 
-    /**
-     * Procesa una nueva entrega de donación:
-     * 1. Obtiene o crea el perfil del donante (resiliencia/fallback).
-     * 2. Registra la entrega básica (total y entidad).
-     * 3. Registra la categoría del bien donado.
-     * 4. Actualiza el historial mensual.
-     * 5. Construye el InfoDonacion y delega la evaluación de misiones.
-     * 6. Persiste el perfil.
-     */
-    public void procesarNuevaEntrega(EntregaDonacionDTO dto) {
-        Long donanteId = dto.getDonanteId();
-        Long donacionSegmendatadId = dto.getDonacionSegmentadaId();
-        Long ultimaMisionId = dto.getUltimaMisionId();
-        double progreso = dto.getProgreso();
+    public EvaluacionMisionResponseDTO procesarNuevaEntrega(EntregaDonacionDTO dto) {
+        logger.info("Iniciando procesamiento de entrega. Donante: {}, Misión original: {}",
+                dto.getDonanteId(), dto.getUltimaMisionId());
 
-        Mision mision = this.misionRepository.findById(ultimaMisionId)
-                .orElseThrow(() -> new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId));
+        Long ultimaMisionId = (dto.getUltimaMisionId() == null) ? obtenerMisionInicialId() : dto.getUltimaMisionId();
+        logger.debug("Misión resuelta para procesar: {}", ultimaMisionId);
 
-        boolean cumplida = mision.estaCumplida(dto);
+        Mision misionActual = this.misionRepository.findById(ultimaMisionId)
+                .orElseThrow(() -> {
+                    logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
+                    return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
+                });
 
-        // Imprimiendo los valores
-        System.out.println("Donante ID: " + donanteId);
-        System.out.println("Donación Segmentada ID: " + donacionSegmendatadId);
-        System.out.println("Última Misión ID: " + ultimaMisionId);
-        System.out.println("Progreso: " + progreso);
-        /*
-            1. Le pedimos al servicio de donaciones el rol y la ultima mision del del donante
-            2. Vemos si con estos datos cumple para subir de misión
-            3. SI sube de misión actualizamos la info del donante (POST donaciones)
-            4. SI no sube no hago nada
-         */
+        logger.debug("Llamando a DonacionesClient para obtener indicadores...");
+        IndicadoresDonanteDTO indicadores = this.donacionesRestClient.obtenerIndicadores(
+                dto.getDonanteId(),
+                dto.getDonacionSegmentadaId(),
+                List.of(
+                    "CANTIDAD_BIENES",
+                    "MESES_CONSECUTIVOS",
+                    "CATEGORIAS_UNICAS",
+                    "ENTREGAS_EXITOSAS_TOTALES"
+                )
+        );
+        logger.debug("Indicadores recibidos: {}", indicadores);
 
-        //1. POST Crear perfilDonante en donante (Servicio donaciones)
-        // Ultima mision y progreso actual del donante
-        //Vemos que mision matchea en base al rol del usuario
-        // 1. Actualizamos el progreso
-        // Vemos
+        boolean cumplida = misionActual.estaCumplida(dto, indicadores);
+        logger.info("Resultado de evaluación de misión (Cumplida: {}): {} para donante {}",
+                cumplida, misionActual.getTitulo(), dto.getDonanteId());
 
+        if (cumplida) {
+            Optional<Mision> siguienteMision = this.misionRepository.findSiguiente(ultimaMisionId);
+            Long siguienteMisionId = siguienteMision.map(Mision::getId).orElse(null);
 
-        /*
-        Perfil perfil = repository.findByDonanteId(donanteId);
-        if (perfil == null) {
-            perfil = new Perfil(donanteId);
-            // NombreUsuario queda null aquí por fallback, se podría buscar pero lo creamos resiliente
+            logger.info("Misión completada. Siguiente misión ID: {}", siguienteMisionId);
+
+            //TODO activar n8n
+
+            return EvaluacionMisionResponseDTO.builder()
+                    .misionCumplida(true)
+                    .nuevoProgreso(0.0)
+                    .insigniaGanada(misionActual.getInsigniaAsociada())
+                    .siguienteMisionId(siguienteMisionId)
+                    .build();
         }
 
-        if (dto.getNombreUsuario() != null) {
-            perfil.setNombreUsuario(dto.getNombreUsuario());
-        }
+        double progresoActualizado = misionActual.calcularNuevoProgreso(dto, indicadores);
+        logger.info("Misión no completada. Progreso actualizado a: {}", progresoActualizado);
 
-        perfil.registrarEntrega(dto.getEntidadBeneficiariaId());
-
-        perfil.registrarCategoria(dto.getCategoriaDonacion());
-
-        LocalDate fecha = dto.getFechaDonacion() != null ? dto.getFechaDonacion() : LocalDate.now();
-
-        actualizarHistorialMensual(perfil, fecha);
-
-        InfoDonacion infoDonacion = InfoDonacion.builder()
-                .donanteId(donanteId)
-                .entidadBeneficiariaId(dto.getEntidadBeneficiariaId())
-                .cantidadBienes(dto.getCantidadBienes())
-                .fechaDonacion(fecha)
-                .categoriaDonacion(dto.getCategoriaDonacion())
-                .categoriasAcumuladas(new ArrayList<>(perfil.getCategoriasAyudadas()))
+        return EvaluacionMisionResponseDTO.builder()
+                .misionCumplida(false)
+                .nuevoProgreso(progresoActualizado)
+                .insigniaGanada(null)
+                .siguienteMisionId(ultimaMisionId)
                 .build();
+    }
 
-        evaluadorMisiones.evaluar(perfil, infoDonacion);
-        repository.create(perfil);
-
-         */
+    //TODO Debatir: Deberiamos crearle la mision inicial al usuario en donaciones ? deberiamos manejarlo desde aca pero de otra forma?
+    private Long obtenerMisionInicialId() {
+        return 1L;
     }
 }

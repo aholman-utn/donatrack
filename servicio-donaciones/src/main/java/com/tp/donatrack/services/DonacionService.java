@@ -73,16 +73,18 @@ public class DonacionService {
         Donante donante = this.donanteService.buscarDonantePorId(donanteId);
 
         segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId());
+        this.notificarEntrega(segmentada);
+
+        this.donanteService.registrarEntregaEnPerfil(donanteId, segmentada);
 
         if (eventPublisher != null) {
             DonacionEntregadaEventDTO donacionEntregada = new DonacionEntregadaEventDTO();
             donacionEntregada.setDonacionSegmentadaId(segmentada.getId());
             donacionEntregada.setProgreso(donante.getPerfil().getProgreso());
             donacionEntregada.setDonanteId(donante.getPersona().getId());
+            donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
             eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
         }
-
-        this.notificarEntrega(segmentada);
     }
 
     public List<DonacionHistorialDTO> obtenerTodas() {

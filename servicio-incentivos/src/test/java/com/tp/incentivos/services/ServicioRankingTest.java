@@ -1,6 +1,6 @@
 package com.tp.incentivos.services;
 /*
-import com.tp.incentivos.domain.Insignia;
+import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.domain.misiones.Mision;
 import com.tp.incentivos.domain.misiones.MisionDonacionesExitosas;
 import com.tp.incentivos.domain.Perfil;

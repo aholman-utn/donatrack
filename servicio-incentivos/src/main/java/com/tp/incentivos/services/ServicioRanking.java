@@ -16,13 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 public class ServicioRanking {
-/**
     private final IncentivosRepository repository;
 
     public ServicioRanking(IncentivosRepository repository) {
         this.repository = repository;
     }
-
+    /*
     public List<RankingItemDTO> obtenerRankingCompleto() {
         return obtenerRankingCompleto(false);
     }
@@ -78,13 +77,15 @@ public class ServicioRanking {
                         .totalMisionesCompletadas(0)
                         .build());
     }
+    */
 
     public int calcularPosicion(Integer donanteId) {
-        return calcularPosicion(donanteId, false);
+        //return calcularPosicion(donanteId, false);
+        return 0;
     }
-
+    /*
     public int calcularPosicion(Integer donanteId, boolean mesActual) {
         return obtenerPosicionDonante(donanteId, mesActual).getPosicion();
     }
- */
+    */
 }

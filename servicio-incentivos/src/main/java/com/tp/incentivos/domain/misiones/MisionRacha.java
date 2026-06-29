@@ -1,11 +1,11 @@
 package com.tp.incentivos.domain.misiones;
 
-import com.tp.incentivos.domain.Insignia;
+import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
-import lombok.*;
+import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class MisionRacha extends Mision {
     public MisionRacha(
             int objetivo,
@@ -15,24 +15,19 @@ public class MisionRacha extends Mision {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
-        this.insigniaAsociada =  new Insignia(
+        this.insigniaAsociada = new Insignia(
             "Racha",
-            "Donaste durante 2 meses seguidos"
+            "Donaste durante " + objetivo + " meses seguidos"
         );
     }
 
     @Override
-    public int getObjetivo() {
-        return 0;
+    public double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO indicadores) {
+        return (double) (100 * indicadores.getMesesConsecutivosRacha()) / this.objetivo;
     }
 
     @Override
-    public boolean tieneSiguiente(){
-        return true;
-    }
-
-    @Override
-    public boolean estaCumplida(EntregaDonacionDTO datos) {
-        return false;
+    public boolean estaCumplida(EntregaDonacionDTO dto, IndicadoresDonanteDTO indicadores) {
+        return indicadores.getMesesConsecutivosRacha() >= this.objetivo;
     }
 }
