@@ -89,6 +89,15 @@ public class DonacionService {
             eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
         }
     }
+
+    public void registrarEntregaFallida(Long donacionSegmentadaId, String motivo) {
+        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
+        if (segmentada == null) {
+            throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
+        }
+        segmentada.registrarEntregaFallida("Sistema", motivo != null ? motivo : "Entrega fallida reportada por logística");
+    }
+
     public List<DonacionHistorialDTO> obtenerTodas() {
         return donacionRepository.findAll().stream()
                 .map(this::mapToDTO)

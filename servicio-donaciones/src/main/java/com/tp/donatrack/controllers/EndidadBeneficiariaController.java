@@ -1,5 +1,6 @@
 package com.tp.donatrack.controllers;
 
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.dtos.CrearPersonaJuridicaRequest;
 import com.tp.donatrack.services.EntidadBeneficiariaService;
@@ -58,4 +59,29 @@ public class EndidadBeneficiariaController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/contacto-notificacion")
+    public ResponseEntity<NotificacionRequestDTO> obtenerContactoParaNotificacion(@PathVariable Long id) {
+        EntidadBeneficiaria entidad = entidadBeneficiariaService.buscarEntidad(id);
+        if (entidad == null || entidad.getDatosDeEntidad() == null || entidad.getDatosDeEntidad().getMedioPredeterminado() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        java.util.Map<String, String> mapaMedio = entidad.getDatosDeEntidad().getMedioPredeterminado();
+        String tipoString = mapaMedio.get("medio");
+        String valor = mapaMedio.get("valor");
+
+        if (tipoString == null || valor == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        NotificacionRequestDTO responseDTO = new NotificacionRequestDTO();
+        responseDTO.setMedio(com.tp.commons.domain.notificador.TipoNotificador.valueOf(tipoString.toUpperCase()));
+        responseDTO.setDestinatario(valor);
+        responseDTO.setIdPersona(entidad.getDatosDeEntidad().getId());
+        responseDTO.setMensaje(null);
+        responseDTO.setAsunto(null);
+
+        return ResponseEntity.ok(responseDTO);
+    }
 }
+
