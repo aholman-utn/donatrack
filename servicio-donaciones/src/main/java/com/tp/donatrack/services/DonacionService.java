@@ -13,6 +13,7 @@ import com.tp.donatrack.repositories.DonacionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +89,6 @@ public class DonacionService {
             eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
         }
     }
-
     public List<DonacionHistorialDTO> obtenerTodas() {
         return donacionRepository.findAll().stream()
                 .map(this::mapToDTO)

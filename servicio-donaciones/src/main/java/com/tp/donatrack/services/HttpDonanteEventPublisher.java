@@ -24,7 +24,7 @@ public class HttpDonanteEventPublisher implements DonanteEventPublisher {
 
     @Override
     public void publicar(DonanteCreadoEvent event) {
-        Map<String, Object> requestBody = new HashMap<>();
+        /*Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("donanteId", event.donanteId());
         requestBody.put("nombreUsuario", event.nombreUsuario());
 
@@ -43,6 +43,6 @@ public class HttpDonanteEventPublisher implements DonanteEventPublisher {
         } catch (Exception e) {
             // Capturamos la excepción para ser resilientes si incentivos cae
             System.err.println("Error al notificar al servicio de incentivos sobre nuevo donante: " + e.getMessage());
-        }
+        }*/
     }
 }

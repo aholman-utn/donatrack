@@ -1,5 +1,7 @@
 package com.tp.donatrack.controllers;
 
+import com.tp.commons.domain.notificador.TipoNotificador;
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(DonanteRoutes.BASE)
@@ -164,5 +167,33 @@ public class DonanteController {
     @GetMapping("/metricas/{donanteId}")
     public ResponseEntity<com.tp.donatrack.dtos.MetricasActividadDTO> obtenerMetricas(@PathVariable Long donanteId) {
         return ResponseEntity.ok(donanteService.obtenerMetricas(donanteId));
+    }
+
+    @GetMapping("/{id}/contacto-notificacion")
+    public ResponseEntity<NotificacionRequestDTO> obtenerContactoParaNotificacion(@PathVariable Long id) {
+        Donante donante = donanteService.buscarDonantePorId(id);
+
+        if (donante == null || donante.getPersona() == null || donante.getPersona().getMedioPredeterminado() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, String> mapaMedio = donante.getPersona().getMedioPredeterminado();
+        String tipoString = mapaMedio.get("medio");
+        String valor = mapaMedio.get("valor");
+
+        if (tipoString == null || valor == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        NotificacionRequestDTO responseDTO = new NotificacionRequestDTO();
+
+        responseDTO.setMedio(TipoNotificador.valueOf(tipoString.toUpperCase()));
+        responseDTO.setDestinatario(valor);
+        responseDTO.setIdPersona(donante.getPersona().getId());
+
+        responseDTO.setMensaje(null);
+        responseDTO.setAsunto(null);
+
+        return ResponseEntity.ok(responseDTO);
     }
 }

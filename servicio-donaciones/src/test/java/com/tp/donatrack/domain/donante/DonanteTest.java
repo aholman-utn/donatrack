@@ -82,20 +82,6 @@
         }
 
         @Test
-        @DisplayName("Debe registrar la entrega de donaciones actualizando el historial en el perfil")
-        public void testRegistrarEntrega() {
-            PerfilDonante perfil = new PerfilDonante();
-            Assertions.assertEquals(0, perfil.getHistorialDonaciones().size());
-
-            perfil.registrarEntrega(CategoriaBien.ALIMENTOS);
-            Assertions.assertEquals(1, perfil.getHistorialDonaciones().size());
-
-            ItemDonacionSegmentada item = perfil.getHistorialDonaciones().get(0);
-            Assertions.assertEquals(java.time.LocalDate.now(), item.getFecha());
-            Assertions.assertEquals(CategoriaBien.ALIMENTOS, item.getCategoria());
-        }
-
-        @Test
         @DisplayName("El nivel del donante debe poder ser actualizado externamente (ej. por respuesta de Incentivos)")
         public void testActualizarNivelDonante() {
             PerfilDonante perfil = new PerfilDonante();

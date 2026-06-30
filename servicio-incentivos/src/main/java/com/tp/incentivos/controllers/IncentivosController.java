@@ -2,10 +2,6 @@ package com.tp.incentivos.controllers;
 
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
-import com.tp.incentivos.dtos.InsigniasDonanteDTO;
-import com.tp.incentivos.dtos.MetricasActividadDTO;
-import com.tp.incentivos.dtos.MisionesDonanteDTO;
-import com.tp.incentivos.dtos.PerfilIncentivosDTO;
 import com.tp.incentivos.dtos.RankingItemDTO;
 import com.tp.incentivos.services.IncentivosService;
 import com.tp.incentivos.services.ServicioRanking;
@@ -15,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.HttpStatus;
 import java.util.List;
-import java.util.Map;
-import com.tp.incentivos.dtos.CrearPerfilDTO;
 
 @RestController
 @RequestMapping("/incentivos")

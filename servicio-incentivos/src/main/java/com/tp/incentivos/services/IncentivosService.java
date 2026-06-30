@@ -1,8 +1,12 @@
 package com.tp.incentivos.services;
 
+import com.tp.commons.domain.donantes.Nivel;
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
+import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.incentivos.clients.DonacionesRestClient;
+import com.tp.incentivos.clients.InsigniasRestClient;
 import com.tp.incentivos.domain.misiones.Mision;
 import com.tp.incentivos.dtos.*;
 import com.tp.incentivos.repositories.MisionRepository;
@@ -16,14 +20,20 @@ import java.util.List;
 public class IncentivosService {
     private final MisionRepository misionRepository;
     private final DonacionesRestClient donacionesRestClient;
+    private final InsigniasRestClient insigniasRestClient;
+    private final NotificacionRestClient notificacionRestClient;
     private static final Logger logger = LoggerFactory.getLogger(IncentivosService.class);
 
     public IncentivosService(
             MisionRepository misionRepository,
-            DonacionesRestClient donacionesRestClient
+            DonacionesRestClient donacionesRestClient,
+            InsigniasRestClient insigniasRestClient,
+            NotificacionRestClient notificacionRestClient
     ) {
         this.misionRepository = misionRepository;
         this.donacionesRestClient = donacionesRestClient;
+        this.insigniasRestClient = insigniasRestClient;
+        this.notificacionRestClient = notificacionRestClient;
     }
 
     public EvaluacionMisionResponseDTO procesarNuevaEntrega(EntregaDonacionDTO dto) {
@@ -31,26 +41,25 @@ public class IncentivosService {
                 dto.getDonanteId(), dto.getUltimaMisionId());
 
         Long ultimaMisionId = (dto.getUltimaMisionId() == null) ? obtenerMisionInicialId() : dto.getUltimaMisionId();
-        logger.debug("Misión resuelta para procesar: {}", ultimaMisionId);
+        logger.info("Misión resuelta para procesar: {}", ultimaMisionId);
 
         Mision misionActual = this.misionRepository.findById(ultimaMisionId)
-                .orElseThrow(() -> {
-                    logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
-                    return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
-                });
+            .orElseThrow(() -> {
+                logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
+                return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
+            });
 
-        logger.debug("Llamando a DonacionesClient para obtener indicadores...");
+        logger.info("Llamando a DonacionesClient para obtener indicadores...");
         IndicadoresDonanteDTO indicadores = this.donacionesRestClient.obtenerIndicadores(
                 dto.getDonanteId(),
                 dto.getDonacionSegmentadaId(),
                 List.of(
                     "CANTIDAD_BIENES",
                     "MESES_CONSECUTIVOS",
-                    "CATEGORIAS_UNICAS",
+                    "CATEGORIAS_DISTINTAS",
                     "ENTREGAS_EXITOSAS_TOTALES"
                 )
         );
-        logger.debug("Indicadores recibidos: {}", indicadores);
 
         boolean cumplida = misionActual.estaCumplida(dto, indicadores);
         logger.info("Resultado de evaluación de misión (Cumplida: {}): {} para donante {}",
@@ -63,27 +72,29 @@ public class IncentivosService {
             logger.info("Misión completada. Siguiente misión ID: {}", siguienteMisionId);
 
             boolean subioDeCategoria = false;
-            com.tp.commons.domain.donantes.Nivel nuevoNivel = dto.getCategoriaDonante();
+            Nivel nuevoNivel = dto.getCategoriaDonante();
 
             if (siguienteMisionId == null) {
-                if (nuevoNivel == com.tp.commons.domain.donantes.Nivel.COLABORADOR) {
-                    nuevoNivel = com.tp.commons.domain.donantes.Nivel.SOSTENEDOR;
-                    subioDeCategoria = true;
-                } else if (nuevoNivel == com.tp.commons.domain.donantes.Nivel.SOSTENEDOR) {
-                    nuevoNivel = com.tp.commons.domain.donantes.Nivel.TRANSFORMADOR;
-                    subioDeCategoria = true;
+                if (nuevoNivel == Nivel.COLABORADOR) {
+                    nuevoNivel = Nivel.SOSTENEDOR;
+                } else if (nuevoNivel == Nivel.SOSTENEDOR) {
+                    nuevoNivel = Nivel.TRANSFORMADOR;
                 }
+                subioDeCategoria = true;
             }
 
-            try {
-                org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-                java.util.Map<String, String> body = new java.util.HashMap<>();
-                body.put("user", dto.getNombreDonante());
-                body.put("nombreMision", misionActual.getTitulo());
-                body.put("descripcion", misionActual.getDescripcion());
-                restTemplate.postForObject("http://localhost:5678/webhook/nueva_insignia", body, String.class);
-            } catch (Exception e) {
-                logger.error("Error al notificar a n8n: {}", e.getMessage());
+            this.insigniasRestClient.notificarInsigniaObtenida(
+                dto.getNombreDonante(),
+                misionActual.getTitulo(),
+                misionActual.getDescripcion()
+            );
+
+            //Notificamos al usuario que completo la mision.
+            this.notificarMisionCumplida(dto.getDonanteId(), misionActual.getTitulo());
+
+            if (subioDeCategoria) {
+                //Notificamos al usuario que subio de categoria.
+                this.notificarSubidaNivel(dto.getDonanteId(), nuevoNivel);
             }
 
             return EvaluacionMisionResponseDTO.builder()
@@ -105,6 +116,51 @@ public class IncentivosService {
                 .insigniaGanada(null)
                 .siguienteMisionId(ultimaMisionId)
                 .build();
+    }
+
+    public void notificarMisionCumplida(Long donanteId, String tituloMision) {
+        String mensaje = "¡Felicitaciones! Has completado con éxito la misión: " + tituloMision;
+        String asunto = "¡Nueva Insignia Desbloqueada!";
+
+        this.despacharNotificacion(donanteId, mensaje, asunto);
+    }
+
+    public void notificarSubidaNivel(Long donanteId, Nivel nuevoNivel) {
+        String mensaje = "¡Increíble! Gracias a tu compromiso constante, has ascendido a la categoría: " + nuevoNivel;
+        String asunto = "¡Subiste de Nivel en DonaTrack!";
+
+        this.despacharNotificacion(donanteId, mensaje, asunto);
+    }
+
+    private void despacharNotificacion(Long donanteId, String mensaje, String asunto) {
+        try {
+            NotificacionRequestDTO requestNotificacion = this.donacionesRestClient.obtenerDatosParaNotificar(donanteId);
+
+            if (requestNotificacion == null || requestNotificacion.getMedio() == null || requestNotificacion.getDestinatario() == null) {
+                logger.warn("Donante ID {} sin medio configurado. No se despacha la notificación: {}", donanteId, asunto);
+                return;
+            }
+
+            requestNotificacion.setMensaje(mensaje);
+            requestNotificacion.setAsunto(asunto);
+
+            logger.info("Enviando request de notificación ({}) para donante {} vía {}", asunto, donanteId, requestNotificacion.getMedio());
+
+            this.notificacionRestClient.notificar(
+                    requestNotificacion.getMedio(),
+                    requestNotificacion.getDestinatario(),
+                    requestNotificacion.getMensaje(),
+                    requestNotificacion.getAsunto(),
+                    donanteId
+            );
+
+            logger.info("Notificación '{}' despachada con éxito.", asunto);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("ERROR: El tipo de medio no es válido para el donante {}.", donanteId, e);
+        } catch (Exception e) {
+            logger.error("ERROR INESPERADO al notificar al donante {}.", donanteId, e);
+        }
     }
 
     //TODO Debatir: Deberiamos crearle la mision inicial al usuario en donaciones ? deberiamos manejarlo desde aca pero de otra forma?

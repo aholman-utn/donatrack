@@ -14,30 +14,34 @@ public class MisionRepository {
         public MisionRepository() {
 
                 Mision misionExitosas = new MisionDonacionesExitosas(
-                                1,
-                                "Héroe Confirmado",
-                                "Lograr 1 donacion que sean recibidas exitosamente por una entidad beneficiaria.");
+                    1,
+                    "Donacion Exitosa",
+                    "Lograr 1 donacion que sean recibidas exitosamente por una entidad beneficiaria."
+                );
                 misionExitosas.setId(1L);
                 misionExitosas.setOrden(1);
 
                 Mision misionCompletitud = new MisionCompletitud(
-                                4,
-                                "Explorador de Categorías",
-                                "Realizar donaciones de 4 categorías distintas.");
+                    4,
+                    "Completitud",
+                    "Realizar donaciones de 4 categorías distintas."
+                );
                 misionCompletitud.setId(2L);
                 misionCompletitud.setOrden(2);
 
                 Mision misionHabil = new MisionHabilDonador(
-                                20,
-                                "Ayuda Masiva",
-                                "Realizar una donación que supere los 20 bienes en una sola entrega.");
+                    20,
+                    "Habil Donador",
+                    "Realizar una donación que supere los 20 bienes en una sola entrega."
+                );
                 misionHabil.setId(3L);
                 misionHabil.setOrden(3);
 
                 Mision misionRacha = new MisionRacha(
-                                3,
-                                "Racha Solidaria",
-                                "Realizar una donación durante 3 meses consecutivos.");
+                    3,
+                    "Racha",
+                    "Realizar una donación durante 3 meses consecutivos."
+                );
                 misionRacha.setId(4L);
                 misionRacha.setOrden(4);
 

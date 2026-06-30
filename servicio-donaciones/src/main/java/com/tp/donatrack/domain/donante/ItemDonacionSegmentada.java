@@ -13,6 +13,7 @@ import lombok.*;
 @Builder
 public class ItemDonacionSegmentada {
     private Long id;
+    private Long entidadBeneficiariaId;
     private LocalDate fecha;
     private CategoriaBien categoria;
     private EstadoDonacionSegmentada estado;

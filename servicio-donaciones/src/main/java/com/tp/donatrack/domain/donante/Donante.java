@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Donante {
-    private Long donanteId;
     private Persona persona;
     private String password;
 

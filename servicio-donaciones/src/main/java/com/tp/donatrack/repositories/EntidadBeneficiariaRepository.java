@@ -19,7 +19,7 @@ public class EntidadBeneficiariaRepository {
     public EntidadBeneficiaria create(EntidadBeneficiaria entidadBeneficiaria){
         if (entidadBeneficiaria.getDatosDeEntidad() != null && entidadBeneficiaria.getDatosDeEntidad().getId() == null) {
             entidadBeneficiaria.getDatosDeEntidad().setId(Persona.nextId());
-            entidadBeneficiaria.setEntidadBeneficiariaId(ID_GENERATOR.getAndIncrement());
+            //entidadBeneficiaria.setEntidadBeneficiariaId(ID_GENERATOR.getAndIncrement());
         }
         this.entidades.add(entidadBeneficiaria);
         return entidadBeneficiaria;

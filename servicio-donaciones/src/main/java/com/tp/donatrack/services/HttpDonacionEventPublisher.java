@@ -1,11 +1,10 @@
 package com.tp.donatrack.services;
 
-import com.tp.commons.domain.donantes.Nivel;
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
-import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
 import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
 import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.domain.donante.Metrica;
 import com.tp.donatrack.repositories.DonanteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +26,8 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
     public HttpDonacionEventPublisher(
             RestTemplate restTemplate,
             @Value("${services.incentivos.url}") String incentivosUrl,
-            DonanteRepository donanteRepository) {
+            DonanteRepository donanteRepository
+    ) {
         this.restTemplate = restTemplate;
         this.incentivosUrl = incentivosUrl;
         this.donanteRepository = donanteRepository;
@@ -48,8 +47,10 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
             // Log para ver qué estamos enviando
             logger.debug("Enviando request a Incentivos: {}", requestBody);
 
+            String url = incentivosUrl + "/entrega";
+
             var responseEntity = restTemplate.postForEntity(
-                    incentivosUrl,
+                    url,
                     requestBody,
                     EvaluacionMisionResponseDTO.class
             );
@@ -66,27 +67,26 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
                     return;
                 }
 
-                donante.getPerfil().setProgreso(response.getNuevoProgreso());
-
-                donante.getPerfil().setMisionActualId(response.getSiguienteMisionId());
-
                 if (response.getInsigniaGanada() != null) {
                     logger.info("Donante ganó insignia: {}", response.getInsigniaGanada().getTitulo());
                     donante.getPerfil().getInsigniasGanadas().add(response.getInsigniaGanada().getTitulo());
                 }
 
                 // Registrar misión completada en métricas
-                if (response.isMisionCumplida() && event.dto().getUltimaMisionId() != null) {
-                    if (donante.getPerfil().getMetricasPerfil().getMisionesCompletadas() == null) {
-                        donante.getPerfil().getMetricasPerfil().setMisionesCompletadas(new java.util.ArrayList<>());
-                    }
-                    donante.getPerfil().getMetricasPerfil().getMisionesCompletadas().add(event.dto().getUltimaMisionId());
+                if (response.isMisionCumplida()) {
+                    Metrica metricaDonante = donante.getPerfil().getMetricasPerfil();
+                    logger.info("Donante ganó mision: {}", event.dto().getUltimaMisionId());
+                    metricaDonante.getMisionesCompletadas().add(donante.getPerfil().getMisionActualId());
                 }
 
                 if (response.isSubioDeCategoria() && response.getNuevoNivel() != null) {
                     logger.info("Donante subió de nivel: {}", response.getNuevoNivel());
                     donante.getPerfil().setNivelDonante(response.getNuevoNivel());
                 }
+
+                donante.getPerfil().setProgreso(response.getNuevoProgreso());
+
+                donante.getPerfil().setMisionActualId(response.getSiguienteMisionId());
 
                 this.donanteRepository.update(donante);
                 logger.info("Donante ID {} actualizado correctamente en memoria.", donante.getPersona().getId());

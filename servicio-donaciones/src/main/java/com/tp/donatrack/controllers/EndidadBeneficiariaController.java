@@ -26,7 +26,6 @@ public class EndidadBeneficiariaController {
             @Valid @RequestBody CrearPersonaJuridicaRequest request) {
 
         EntidadBeneficiaria entidad = entidadBeneficiariaService.registrar(request.toDomain());
-        System.out.println("Entidad " + entidad.getEntidadBeneficiariaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(entidad);
     }
 

@@ -261,7 +261,7 @@ public class DonanteService {
         }
 
         if (indicadores.contains("ENTREGAS_EXITOSAS_TOTALES")) {
-            builder.cantidadDonacionesEntregadas(perfil.calcularCantidadDonacionesEntregadas());
+            builder.cantidadDonacionesEntregadas(perfil.calcularDonacionesAEntidadesBeneficiarias());
         }
 
         return builder.build();
@@ -272,7 +272,7 @@ public class DonanteService {
 
     public void registrarEntregaEnPerfil(Long donanteId, DonacionSegmentada segmentada) {
         Donante donante = this.buscarDonantePorId(donanteId);
-        donante.getPerfil().registrarEntrega(segmentada.getSubCategoria().getCategoria());
+        donante.getPerfil().registrarEntrega(segmentada);
     }
 
     public MetricasActividadDTO obtenerMetricas(Long donanteId) {

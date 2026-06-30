@@ -1,6 +1,7 @@
 package com.tp.incentivos.clients;
 
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -10,8 +11,6 @@ import java.util.List;
 
 @Component
 public class DonacionesRestClient {
-
-    // 1. Lo instanciás vos a mano igual que en el otro servicio
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${services.donaciones.url}")
@@ -44,5 +43,19 @@ public class DonacionesRestClient {
             return List.of();
         }
         return java.util.Arrays.asList(array);
+    }
+
+    public NotificacionRequestDTO obtenerDatosParaNotificar(Long donanteId) {
+        try {
+            String url = UriComponentsBuilder.fromHttpUrl(donacionesUrl)
+                .path("/donantes/{id}/contacto-notificacion")
+                .buildAndExpand(donanteId)
+                .toUriString();
+
+            return restTemplate.getForObject(url, NotificacionRequestDTO.class);
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

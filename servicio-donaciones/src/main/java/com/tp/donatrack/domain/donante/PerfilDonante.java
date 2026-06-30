@@ -1,12 +1,14 @@
 package com.tp.donatrack.domain.donante;
 
 import com.tp.commons.domain.donantes.Nivel;
-import com.tp.donatrack.domain.bien.CategoriaBien;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import lombok.*;
 
 @Getter
@@ -17,7 +19,8 @@ public class PerfilDonante {
     @Builder.Default
     private boolean visibilidadInsignia = true;
 
-    private Long misionActualId;
+    @Builder.Default
+    private Long misionActualId = 1L;
 
     @Builder.Default
     private List<String> insigniasGanadas = new ArrayList<>();
@@ -36,24 +39,38 @@ public class PerfilDonante {
     public PerfilDonante() {
         this.visibilidadInsignia = true;
         this.nivelDonante = Nivel.COLABORADOR;
+        this.misionActualId = 1L;
         this.progreso = (double) 0;
         this.historialDonaciones = new ArrayList<>();
         this.insigniasGanadas = new ArrayList<>();
         this.metricasPerfil = new Metrica();
     }
 
-    public void registrarEntrega(CategoriaBien categoria) {
+    public void registrarEntrega(DonacionSegmentada segmentada) {
         if (this.historialDonaciones == null) {
             this.historialDonaciones = new ArrayList<>();
         }
         ItemDonacionSegmentada item = ItemDonacionSegmentada.builder()
+                .id(segmentada.getId())
                 .fecha(LocalDate.now())
-                .categoria(categoria)
+                .entidadBeneficiariaId(segmentada.getEntidadBeneficiariaAsignadaId())
+                .categoria(segmentada.getSubCategoria().getCategoria())
+                .estado(EstadoDonacionSegmentada.ENTREGADA)
                 .build();
         this.historialDonaciones.add(item);
 
-        //if (this.metricas == null) this.metricas = new Metrica();
-        //this.metricas.setTotalDonacionesExitosas(this.metricas.getTotalDonacionesExitosas() + 1);
+        this.metricasPerfil.setTotalDonacionesExitosas(
+            this.metricasPerfil.getTotalDonacionesExitosas() + 1
+        );
+
+        this.metricasPerfil.getCategoriasAyudadas().add(segmentada.getSubCategoria().getCategoria());
+
+        this.metricasPerfil.getEntidadesAyudadas().add(
+            new EntidadAyudada(
+                segmentada.getEntidadBeneficiariaAsignadaId(),
+                segmentada.getId()
+            )
+        );
     }
 
     public int contarCategoriasUnicas() {
@@ -71,24 +88,40 @@ public class PerfilDonante {
             return 0;
         }
 
-        List<LocalDate> fechas = this.historialDonaciones.stream()
-                .map(ItemDonacionSegmentada::getFecha)
+        List<YearMonth> mesesUnicos = this.historialDonaciones.stream()
+                .map(d -> YearMonth.from(d.getFecha()))
+                .distinct()
                 .sorted()
                 .collect(Collectors.toList());
 
-        int racha = 1;
-        for (int i = 0; i < fechas.size() - 1; i++) {
-            LocalDate actual = fechas.get(i);
-            LocalDate siguiente = fechas.get(i + 1);
+        YearMonth mesActual = YearMonth.now();
+        YearMonth ultimoMesDonado = mesesUnicos.get(mesesUnicos.size() - 1);
 
-            if (actual.getMonthValue() == siguiente.getMonthValue() - 1 ||
-                    (actual.getMonthValue() == 12 && siguiente.getMonthValue() == 1)) {
+        if (ultimoMesDonado.isBefore(mesActual.minusMonths(1))) {
+            return 0;
+        }
+
+        int racha = 1;
+
+        for (int i = 0; i < mesesUnicos.size() - 1; i++) {
+            YearMonth actual = mesesUnicos.get(i);
+            YearMonth siguiente = mesesUnicos.get(i + 1);
+
+            if (actual.plusMonths(1).equals(siguiente)) {
                 racha++;
             } else {
                 racha = 1;
             }
         }
+
         return racha;
+    }
+
+    public int calcularDonacionesAEntidadesBeneficiarias() {
+        return (int) this.historialDonaciones.stream()
+                .map(ItemDonacionSegmentada::getEntidadBeneficiariaId)
+                .distinct()
+                .count();
     }
 
     public int calcularCantidadDonacionesEntregadas(){

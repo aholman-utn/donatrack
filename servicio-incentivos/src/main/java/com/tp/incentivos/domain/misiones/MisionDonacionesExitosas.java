@@ -33,7 +33,6 @@ public class MisionDonacionesExitosas extends Mision {
 
     @Override
     public boolean estaCumplida(EntregaDonacionDTO datos, IndicadoresDonanteDTO metricas) {
-        double entregasTotales = datos.getProgreso() + 1;
-        return entregasTotales >= this.objetivo;
+        return metricas.getCantidadDonacionesEntregadas() >= this.objetivo;
     }
 }

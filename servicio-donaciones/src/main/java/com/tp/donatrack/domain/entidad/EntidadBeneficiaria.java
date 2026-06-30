@@ -14,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntidadBeneficiaria {
-    private Long entidadBeneficiariaId;
     private PersonaJuridica datosDeEntidad;
     private List<NecesidadMaterial> nececidades = new ArrayList<>();
 
