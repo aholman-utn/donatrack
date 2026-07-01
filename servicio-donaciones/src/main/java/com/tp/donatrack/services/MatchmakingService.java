@@ -5,12 +5,14 @@ import com.tp.donatrack.domain.asignacion.ServicioMatchmaking;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
+
 import com.tp.donatrack.dtos.EntidadRankingDTO;
 import com.tp.donatrack.dtos.ResultadoMatchmakingDTO;
+
 import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 

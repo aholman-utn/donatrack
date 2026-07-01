@@ -2,7 +2,6 @@ package com.tp.donatrack.domain.donante;
 
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import java.time.LocalDate;
-
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemDonacionSegmentada {
+public class ItemHistoralDonaciones {
     private Long id;
     private Long entidadBeneficiariaId;
     private LocalDate fecha;

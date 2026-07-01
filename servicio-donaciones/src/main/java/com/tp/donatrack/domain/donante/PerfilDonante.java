@@ -34,7 +34,7 @@ public class PerfilDonante {
     private Metrica metricasPerfil = new Metrica();
 
     @Builder.Default
-    private List<ItemDonacionSegmentada> historialDonaciones = new ArrayList<>();
+    private List<ItemHistoralDonaciones> historialDonaciones = new ArrayList<>();
 
     public PerfilDonante() {
         this.visibilidadInsignia = true;
@@ -50,7 +50,7 @@ public class PerfilDonante {
         if (this.historialDonaciones == null) {
             this.historialDonaciones = new ArrayList<>();
         }
-        ItemDonacionSegmentada item = ItemDonacionSegmentada.builder()
+        ItemHistoralDonaciones item = ItemHistoralDonaciones.builder()
                 .id(segmentada.getId())
                 .fecha(LocalDate.now())
                 .entidadBeneficiariaId(segmentada.getEntidadBeneficiariaAsignadaId())
@@ -60,17 +60,14 @@ public class PerfilDonante {
         this.historialDonaciones.add(item);
 
         this.metricasPerfil.setTotalDonacionesExitosas(
-            this.metricasPerfil.getTotalDonacionesExitosas() + 1
-        );
+                this.metricasPerfil.getTotalDonacionesExitosas() + 1);
 
         this.metricasPerfil.getCategoriasAyudadas().add(segmentada.getSubCategoria().getCategoria());
 
         this.metricasPerfil.getEntidadesAyudadas().add(
-            new EntidadAyudada(
-                segmentada.getEntidadBeneficiariaAsignadaId(),
-                segmentada.getId()
-            )
-        );
+                new EntidadAyudada(
+                        segmentada.getEntidadBeneficiariaAsignadaId(),
+                        segmentada.getId()));
     }
 
     public int contarCategoriasUnicas() {
@@ -78,7 +75,7 @@ public class PerfilDonante {
             return 0;
         }
         return Math.toIntExact(this.historialDonaciones.stream()
-                .map(ItemDonacionSegmentada::getCategoria)
+                .map(ItemHistoralDonaciones::getCategoria)
                 .distinct()
                 .count());
     }
@@ -119,12 +116,12 @@ public class PerfilDonante {
 
     public int calcularDonacionesAEntidadesBeneficiarias() {
         return (int) this.historialDonaciones.stream()
-                .map(ItemDonacionSegmentada::getEntidadBeneficiariaId)
+                .map(ItemHistoralDonaciones::getEntidadBeneficiariaId)
                 .distinct()
                 .count();
     }
 
-    public int calcularCantidadDonacionesEntregadas(){
+    public int calcularCantidadDonacionesEntregadas() {
         return this.historialDonaciones.size();
     }
 }

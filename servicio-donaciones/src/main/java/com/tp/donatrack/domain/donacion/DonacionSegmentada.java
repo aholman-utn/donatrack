@@ -5,11 +5,9 @@ import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.bien.Bien;
 import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
 
-import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,10 +75,9 @@ public class DonacionSegmentada {
 
     public void confirmarEntrega(Long entidadBeneficiariaId) {
         transicionar(
-            EstadoDonacionSegmentada.ENTREGADA,
-            String.valueOf(entidadBeneficiariaId),
-            "Entidad beneficiaria confirmó la recepción"
-        );
+                EstadoDonacionSegmentada.ENTREGADA,
+                String.valueOf(entidadBeneficiariaId),
+                "Entidad beneficiaria confirmó la recepción");
     }
 
     public void registrarEntregaFallida(String actor, String justificacion) {
@@ -91,7 +88,8 @@ public class DonacionSegmentada {
     }
 
     public void marcarVencida(String actor) {
-        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene bienes perdecederos)
+        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene
+        // bienes perdecederos)
         transicionar(EstadoDonacionSegmentada.VENCIDA, actor, "Donación marcada como vencida por administrador");
     }
 
@@ -108,13 +106,13 @@ public class DonacionSegmentada {
     public boolean transicionPosible(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo) {
         return switch (anterior) {
             case EN_DEPOSITO ->
-                    nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
-                            || nuevo == EstadoDonacionSegmentada.VENCIDA;
+                nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
+                        || nuevo == EstadoDonacionSegmentada.VENCIDA;
             case ASIGNACION_REALIZADA -> nuevo == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR;
             case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
             case EN_TRASLADO ->
-                    nuevo == EstadoDonacionSegmentada.ENTREGADA
-                            || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
+                nuevo == EstadoDonacionSegmentada.ENTREGADA
+                        || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
             case ENTREGA_FALLIDA -> nuevo == EstadoDonacionSegmentada.EN_DEPOSITO;
             case ENTREGADA, VENCIDA -> false; // Estados finales
             default -> false;

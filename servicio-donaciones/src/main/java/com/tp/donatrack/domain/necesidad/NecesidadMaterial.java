@@ -3,9 +3,7 @@ package com.tp.donatrack.domain.necesidad;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import com.tp.donatrack.domain.bien.SubCategoria;
-
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import lombok.Getter;
 import lombok.Setter;

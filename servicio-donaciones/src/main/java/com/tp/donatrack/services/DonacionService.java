@@ -13,7 +13,6 @@ import com.tp.donatrack.repositories.DonacionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,8 +27,7 @@ public class DonacionService {
             DonacionRepository donacionRepository,
             DonanteService donanteService,
             EntidadBeneficiariaService entidadBeneficiariaService,
-            DonacionEventPublisher eventPublisher
-    ) {
+            DonacionEventPublisher eventPublisher) {
         this.donacionRepository = donacionRepository;
         this.donanteService = donanteService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
@@ -95,7 +93,8 @@ public class DonacionService {
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
-        segmentada.registrarEntregaFallida("Sistema", motivo != null ? motivo : "Entrega fallida reportada por logística");
+        segmentada.registrarEntregaFallida("Sistema",
+                motivo != null ? motivo : "Entrega fallida reportada por logística");
     }
 
     public List<DonacionHistorialDTO> obtenerTodas() {

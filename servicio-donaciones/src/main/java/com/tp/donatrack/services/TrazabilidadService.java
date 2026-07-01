@@ -3,12 +3,14 @@ package com.tp.donatrack.services;
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
+
 import com.tp.donatrack.dtos.CrearEventoRequest;
 import com.tp.donatrack.dtos.TrazaDonacionDTO;
 import com.tp.donatrack.dtos.TrazaSegmentoDTO;
-import com.tp.donatrack.repositories.DonacionRepository;
-import org.springframework.stereotype.Service;
 
+import com.tp.donatrack.repositories.DonacionRepository;
+
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +19,11 @@ public class TrazabilidadService {
     private final DonacionRepository donacionRepository;
 
     public TrazabilidadService(
-            DonacionRepository donacionRepository
-    ) {
+            DonacionRepository donacionRepository) {
         this.donacionRepository = donacionRepository;
     }
 
-    private Donacion buscarDonacionPorId(Integer id){
+    private Donacion buscarDonacionPorId(Integer id) {
         Donacion donacion = donacionRepository.findById(id);
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
@@ -30,14 +31,13 @@ public class TrazabilidadService {
         return donacion;
     }
 
-    private DonacionSegmentada buscarDonacionSegmentadaPorId(Integer idDonacion, Integer idSegmentada){
+    private DonacionSegmentada buscarDonacionSegmentadaPorId(Integer idDonacion, Integer idSegmentada) {
         Donacion donacion = this.buscarDonacionPorId(idDonacion);
         return donacion.getDonacionesSegmentadas().stream()
                 .filter(p -> p.getId().equals(idSegmentada))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "No se encontró la el segmento de la donación con ID: " + idSegmentada
-                ));
+                        "No se encontró la el segmento de la donación con ID: " + idSegmentada));
     }
 
     public TrazaDonacionDTO trazabilizarDonacion(Integer id) {
@@ -67,9 +67,8 @@ public class TrazabilidadService {
     public TrazaSegmentoDTO transicionarDonacion(
             Integer idDonacion,
             Integer idSegmento,
-            CrearEventoRequest request
-    ) {
-        DonacionSegmentada segmentada =  buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+            CrearEventoRequest request) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), request.getNuevoEstado())) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -77,8 +76,7 @@ public class TrazabilidadService {
         segmentada.transicionar(
                 request.getNuevoEstado(),
                 request.getActor(),
-                request.getDescripcion()
-        );
+                request.getDescripcion());
 
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
@@ -86,9 +84,8 @@ public class TrazabilidadService {
     public TrazaSegmentoDTO transicionListaEntregar(
             Integer idDonacion,
             Integer idSegmento,
-            String actor
-    ) {
-        DonacionSegmentada segmentada =  buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+            String actor) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -99,9 +96,8 @@ public class TrazabilidadService {
     public TrazaSegmentoDTO transicionEnTraslado(
             Integer idDonacion,
             Integer idSegmento,
-            String actor
-    ) {
-        DonacionSegmentada segmentada =  buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+            String actor) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_TRASLADO)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -113,9 +109,8 @@ public class TrazabilidadService {
             Integer idDonacion,
             Integer idSegmento,
             String actor,
-            String justificacion
-    ) {
-        DonacionSegmentada segmentada =  buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+            String justificacion) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGA_FALLIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -126,9 +121,8 @@ public class TrazabilidadService {
     public TrazaSegmentoDTO transicionMarcarVencida(
             Integer idDonacion,
             Integer idSegmento,
-            String actor
-    ) {
-        DonacionSegmentada segmentada =  buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+            String actor) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.VENCIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }

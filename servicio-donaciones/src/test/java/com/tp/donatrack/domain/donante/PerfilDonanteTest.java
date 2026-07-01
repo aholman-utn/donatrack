@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDate;
 
-
 class PerfilDonanteTest {
 
     private PerfilDonante perfil;
@@ -21,12 +20,10 @@ class PerfilDonanteTest {
         LocalDate hoy = LocalDate.now();
 
         perfil.getHistorialDonaciones().add(
-                ItemDonacionSegmentada.builder().fecha(hoy.minusMonths(1)).build()
-        );
+                ItemHistoralDonaciones.builder().fecha(hoy.minusMonths(1)).build());
 
         perfil.getHistorialDonaciones().add(
-                ItemDonacionSegmentada.builder().fecha(hoy).build()
-        );
+                ItemHistoralDonaciones.builder().fecha(hoy).build());
 
         int racha = perfil.calcularRachaMeses();
 
@@ -38,12 +35,10 @@ class PerfilDonanteTest {
         LocalDate hoy = LocalDate.now();
 
         perfil.getHistorialDonaciones().add(
-                ItemDonacionSegmentada.builder().fecha(hoy.minusMonths(3)).build()
-        );
+                ItemHistoralDonaciones.builder().fecha(hoy.minusMonths(3)).build());
 
         perfil.getHistorialDonaciones().add(
-                ItemDonacionSegmentada.builder().fecha(hoy.minusMonths(1)).build()
-        );
+                ItemHistoralDonaciones.builder().fecha(hoy.minusMonths(1)).build());
 
         int racha = perfil.calcularRachaMeses();
 
@@ -54,17 +49,20 @@ class PerfilDonanteTest {
     void testRachaDonacionMesesConsecutivos() {
         LocalDate hoy = LocalDate.now();
         // Enero y Febrero
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().fecha(hoy.minusMonths(1)).build());
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().fecha(hoy).build());
+        perfil.getHistorialDonaciones().add(ItemHistoralDonaciones.builder().fecha(hoy.minusMonths(1)).build());
+        perfil.getHistorialDonaciones().add(ItemHistoralDonaciones.builder().fecha(hoy).build());
 
         assertEquals(2, perfil.calcularRachaMeses(), "La racha debería ser 2");
     }
 
     @Test
     void testCompletitudCategoriasDistintas() {
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().categoria(CategoriaBien.ALIMENTOS).build());
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().categoria(CategoriaBien.MOBILIARIO).build());
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().categoria(CategoriaBien.ALIMENTOS).build());
+        perfil.getHistorialDonaciones()
+                .add(ItemHistoralDonaciones.builder().categoria(CategoriaBien.ALIMENTOS).build());
+        perfil.getHistorialDonaciones()
+                .add(ItemHistoralDonaciones.builder().categoria(CategoriaBien.MOBILIARIO).build());
+        perfil.getHistorialDonaciones()
+                .add(ItemHistoralDonaciones.builder().categoria(CategoriaBien.ALIMENTOS).build());
 
         assertEquals(2, perfil.contarCategoriasUnicas(), "Debería contar solo 2 categorías únicas");
     }
@@ -80,8 +78,8 @@ class PerfilDonanteTest {
 
     @Test
     void testCantidadDonacionesEntregadas() {
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().build());
-        perfil.getHistorialDonaciones().add(ItemDonacionSegmentada.builder().build());
+        perfil.getHistorialDonaciones().add(ItemHistoralDonaciones.builder().build());
+        perfil.getHistorialDonaciones().add(ItemHistoralDonaciones.builder().build());
 
         assertEquals(2, perfil.calcularCantidadDonacionesEntregadas());
     }
