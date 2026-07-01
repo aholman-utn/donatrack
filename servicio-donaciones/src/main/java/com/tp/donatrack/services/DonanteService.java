@@ -12,6 +12,7 @@ import com.tp.donatrack.domain.persona.Persona;
 
 import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
+import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
 import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.DonanteRepository;
 
