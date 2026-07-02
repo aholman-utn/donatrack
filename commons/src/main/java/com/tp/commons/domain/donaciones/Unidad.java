@@ -1,4 +1,4 @@
-package com.tp.commons.enums;
+package com.tp.commons.domain.donaciones;
 
 public enum Unidad {
     UNIDADES,

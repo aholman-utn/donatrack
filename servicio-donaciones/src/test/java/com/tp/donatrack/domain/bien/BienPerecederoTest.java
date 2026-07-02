@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.bien;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ public class BienPerecederoTest {
     @Test
     @DisplayName("Debe crear un Bien Perecedero (Arroz) con su categoría Alimentos")
     public void debeCrearArrozCorrectamente() {
-        SubCategoria arrozSub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", com.tp.commons.enums.Unidad.KG);
+        SubCategoria arrozSub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
         Date fechaVenc = new Date();
 
         BienPerecedero arroz = new BienPerecedero(

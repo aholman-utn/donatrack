@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.bien;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ public class BienDuraderoTest {
     @DisplayName("Debe crear un Bien Duradero (Placard) con su categoría Muebles")
     public void debeCrearPlacardCorrectamente() {
 
-        SubCategoria placardSub = new SubCategoria(CategoriaBien.MOBILIARIO, "Placard", com.tp.commons.enums.Unidad.UNIDADES);
+        SubCategoria placardSub = new SubCategoria(CategoriaBien.MOBILIARIO, "Placard", Unidad.UNIDADES);
 
         BienDuradero miPlacard = new BienDuradero(
             "Placard 2 cuerpos", 

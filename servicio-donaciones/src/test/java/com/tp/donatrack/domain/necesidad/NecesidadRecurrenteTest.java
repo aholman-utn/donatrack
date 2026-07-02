@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.commons.enums.Unidad;
+import com.tp.commons.domain.donaciones.Unidad;
 
 class NecesidadRecurrenteTest {
 

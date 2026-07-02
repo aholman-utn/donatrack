@@ -13,7 +13,7 @@ import com.tp.donatrack.domain.bien.BienDuradero;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.bien.CategoriaBien;
-import com.tp.commons.enums.Unidad;
+import com.tp.commons.domain.donaciones.Unidad;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

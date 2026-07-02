@@ -1,6 +1,6 @@
 package com.tp.donatrack.logistica.domain.planificacion;
 
-import com.tp.commons.enums.Unidad;
+import com.tp.commons.domain.donaciones.Unidad;
 import org.springframework.stereotype.Component;
 
 @Component

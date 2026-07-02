@@ -1,5 +1,6 @@
 package com.tp.donatrack.dtos;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,6 +67,6 @@ public class CrearDonacionRequest {
     public static class SubCategoriaRequest {
         private CategoriaBien categoria;
         private String descripcion;
-        private com.tp.commons.enums.Unidad unidad;
+        private Unidad unidad;
     }
 }

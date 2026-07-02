@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.bien;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,7 +10,7 @@ public class SubCategoriaTest {
     @Test
     public void testCrearSubcategoria() {
         CategoriaBien cat = CategoriaBien.VESTIMENTA;
-        com.tp.commons.enums.Unidad uni = com.tp.commons.enums.Unidad.UNIDADES;
+        Unidad uni = Unidad.UNIDADES;
         String desc = "Muebles";
 
         SubCategoria subCategoria = new SubCategoria(cat, desc, uni);

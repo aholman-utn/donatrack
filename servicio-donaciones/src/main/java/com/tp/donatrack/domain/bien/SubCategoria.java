@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.bien;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +11,12 @@ import java.util.Objects;
 public class SubCategoria {
     private CategoriaBien categoria;
     private String descripcion;
-    private com.tp.commons.enums.Unidad unidad;
+    private Unidad unidad;
 
     public SubCategoria(
         CategoriaBien categoria, 
         String descripcion, 
-        com.tp.commons.enums.Unidad unidad
+        Unidad unidad
     ) {
         this.categoria = categoria;
         this.descripcion = descripcion;

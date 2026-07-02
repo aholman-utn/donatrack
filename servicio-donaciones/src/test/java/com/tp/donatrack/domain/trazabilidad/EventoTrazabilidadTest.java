@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.trazabilidad;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
@@ -20,7 +21,7 @@ class EventoTrazabilidadTest {
 
     @BeforeEach
     void setUp() {
-        subCategoria = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
+        subCategoria = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
         BienDuradero silla = new BienDuradero("Silla", "Silla de oficina", "silla.png", subCategoria, EstadoBien.USADO);
         List<Bien> bienes = Arrays.asList(silla);
         donacion = new DonacionSegmentada(1, subCategoria, bienes);

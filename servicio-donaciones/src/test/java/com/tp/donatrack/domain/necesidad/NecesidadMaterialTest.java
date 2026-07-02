@@ -4,6 +4,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ class NecesidadMaterialTest {
     @BeforeEach
     void setUp() {
         categoria = CategoriaBien.MOBILIARIO;
-        subCategoria = new SubCategoria(categoria, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
+        subCategoria = new SubCategoria(categoria, "Sillas", Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 3, new Date(), "Inundación");
     }
 

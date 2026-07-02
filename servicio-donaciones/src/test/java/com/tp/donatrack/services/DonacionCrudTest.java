@@ -1,5 +1,6 @@
 package com.tp.donatrack.services;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.dtos.ActualizarDonacionRequest;
@@ -54,7 +55,7 @@ class DonacionCrudTest {
         CrearDonacionRequest.SubCategoriaRequest sub = new CrearDonacionRequest.SubCategoriaRequest();
         sub.setCategoria(com.tp.donatrack.domain.bien.CategoriaBien.MOBILIARIO);
         sub.setDescripcion("Mesas");
-        sub.setUnidad(com.tp.commons.enums.Unidad.UNIDADES);
+        sub.setUnidad(Unidad.UNIDADES);
         bien.setSubCategoria(sub);
         
         request.setBienes(List.of(bien));

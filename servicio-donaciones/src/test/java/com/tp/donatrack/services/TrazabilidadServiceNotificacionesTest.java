@@ -1,5 +1,6 @@
 package com.tp.donatrack.services;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.bien.*;
@@ -68,7 +69,7 @@ class TrazabilidadServiceNotificacionesTest {
         entidad = new EntidadBeneficiaria(personaEntidad);
         entidadBeneficiariaRepository.create(entidad);
 
-        SubCategoria subCategoria = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos", Unidad.KILOGRAMOS);
+        SubCategoria subCategoria = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos", Unidad.KG);
         BienPerecedero bien = new BienPerecedero("Fideos", "Fideos secos 500g", null, subCategoria, new Date());
         List<Bien> bienes = List.of(bien);
         donacion = new Donacion(donante, "Donación de fideos", new Date(), bienes);
@@ -108,7 +109,7 @@ class TrazabilidadServiceNotificacionesTest {
     @Test
     @DisplayName("recepcionarEntrega notifica al donante y a la entidad beneficiaria")
     void notificaEntregaExitosa() {
-        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().getFirst();
         Integer idDonacion = donacion.getId();
         Integer idSegmento = Math.toIntExact(segmento.getId());
 
@@ -178,7 +179,7 @@ class TrazabilidadServiceNotificacionesTest {
     @Test
     @DisplayName("Si la donación no tiene donante, no se intenta notificar")
     void sinDonanteNoNotifica() {
-        SubCategoria sub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KILOGRAMOS);
+        SubCategoria sub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
         BienPerecedero bien = new BienPerecedero("Arroz", "Arroz 1kg", null, sub, new Date());
         Donacion donacionSinDonante = new Donacion(null, "Donación anónima", new Date(), List.of(bien));
         donacionRepository.save(donacionSinDonante);
