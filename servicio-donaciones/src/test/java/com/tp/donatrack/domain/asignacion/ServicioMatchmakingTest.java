@@ -4,7 +4,6 @@ import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
-import com.tp.donatrack.domain.necesidad.EstadoNecesidad;
 import com.tp.donatrack.domain.necesidad.NecesidadExtraordinaria;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
 import com.tp.donatrack.domain.persona.TipoOrganizacion;
@@ -29,8 +28,8 @@ class ServicioMatchmakingTest {
     @BeforeEach
     void setUp() {
         servicio = new ServicioMatchmaking();
-        sillas = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
-        fideos = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos secos", Unidad.UNIDADES);
+        sillas = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
+        fideos = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos secos", com.tp.commons.enums.Unidad.UNIDADES);
 
         escuela = crearEntidad("Escuela N°10");
         escuela.agregarNecesidad(new NecesidadExtraordinaria(sillas, 30, new Date(), "Inundación"));
@@ -126,8 +125,8 @@ class ServicioMatchmakingTest {
     @Test
     @DisplayName("Escenario 10 Entidades: Evalua algoritmos y filtra coincidencias (Ganadoras)")
     void deberiaProponerHastaDiezEntidadesYFiltrarCoincidencias() {
-        SubCategoria arroz = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
-        SubCategoria sillasCat = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
+        SubCategoria arroz = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", com.tp.commons.enums.Unidad.KG);
+        SubCategoria sillasCat = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
 
         List<EntidadBeneficiaria> entidades = new ArrayList<>();
 

@@ -10,12 +10,12 @@ import java.util.Objects;
 public class SubCategoria {
     private CategoriaBien categoria;
     private String descripcion;
-    private Unidad unidad;
+    private com.tp.commons.enums.Unidad unidad;
 
     public SubCategoria(
         CategoriaBien categoria, 
         String descripcion, 
-        Unidad unidad
+        com.tp.commons.enums.Unidad unidad
     ) {
         this.categoria = categoria;
         this.descripcion = descripcion;

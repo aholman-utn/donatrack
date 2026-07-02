@@ -1,5 +1,6 @@
 package com.tp.donatrack.logistica.services;
 
+import com.tp.commons.dtos.logistica.DonacionSegmentadaListaParaEntregarALogisticaDTO;
 import com.tp.donatrack.logistica.domain.Camion;
 import com.tp.donatrack.logistica.domain.Chofer;
 import com.tp.donatrack.logistica.domain.Envio;
@@ -7,8 +8,8 @@ import com.tp.donatrack.logistica.domain.EstadoEnvio;
 import com.tp.donatrack.logistica.domain.EventoLogistica;
 import com.tp.donatrack.logistica.domain.Parada;
 import com.tp.donatrack.logistica.domain.Ruta;
+import com.tp.donatrack.logistica.domain.planificacion.Planificacion;
 import com.tp.donatrack.logistica.repository.LogisticaEventRepository;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,23 +18,35 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.tp.donatrack.logistica.repository.RutaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class LogisticaService {
+    private static final Logger logger = LoggerFactory.getLogger(LogisticaService.class);
 
     private final LogisticaEventRepository eventRepository;
-
+    private final RutaRepository rutaRepository;
     private final Map<Long, Camion> camiones = new ConcurrentHashMap<>();
     private final Map<Long, Chofer> choferes = new ConcurrentHashMap<>();
     private final Map<Long, Envio> envios = new ConcurrentHashMap<>();
-    private final Map<Long, Ruta> rutas = new ConcurrentHashMap<>();
 
     private final AtomicLong camionIdSeq = new AtomicLong(1);
     private final AtomicLong choferIdSeq = new AtomicLong(1);
     private final AtomicLong envioIdSeq = new AtomicLong(1);
-    private final AtomicLong rutaIdSeq = new AtomicLong(1);
+    private final Planificacion planificacion;
 
-    public LogisticaService(LogisticaEventRepository eventRepository) {
+    public LogisticaService(
+        LogisticaEventRepository eventRepository,
+        RutaRepository rutaRepository,
+        Planificacion planificacion
+    ) {
         this.eventRepository = eventRepository;
+        this.rutaRepository = rutaRepository;
+        this.planificacion = planificacion;
     }
 
     public Camion registrarCamion(Camion camion) {
@@ -41,6 +54,34 @@ public class LogisticaService {
         camion.setId(id);
         camiones.put(id, camion);
         return camion;
+    }
+
+    @Transactional
+    public void planificarLote(List<DonacionSegmentadaListaParaEntregarALogisticaDTO> loteDonaciones) {
+        if (loteDonaciones == null || loteDonaciones.isEmpty()) {
+            logger.warn("Se recibió un lote de planificación vacío.");
+            return;
+        }
+
+        List<Camion> camionesDisponibles = new ArrayList<>(camiones.values());
+        List<Chofer> choferesDisponibles = new ArrayList<>(choferes.values());
+
+        if (camionesDisponibles.isEmpty() || choferesDisponibles.isEmpty()) {
+            logger.error("No se puede planificar: Faltan camiones o choferes en el sistema.");
+            throw new IllegalStateException("No hay camiones o choferes registrados para armar las rutas.");
+        }
+
+        logger.info("Planificando {} donaciones..", loteDonaciones.size());
+
+        List<Ruta> nuevasRutas = planificacion.planificar(
+                loteDonaciones,
+                camionesDisponibles,
+                choferesDisponibles
+        );
+
+        rutaRepository.saveAll(nuevasRutas);
+
+        logger.info("Planificación finalizada. Se generaron exitosamente {} rutas.", nuevasRutas.size());
     }
 
     public Chofer registrarChofer(Chofer chofer) {
@@ -59,12 +100,8 @@ public class LogisticaService {
     }
 
     public Ruta registrarRuta(Ruta ruta) {
-        Long id = rutaIdSeq.getAndIncrement();
-        ruta.setId(id);
         ruta.setIniciada(false);
-        rutas.put(id, ruta);
 
-        // Al asignar envíos a la ruta, marcamos su estado como ASIGNACION_REALIZADA
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
                 if (parada.getEnviosIds() != null) {
@@ -77,21 +114,26 @@ public class LogisticaService {
                 }
             }
         }
-        return ruta;
+
+        return rutaRepository.save(ruta);
     }
 
     public void iniciarRuta(Long rutaId) {
-        Ruta ruta = rutas.get(rutaId);
+        Ruta ruta = rutaRepository.findById(rutaId);
         if (ruta == null) {
             throw new IllegalArgumentException("No se encontró la ruta con ID: " + rutaId);
         }
 
-        ruta.iniciarRuta(); // triggers state change inside domain and checks if already started
+        ruta.iniciarRuta();
 
-        Camion camion = camiones.get(ruta.getCamionId());
-        String patente = (camion != null) ? camion.getPatente() : "DESCONOCIDO";
+        String patente = "DESCONOCIDO";
+        if (ruta.getCamion() != null && ruta.getCamion().getId() != null) {
+            Camion camion = camiones.get(ruta.getCamion().getId());
+            if (camion != null) {
+                patente = camion.getPatente();
+            }
+        }
 
-        // De acuerdo a las transiciones exigidas, marcamos los envíos de la ruta EN_TRASLADO y generamos eventos
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
                 if (parada.getEnviosIds() != null) {
@@ -105,7 +147,7 @@ public class LogisticaService {
                                     .donacionSegmentadaId(envio.getDonacionSegmentadaId())
                                     .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
                                     .timestamp(LocalDateTime.now())
-                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + ruta.getChoferId())
+                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + ruta.getChofer().getId())
                                     .build();
 
                             eventRepository.registrar(evento);
@@ -114,6 +156,8 @@ public class LogisticaService {
                 }
             }
         }
+
+        rutaRepository.save(ruta);
     }
 
     public void registrarEntregaExitosa(Long envioId, String detalles) {
@@ -167,6 +211,6 @@ public class LogisticaService {
     }
 
     public List<Ruta> listarRutas() {
-        return new ArrayList<>(rutas.values());
+        return rutaRepository.findAll();
     }
 }

@@ -1,4 +1,4 @@
-package com.tp.donatrack.domain.bien;
+package com.tp.commons.enums;
 
 public enum Unidad {
     UNIDADES,

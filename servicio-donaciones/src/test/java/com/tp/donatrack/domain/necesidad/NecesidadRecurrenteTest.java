@@ -1,6 +1,5 @@
 package com.tp.donatrack.domain.necesidad;
 
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -11,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.bien.Unidad;
+import com.tp.commons.enums.Unidad;
 
 class NecesidadRecurrenteTest {
 

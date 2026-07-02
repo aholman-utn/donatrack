@@ -66,6 +66,6 @@ public class CrearDonacionRequest {
     public static class SubCategoriaRequest {
         private CategoriaBien categoria;
         private String descripcion;
-        private Unidad unidad;
+        private com.tp.commons.enums.Unidad unidad;
     }
 }

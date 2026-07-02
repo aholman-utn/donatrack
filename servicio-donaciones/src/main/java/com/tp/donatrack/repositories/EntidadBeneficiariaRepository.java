@@ -5,6 +5,7 @@ import com.tp.donatrack.domain.persona.Persona;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -36,9 +37,16 @@ public class EntidadBeneficiariaRepository {
 
     public void delete(EntidadBeneficiaria entidad) {entidades.remove(entidad);}
 
-    public void clear() {
-        this.entidades.clear();
-        com.tp.donatrack.domain.persona.Persona.resetIdGenerator();
+    public List<EntidadBeneficiaria> findAllById(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return this.entidades.stream()
+                .filter(entidad -> entidad.getDatosDeEntidad() != null
+                        && entidad.getDatosDeEntidad().getId() != null
+                        && ids.contains(entidad.getDatosDeEntidad().getId()))
+                .toList();
     }
 
 }

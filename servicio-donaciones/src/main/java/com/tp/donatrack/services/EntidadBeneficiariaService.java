@@ -11,6 +11,8 @@ import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -108,6 +110,10 @@ public class EntidadBeneficiariaService {
         } catch (Exception e) {
             logger.error("ERROR INESPERADO procesando la entidad {}.", entidadId, e);
         }
+    }
+
+    public List<EntidadBeneficiaria> listarPorIds(Collection<Long> ids) {
+        return entidadBeneficiariaRepository.findAllById(ids);
     }
 
 }

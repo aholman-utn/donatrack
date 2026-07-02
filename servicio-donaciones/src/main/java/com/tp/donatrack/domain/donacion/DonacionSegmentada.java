@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 public class DonacionSegmentada {
     private Long id;
-    private int cantidad;
+    private int cantidad; //300 kg de fideos, 200lt de leche...etc
     private SubCategoria subCategoria;
     private List<Bien> bienes;
     private EstadoDonacionSegmentada estado;

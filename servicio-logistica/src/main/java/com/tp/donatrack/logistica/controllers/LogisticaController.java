@@ -1,5 +1,6 @@
 package com.tp.donatrack.logistica.controllers;
 
+import com.tp.commons.dtos.logistica.DonacionSegmentadaListaParaEntregarALogisticaDTO;
 import com.tp.donatrack.logistica.domain.Camion;
 import com.tp.donatrack.logistica.domain.Chofer;
 import com.tp.donatrack.logistica.domain.Envio;
@@ -46,11 +47,19 @@ public class LogisticaController {
         return ResponseEntity.ok(logisticaService.registrarEnvio(envio));
     }
 
+    @PostMapping("/planificar")
+    public ResponseEntity<Void> planificarRutas(
+            @RequestBody List<DonacionSegmentadaListaParaEntregarALogisticaDTO> loteDonaciones
+    ) {
+        logisticaService.planificarLote(loteDonaciones);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/envios")
     public ResponseEntity<List<Envio>> listarEnvios() {
         return ResponseEntity.ok(logisticaService.listarEnvios());
     }
-    
+
     @PostMapping("/rutas")
     public ResponseEntity<Ruta> registrarRuta(@RequestBody Ruta ruta) {
         return ResponseEntity.ok(logisticaService.registrarRuta(ruta));

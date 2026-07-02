@@ -18,5 +18,5 @@ public class Camion {
     private String patente;
     private String marca;
     private String modelo;
-    private Double capacidadCarga;
+    private double capacidadCarga;
 }

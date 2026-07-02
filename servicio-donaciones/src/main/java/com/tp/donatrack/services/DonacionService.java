@@ -1,9 +1,6 @@
 package com.tp.donatrack.services;
 
-import com.tp.donatrack.domain.donacion.Donacion;
-import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
-import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
-import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donacion.*;
 import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.dtos.CrearDonacionRequest;
 import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
@@ -163,5 +160,14 @@ public class DonacionService {
                 .estado(donacion.getEstado())
                 .donacionesSegmentadas(segmentadas)
                 .build();
+    }
+
+    public List<DonacionSegmentada> obtenerDonacionesSegmentadas(EstadoDonacionSegmentada estado, Integer limite){
+        long limiteFinal = (limite != null) ? Math.min(limite, 100) : 100;
+        return this.donacionRepository.findAll().stream()
+                .flatMap(donacion -> donacion.getDonacionesSegmentadas().stream())
+                .filter(donacionSegmentada -> donacionSegmentada.getEstado().equals(estado))
+                .limit(limiteFinal)
+                .toList();
     }
 }

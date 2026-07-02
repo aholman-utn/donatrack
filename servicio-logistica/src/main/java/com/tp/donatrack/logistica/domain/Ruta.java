@@ -15,8 +15,10 @@ import java.util.List;
 @Builder
 public class Ruta {
     private Long id;
-    private Long camionId;
-    private Long choferId;
+    //private Long camionId;
+    private Camion camion;
+    //private Long choferId;
+    private Chofer chofer;
     private List<Parada> paradas;
     private Boolean iniciada;
 

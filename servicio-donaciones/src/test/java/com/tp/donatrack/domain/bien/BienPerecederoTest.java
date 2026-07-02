@@ -10,7 +10,7 @@ public class BienPerecederoTest {
     @Test
     @DisplayName("Debe crear un Bien Perecedero (Arroz) con su categoría Alimentos")
     public void debeCrearArrozCorrectamente() {
-        SubCategoria arrozSub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
+        SubCategoria arrozSub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", com.tp.commons.enums.Unidad.KG);
         Date fechaVenc = new Date();
 
         BienPerecedero arroz = new BienPerecedero(

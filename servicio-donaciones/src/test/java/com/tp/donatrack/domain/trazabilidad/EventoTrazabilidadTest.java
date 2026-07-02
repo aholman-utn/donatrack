@@ -20,7 +20,7 @@ class EventoTrazabilidadTest {
 
     @BeforeEach
     void setUp() {
-        subCategoria = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
+        subCategoria = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
         BienDuradero silla = new BienDuradero("Silla", "Silla de oficina", "silla.png", subCategoria, EstadoBien.USADO);
         List<Bien> bienes = Arrays.asList(silla);
         donacion = new DonacionSegmentada(1, subCategoria, bienes);

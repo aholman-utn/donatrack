@@ -9,7 +9,7 @@ public class SubCategoriaTest {
     @Test
     public void testCrearSubcategoria() {
         CategoriaBien cat = CategoriaBien.VESTIMENTA;
-        Unidad uni = Unidad.UNIDADES;
+        com.tp.commons.enums.Unidad uni = com.tp.commons.enums.Unidad.UNIDADES;
         String desc = "Muebles";
 
         SubCategoria subCategoria = new SubCategoria(cat, desc, uni);

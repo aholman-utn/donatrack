@@ -20,7 +20,7 @@ class NecesidadMaterialTest {
     @BeforeEach
     void setUp() {
         categoria = CategoriaBien.MOBILIARIO;
-        subCategoria = new SubCategoria(categoria, "Sillas", Unidad.UNIDADES);
+        subCategoria = new SubCategoria(categoria, "Sillas", com.tp.commons.enums.Unidad.UNIDADES);
         necesidad = new NecesidadExtraordinaria(subCategoria, 3, new Date(), "Inundación");
     }
 
