@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.bien.Unidad;
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,17 +1,7 @@
 package com.tp.donatrack.domain.donacion;
 
-import com.tp.donatrack.domain.bien.CategoriaBien;
-import java.time.LocalDate;
+import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
 
-/**
- * Evento de Dominio que representa que una donación segmentada ha sido
- * entregada.
- * Se utiliza para notificar de manera desacoplada a otros sub-sistemas (ej.
- * Incentivos, Notificaciones).
- */
 public record DonacionEntregadaEvent(
-                Long donanteId,
-                Long entidadBeneficiariaId,
-                CategoriaBien categoriaDonacion,
-                LocalDate fechaDonacion) {
+        DonacionEntregadaEventDTO dto) {
 }

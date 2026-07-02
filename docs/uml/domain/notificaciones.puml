@@ -1,0 +1,105 @@
+@startuml notificaciones
+!include ../_style.puml
+
+title Modelo de Dominio — Servicio de Notificaciones\n(Strategy anidado por medio y por proveedor)
+
+class Notificacion {
+    -id: Long
+    -id_persona: Long
+    -asunto: String
+    -mensaje: String
+    -destinatario: String
+    -fecha: LocalDateTime
+}
+
+interface iNotificador {
+    +enviarNotificacion(destinatario: String, mensaje: String, asunto: String)
+    +getMedio(): TipoNotificador
+}
+
+class NotificadorEmail {
+    +enviarNotificacion(destinatario, mensaje, asunto)
+    +getMedio(): TipoNotificador
+}
+
+class NotificadorSMS {
+    +enviarNotificacion(destinatario, mensaje, asunto)
+    +getMedio(): TipoNotificador
+}
+
+class NotificadorWhatsApp {
+    +enviarNotificacion(destinatario, mensaje, asunto)
+    +getMedio(): TipoNotificador
+}
+
+interface iEmailProvider {
+    +enviarEmail(destinatario, mensaje, asunto)
+}
+
+interface iSMSProvider {
+    +enviarSMS(numero, mensaje)
+}
+
+interface iWhatsAppProvider {
+    +enviarWhatsApp(numero, mensaje)
+}
+
+class EmailProvider {
+    +enviarEmail(destinatario, mensaje, asunto)
+}
+
+class SMSProvider {
+    +enviarSMS(numero, mensaje)
+}
+
+class WhatsAppProvider {
+    +enviarWhatsApp(numero, mensaje)
+}
+
+iNotificador <|.. NotificadorEmail
+iNotificador <|.. NotificadorSMS
+iNotificador <|.. NotificadorWhatsApp
+
+iEmailProvider <|.. EmailProvider
+iSMSProvider <|.. SMSProvider
+iWhatsAppProvider <|.. WhatsAppProvider
+
+NotificadorEmail "1" o-- "1" iEmailProvider : emailProvider
+NotificadorSMS "1" o-- "1" iSMSProvider : smsProvider
+NotificadorWhatsApp "1" o-- "1" iWhatsAppProvider : whatsappProvider
+
+iNotificador ..> TipoNotificador : getMedio() >
+
+package "commons (compartido entre servicios)" #F7F7F7 {
+    enum TipoNotificador {
+        EMAIL
+        SMS
+        WHATSAPP
+    }
+}
+
+note top of iNotificador
+    **Strategy (nivel 1 — medio de envío)**: el servicio
+    de aplicación selecciona la implementación filtrando
+    por getMedio() == TipoNotificador solicitado.
+end note
+
+note bottom of iEmailProvider
+    **Strategy anidado / Bridge (nivel 2 — proveedor concreto)**:
+    cada Notificador* delega el envío real en un proveedor
+    inyectado por composición, desacoplando "cómo se decide
+    el medio" de "cómo se envía efectivamente".
+    Hoy los 3 proveedores son simulaciones (imprimen por
+    consola); no hay integración real con un servicio
+    externo de email/SMS/WhatsApp todavía.
+end note
+
+legend right
+    |= Color |= Significado |
+    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    | <back:#FFF3E0>     </back> | Interfaz (Strategy) |
+    | <back:#F1F4E8>     </back> | Enum de dominio |
+    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+endlegend
+
+@enduml

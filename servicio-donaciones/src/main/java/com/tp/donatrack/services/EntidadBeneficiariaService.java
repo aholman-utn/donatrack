@@ -6,10 +6,13 @@ import com.tp.commons.services.notificador.NotificacionRestClient;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
+
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -19,9 +22,8 @@ public class EntidadBeneficiariaService {
     private static final Logger logger = LoggerFactory.getLogger(EntidadBeneficiariaService.class);
 
     public EntidadBeneficiariaService(
-        EntidadBeneficiariaRepository entidadBeneficiariaRepository,
-        NotificacionRestClient notificacionRestClient
-    ) {
+            EntidadBeneficiariaRepository entidadBeneficiariaRepository,
+            NotificacionRestClient notificacionRestClient) {
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
         this.notificacionRestClient = notificacionRestClient;
     }
@@ -86,24 +88,32 @@ public class EntidadBeneficiariaService {
                             contacto,
                             "Se ha confirmado la recepción de la donación.",
                             "Confirmación de Entrega",
-                            personaEntidad.getId()
-                    );
+                            personaEntidad.getId());
                     logger.info("Notificación de entidad {} enviada con éxito.", personaEntidad.getId());
                 } else {
-                    logger.warn("El JSON del medio predeterminado está incompleto para la entidad {}", personaEntidad.getId());
+                    logger.warn("El JSON del medio predeterminado está incompleto para la entidad {}",
+                            personaEntidad.getId());
                 }
 
             } else {
-                logger.warn("La entidad ID {} no tiene un medio predeterminado configurado. No se envió notificación.", personaEntidad.getId());
+                logger.warn("La entidad ID {} no tiene un medio predeterminado configurado. No se envió notificación.",
+                        personaEntidad.getId());
             }
 
         } catch (IllegalArgumentException e) {
-            logger.error("ERROR DE ENUM: La clave en la base de datos no existe en TipoNotificador para la entidad {}.", entidadId, e);
+            logger.error("ERROR DE ENUM: La clave en la base de datos no existe en TipoNotificador para la entidad {}.",
+                    entidadId, e);
         } catch (NullPointerException e) {
-            logger.error("ERROR DE REFERENCIA NULA: Chequeá que notificacionService esté inicializado. Falló en entidad {}.", entidadId, e);
+            logger.error(
+                    "ERROR DE REFERENCIA NULA: Chequeá que notificacionService esté inicializado. Falló en entidad {}.",
+                    entidadId, e);
         } catch (Exception e) {
             logger.error("ERROR INESPERADO procesando la entidad {}.", entidadId, e);
         }
+    }
+
+    public List<EntidadBeneficiaria> listarPorIds(Collection<Long> ids) {
+        return entidadBeneficiariaRepository.findAllById(ids);
     }
 
 }

@@ -1,0 +1,101 @@
+' =========================================================
+' Estilo compartido para todos los diagramas UML de DonaTrack
+' Incluir con: !include ../_style.puml  (desde domain/, architecture/, casos-de-uso/)
+' =========================================================
+
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam arrowThickness 1.2
+
+skinparam titleFontSize 20
+skinparam titleFontStyle bold
+
+' ---- Clases (diagramas de dominio) ----
+skinparam class {
+    BackgroundColor #EFF6FF
+    BorderColor #2B5B84
+    ArrowColor #2B5B84
+    FontColor #10222E
+    AttributeFontColor #10222E
+    AttributeFontSize 12
+    StereotypeFontColor #2B5B84
+    HeaderBackgroundColor #D6E7F7
+}
+
+skinparam interface {
+    BackgroundColor #FFF3E0
+    BorderColor #B9700A
+    FontColor #4A2E00
+}
+
+skinparam enum {
+    BackgroundColor #F1F4E8
+    BorderColor #5B7A2B
+    FontColor #2E3B14
+}
+
+skinparam package {
+    BackgroundColor #FBFBFB
+    BorderColor #8A8A8A
+    FontColor #333333
+    FontStyle bold
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #C9B458
+    FontColor #4A4326
+}
+
+' ---- Componentes / despliegue (arquitectura) ----
+skinparam component {
+    BackgroundColor #EFF6FF
+    BorderColor #2B5B84
+    ArrowColor #2B5B84
+    FontColor #10222E
+}
+
+skinparam database {
+    BackgroundColor #F1F4E8
+    BorderColor #5B7A2B
+    FontColor #2E3B14
+}
+
+skinparam node {
+    BackgroundColor #FBFBFB
+    BorderColor #555555
+    FontColor #222222
+}
+
+skinparam cloud {
+    BackgroundColor #FFF3E0
+    BorderColor #B9700A
+    FontColor #4A2E00
+}
+
+skinparam queue {
+    BackgroundColor #FDE8EC
+    BorderColor #A03A52
+    FontColor #4A1220
+}
+
+' ---- Casos de uso ----
+skinparam usecase {
+    BackgroundColor #EFF6FF
+    BorderColor #2B5B84
+    ArrowColor #2B5B84
+    FontColor #10222E
+}
+
+skinparam actor {
+    BackgroundColor #FFF3E0
+    BorderColor #B9700A
+    FontColor #10222E
+}
+
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55

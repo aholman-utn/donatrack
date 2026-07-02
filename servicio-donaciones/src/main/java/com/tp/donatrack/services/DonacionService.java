@@ -1,7 +1,9 @@
 package com.tp.donatrack.services;
 
-import com.tp.donatrack.domain.donacion.Donacion;
-import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donacion.*;
+import com.tp.donatrack.domain.donante.Donante;
+import com.tp.donatrack.dtos.CrearDonacionRequest;
+import com.tp.donatrack.dtos.DonacionEntregadaEventDTO;
 import com.tp.donatrack.dtos.DonacionHistorialDTO;
 import com.tp.donatrack.dtos.DonacionSegmentadaHistorialDTO;
 import com.tp.donatrack.repositories.DonacionRepository;
@@ -16,22 +18,21 @@ public class DonacionService {
     private final DonacionRepository donacionRepository;
     private final DonanteService donanteService;
     private final EntidadBeneficiariaService entidadBeneficiariaService;
-    private final com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher;
+    private final DonacionEventPublisher eventPublisher;
 
     public DonacionService(
             DonacionRepository donacionRepository,
             DonanteService donanteService,
             EntidadBeneficiariaService entidadBeneficiariaService,
-            com.tp.donatrack.domain.donacion.DonacionEventPublisher eventPublisher
-    ) {
+            DonacionEventPublisher eventPublisher) {
         this.donacionRepository = donacionRepository;
         this.donanteService = donanteService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
         this.eventPublisher = eventPublisher;
     }
 
-    public Donacion registrarDonacion(com.tp.donatrack.dtos.CrearDonacionRequest request) {
-        com.tp.donatrack.domain.donante.Donante donante = donanteService.buscarDonantePorId(request.getDonanteId());
+    public Donacion registrarDonacion(CrearDonacionRequest request) {
+        Donante donante = donanteService.buscarDonantePorId(request.getDonanteId());
         if (donante == null) {
             throw new IllegalArgumentException("No se encontró el donante con ID: " + request.getDonanteId());
         }
@@ -50,8 +51,8 @@ public class DonacionService {
      * Confirma la entrega de una donación segmentada específica.
      * Utiliza la entidad beneficiaria que fue asignada durante el matchmaking.
      */
-    public void registrarEntrega(Integer donacionSegmentadaId) {
-        com.tp.donatrack.domain.donacion.DonacionSegmentada segmentada = donacionRepository
+    public void registrarEntrega(Long donacionSegmentadaId) {
+        DonacionSegmentada segmentada = donacionRepository
                 .findSegmentadaById(donacionSegmentadaId);
 
         if (segmentada == null) {
@@ -63,8 +64,34 @@ public class DonacionService {
                     "La donación segmentada no tiene una entidad beneficiaria asignada. Ejecute el matchmaking primero.");
         }
 
-        segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId(), eventPublisher);
+        Long donanteId = segmentada.getDonanteId();
+
+        Donante donante = this.donanteService.buscarDonantePorId(donanteId);
+
+        segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId());
         this.notificarEntrega(segmentada);
+
+        this.donanteService.registrarEntregaEnPerfil(donanteId, segmentada);
+
+        if (eventPublisher != null) {
+            DonacionEntregadaEventDTO donacionEntregada = new DonacionEntregadaEventDTO();
+            donacionEntregada.setDonacionSegmentadaId(segmentada.getId());
+            donacionEntregada.setProgreso(donante.getPerfil().getProgreso());
+            donacionEntregada.setDonanteId(donante.getPersona().getId());
+            donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
+            donacionEntregada.setCategoriaDonante(donante.getPerfil().getNivelDonante());
+            donacionEntregada.setNombreDonante(donante.getNombreCompleto());
+            eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+        }
+    }
+
+    public void registrarEntregaFallida(Long donacionSegmentadaId, String motivo) {
+        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
+        if (segmentada == null) {
+            throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
+        }
+        segmentada.registrarEntregaFallida("Sistema",
+                motivo != null ? motivo : "Entrega fallida reportada por logística");
     }
 
     public List<DonacionHistorialDTO> obtenerTodas() {
@@ -133,5 +160,14 @@ public class DonacionService {
                 .estado(donacion.getEstado())
                 .donacionesSegmentadas(segmentadas)
                 .build();
+    }
+
+    public List<DonacionSegmentada> obtenerDonacionesSegmentadas(EstadoDonacionSegmentada estado, Integer limite){
+        long limiteFinal = (limite != null) ? Math.min(limite, 100) : 100;
+        return this.donacionRepository.findAll().stream()
+                .flatMap(donacion -> donacion.getDonacionesSegmentadas().stream())
+                .filter(donacionSegmentada -> donacionSegmentada.getEstado().equals(estado))
+                .limit(limiteFinal)
+                .toList();
     }
 }

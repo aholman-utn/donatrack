@@ -1,5 +1,6 @@
 package com.tp.donatrack.dtos;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import lombok.Getter;
 import lombok.Setter;

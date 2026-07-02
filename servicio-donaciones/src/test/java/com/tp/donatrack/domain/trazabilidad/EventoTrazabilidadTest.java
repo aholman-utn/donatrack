@@ -1,5 +1,6 @@
 package com.tp.donatrack.domain.trazabilidad;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;

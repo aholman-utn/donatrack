@@ -1,16 +1,20 @@
 package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.bien.SubCategoria;
+
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
+
 import com.tp.donatrack.domain.necesidad.NecesidadExtraordinaria;
 import com.tp.donatrack.domain.necesidad.NecesidadMaterial;
 import com.tp.donatrack.domain.necesidad.NecesidadRecurrente;
+
 import com.tp.donatrack.dtos.necesidad.CrearNecesidadDTO;
 import com.tp.donatrack.dtos.necesidad.NecesidadResponseDTO;
+
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import com.tp.donatrack.repositories.NecesidadRepository;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +26,8 @@ public class NecesidadService {
     private final NecesidadRepository necesidadRepository;
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
 
-    public NecesidadService(NecesidadRepository necesidadRepository, EntidadBeneficiariaRepository entidadBeneficiariaRepository) {
+    public NecesidadService(NecesidadRepository necesidadRepository,
+            EntidadBeneficiariaRepository entidadBeneficiariaRepository) {
         this.necesidadRepository = necesidadRepository;
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
     }
@@ -31,7 +36,8 @@ public class NecesidadService {
         // Validar Entidad
         EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(dto.getEntidadBeneficiariaId());
         if (entidad == null) {
-            throw new IllegalArgumentException("Entidad beneficiaria no encontrada con ID: " + dto.getEntidadBeneficiariaId());
+            throw new IllegalArgumentException(
+                    "Entidad beneficiaria no encontrada con ID: " + dto.getEntidadBeneficiariaId());
         }
 
         SubCategoria subCategoria = new SubCategoria(null, dto.getSubCategoriaNombre(), null);
@@ -51,7 +57,7 @@ public class NecesidadService {
 
         necesidad.setEntidadBeneficiariaId(dto.getEntidadBeneficiariaId());
         necesidad = necesidadRepository.create(necesidad);
-        
+
         // Vincular en memoria la necesidad a la entidad beneficiaria
         entidad.agregarNecesidad(necesidad);
 
@@ -75,7 +81,7 @@ public class NecesidadService {
 
         necesidad.setCantidadObjetivo(dto.getCantidad());
         necesidad.setFechaDelPedido(Date.from(dto.getFechaLimite().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        
+
         SubCategoria subCategoria = new SubCategoria(null, dto.getSubCategoriaNombre(), null);
         necesidad.setSubCategoria(subCategoria);
 
@@ -110,7 +116,8 @@ public class NecesidadService {
         NecesidadResponseDTO dto = NecesidadResponseDTO.builder()
                 .id(necesidad.getId())
                 .entidadBeneficiariaId(necesidad.getEntidadBeneficiariaId())
-                .subCategoriaNombre(necesidad.getSubCategoria() != null ? necesidad.getSubCategoria().getDescripcion() : null)
+                .subCategoriaNombre(
+                        necesidad.getSubCategoria() != null ? necesidad.getSubCategoria().getDescripcion() : null)
                 .cantidadSolicitada(necesidad.getCantidadObjetivo())
                 .cantidadCubierta(necesidad.getCantidadRecibida())
                 .fechaDelPedido(necesidad.getFechaDelPedido())

@@ -3,16 +3,21 @@ package com.tp.donatrack.services;
 import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.commons.services.notificador.NotificacionRestClient;
 
-import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
-import com.tp.donatrack.domain.persona.Persona;
-import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
-import com.tp.donatrack.dtos.DonanteInactivoDTO;
-import com.tp.donatrack.dtos.ImportacionResponseDTO;
+import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+
+import com.tp.donatrack.domain.donante.PerfilDonante;
 import com.tp.donatrack.domain.donante.Donante;
-import com.tp.donatrack.domain.donante.DonanteCreadoEvent;
-import com.tp.donatrack.domain.donante.DonanteEventPublisher;
+
+import com.tp.donatrack.domain.persona.Persona;
+
+import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
+import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
+import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.DonanteRepository;
+
+import com.tp.donatrack.dtos.*;
+import com.tp.commons.dtos.incentivos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +32,6 @@ import org.slf4j.LoggerFactory;
 public class DonanteService {
     private final DonanteRepository donanteRepository;
     private final NotificacionRestClient notificacionRestClient;
-    private final DonanteEventPublisher eventPublisher;
     private static final Logger logger = LoggerFactory.getLogger(DonanteService.class);
 
     @Autowired
@@ -39,23 +43,16 @@ public class DonanteService {
     public DonanteService(
             DonanteRepository donanteRepository,
             NotificacionRestClient notifService,
-            List<iLectorArchivo> lectores,
-            DonanteEventPublisher eventPublisher
-    ) {
+            List<iLectorArchivo> lectores) {
         this.donanteRepository = donanteRepository;
         this.notificacionRestClient = notifService;
         this.lectoresDeArchivos = lectores;
-        this.eventPublisher = eventPublisher;
     }
 
     // CREATE
     public Donante registrar(Persona persona) {
         Donante donante = new Donante(persona);
-        Donante nuevoDonante = donanteRepository.create(donante);
-        if (nuevoDonante != null) {
-            eventPublisher.publicar(new DonanteCreadoEvent(nuevoDonante.getPersona().getId(), nuevoDonante.getNombreCompleto()));
-        }
-        return nuevoDonante;
+        return donanteRepository.create(donante);
     }
 
     // READ
@@ -113,8 +110,7 @@ public class DonanteService {
                         email,
                         "Gracias por sumarte como donante...",
                         "¡Bienvenido a Donatrack!",
-                        persona.getId()
-                );
+                        persona.getId());
             }
             // 5. Respuesta de la aplicación
             String mensaje = "Importados " + registros.size() + " registros exitosamente";
@@ -125,23 +121,6 @@ public class DonanteService {
         } catch (Exception e) {
             return new ImportacionResponseDTO(false, "Error al importar: " + e.getMessage());
         }
-    }
-
-    private Donante darDeAlta(Donante donante) {
-        Donante nuevo_donante = this.donanteRepository.create(donante);
-        if (nuevo_donante != null) {
-            Persona persona = donante.getPersona();
-            String email = persona.getMedioDeContacto().get("email").getFirst();
-            notificacionRestClient.notificar(
-                    TipoNotificador.EMAIL,
-                    email,
-                    "Gracias por sumarte como donante...",
-                    "¡Bienvenido a Donatrack!",
-                    persona.getId()
-            );
-            eventPublisher.publicar(new DonanteCreadoEvent(nuevo_donante.getPersona().getId(), nuevo_donante.getNombreCompleto()));
-        }
-        return nuevo_donante;
     }
 
     public List<DonanteInactivoDTO> obtenerDonantesSinInteraccionMasDeDias(int dias) {
@@ -162,9 +141,11 @@ public class DonanteService {
                     if (medioMap.containsKey("medio")) {
                         dto.setContacto(medioMap.get("valor"));
                         try {
-                            dto.setTipoNotificadorPreferido(TipoNotificador.valueOf(medioMap.get("medio").toUpperCase()));
+                            dto.setTipoNotificadorPreferido(
+                                    TipoNotificador.valueOf(medioMap.get("medio").toUpperCase()));
                         } catch (IllegalArgumentException e) {
-                            System.err.println("Advertencia: El medio '" + medioMap.get("medio") + "' no coincide con ningún TipoNotificador.");
+                            System.err.println("Advertencia: El medio '" + medioMap.get("medio")
+                                    + "' no coincide con ningún TipoNotificador.");
                         }
                     } else {
                         Map.Entry<String, String> entry = medioMap.entrySet().iterator().next();
@@ -172,7 +153,8 @@ public class DonanteService {
                         try {
                             dto.setTipoNotificadorPreferido(TipoNotificador.valueOf(entry.getKey().toUpperCase()));
                         } catch (IllegalArgumentException e) {
-                            System.err.println("Advertencia: El medio '" + entry.getKey() + "' no coincide con ningún TipoNotificador.");
+                            System.err.println("Advertencia: El medio '" + entry.getKey()
+                                    + "' no coincide con ningún TipoNotificador.");
                         }
                     }
 
@@ -212,23 +194,142 @@ public class DonanteService {
                             contacto,
                             "Se ha confirmado la recepción de la donación.",
                             "Confirmación de Entrega a Entidad Beneficiaria",
-                            persona.getId()
-                    );
+                            persona.getId());
                     logger.info("Notificación de donante {} enviada con éxito.", persona.getId());
                 } else {
                     logger.warn("El JSON del medio predeterminado está incompleto para el donante {}", persona.getId());
                 }
 
             } else {
-                logger.warn("El donante ID {} no tiene un medio predeterminado configurado. No se envió notificación.", persona.getId());
+                logger.warn("El donante ID {} no tiene un medio predeterminado configurado. No se envió notificación.",
+                        persona.getId());
             }
 
         } catch (IllegalArgumentException e) {
-            logger.error("ERROR DE ENUM: La clave en la base de datos no existe en TipoNotificador para el donante {}.", donanteId, e);
+            logger.error("ERROR DE ENUM: La clave en la base de datos no existe en TipoNotificador para el donante {}.",
+                    donanteId, e);
         } catch (NullPointerException e) {
-            logger.error("ERROR DE REFERENCIA NULA: Chequeá que notifService esté inicializado. Falló en donante {}.", donanteId, e);
+            logger.error("ERROR DE REFERENCIA NULA: Chequeá que notifService esté inicializado. Falló en donante {}.",
+                    donanteId, e);
         } catch (Exception e) {
             logger.error("ERROR INESPERADO procesando el donante {}.", donanteId, e);
         }
+    }
+
+    public IndicadoresDonanteDTO calcularIndicadores(Long donanteId, DonacionSegmentada segmentada,
+            List<String> indicadores) {
+        Donante donante = donanteRepository.findById(donanteId);
+
+        if (donante == null) {
+            throw new RuntimeException("Donante no encontrado");
+        }
+
+        PerfilDonante perfil = donante.getPerfil();
+
+        IndicadoresDonanteDTO.IndicadoresDonanteDTOBuilder builder = IndicadoresDonanteDTO.builder();
+
+        if (indicadores.contains("CANTIDAD_BIENES")) {
+            builder.cantidadBienesTotal(segmentada.getCantidad());
+        }
+
+        if (indicadores.contains("CATEGORIAS_DISTINTAS")) {
+            builder.cantidadCategoriasUnicas(perfil.contarCategoriasUnicas());
+        }
+
+        if (indicadores.contains("MESES_CONSECUTIVOS")) {
+            builder.mesesConsecutivosRacha(perfil.calcularRachaMeses());
+        }
+
+        if (indicadores.contains("ENTREGAS_EXITOSAS_TOTALES")) {
+            builder.cantidadDonacionesEntregadas(perfil.calcularDonacionesAEntidadesBeneficiarias());
+        }
+
+        return builder.build();
+    }
+
+    @Autowired
+    private DonacionRepository donacionRepository;
+
+    public void registrarEntregaEnPerfil(Long donanteId, DonacionSegmentada segmentada) {
+        Donante donante = this.buscarDonantePorId(donanteId);
+        donante.getPerfil().registrarEntrega(segmentada);
+    }
+
+    public MetricasActividadDTO obtenerMetricas(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null)
+            throw new RuntimeException("Donante no encontrado");
+        PerfilDonante perfil = donante.getPerfil();
+
+        List<DonacionSegmentada> segmentadas = donacionRepository.findByDonanteId(donanteId).stream()
+                .flatMap(d -> d.getDonacionesSegmentadas().stream())
+                .collect(Collectors.toList());
+
+        List<Long> entidadesIds = segmentadas.stream()
+                .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA)
+                .map(DonacionSegmentada::getEntidadBeneficiariaAsignadaId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        int totalExitosas = perfil.calcularCantidadDonacionesEntregadas();
+
+        int donacionesMesActual = (int) perfil.getHistorialDonaciones().stream()
+                .filter(item -> item.getFecha().getMonthValue() == java.time.LocalDate.now().getMonthValue() &&
+                        item.getFecha().getYear() == java.time.LocalDate.now().getYear())
+                .count();
+
+        Map<String, Integer> agrupado = perfil.getHistorialDonaciones().stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getFecha().getYear() + "-" + item.getFecha().getMonthValue(),
+                        Collectors.summingInt(x -> 1)));
+
+        List<RegistroDonacionMensualDTO> comparaciones = agrupado.entrySet().stream()
+                .map(e -> {
+                    String[] parts = e.getKey().split("-");
+                    return RegistroDonacionMensualDTO.builder()
+                            .anio(Integer.parseInt(parts[0]))
+                            .mes(Integer.parseInt(parts[1]))
+                            .totalDonaciones(e.getValue())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        int misionesCompletadas = perfil.getMetricasPerfil() != null
+                && perfil.getMetricasPerfil().getMisionesCompletadas() != null
+                        ? perfil.getMetricasPerfil().getMisionesCompletadas().size()
+                        : 0;
+
+        return MetricasActividadDTO.builder()
+                .donanteId(donanteId.intValue())
+                .categoriaDonante(perfil.getNivelDonante().name())
+                .totalDonacionesExitosas(totalExitosas)
+                .entidadesAyudadasCount(entidadesIds.size())
+                .entidadesAyudadasIds(entidadesIds.stream().map(Long::intValue).collect(Collectors.toList()))
+                .donacionesMesActual(donacionesMesActual)
+                .mesPeriodoActual(java.time.LocalDate.now().getMonthValue())
+                .anioPeriodoActual(java.time.LocalDate.now().getYear())
+                .comparacionesMensuales(comparaciones)
+                .misionesCompletadasCount(misionesCompletadas)
+                .build();
+    }
+
+    public PerfilDonanteDTO obtenerPerfilDonante(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null)
+            throw new RuntimeException("Donante no encontrado");
+        PerfilDonante perfil = donante.getPerfil();
+
+        return PerfilDonanteDTO.builder()
+                .visibilidadInsignia(perfil.isVisibilidadInsignia())
+                .categoriaDonante(perfil.getNivelDonante())
+                .misionActualId(perfil.getMisionActualId())
+                .progreso(perfil.getProgreso())
+                .insigniasGanadas(perfil.getInsigniasGanadas())
+                .misionesCompletadasIds(perfil.getMetricasPerfil() != null
+                        && perfil.getMetricasPerfil().getMisionesCompletadas() != null
+                                ? perfil.getMetricasPerfil().getMisionesCompletadas()
+                                : new ArrayList<>())
+                .build();
     }
 }

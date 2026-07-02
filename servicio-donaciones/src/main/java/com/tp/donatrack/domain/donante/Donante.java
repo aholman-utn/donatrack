@@ -1,8 +1,6 @@
 package com.tp.donatrack.domain.donante;
 
-import com.tp.donatrack.domain.persona.Persona;
-import com.tp.donatrack.domain.persona.PersonaHumana;
-import com.tp.donatrack.domain.persona.PersonaJuridica;
+import com.tp.donatrack.domain.persona.*;
 import lombok.*;
 
 @Getter

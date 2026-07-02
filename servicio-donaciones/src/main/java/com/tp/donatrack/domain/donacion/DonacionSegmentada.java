@@ -8,7 +8,6 @@ import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,8 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 public class DonacionSegmentada {
-    private Integer id;
-    private int cantidad;
+    private Long id;
+    private int cantidad; //300 kg de fideos, 200lt de leche...etc
     private SubCategoria subCategoria;
     private List<Bien> bienes;
     private EstadoDonacionSegmentada estado;
@@ -75,16 +74,10 @@ public class DonacionSegmentada {
     }
 
     public void confirmarEntrega(Long entidadBeneficiariaId) {
-        confirmarEntrega(entidadBeneficiariaId, null);
-    }
-
-    public void confirmarEntrega(Long entidadBeneficiariaId, DonacionEventPublisher eventPublisher) {
-        transicionar(EstadoDonacionSegmentada.ENTREGADA, String.valueOf(entidadBeneficiariaId),
+        transicionar(
+                EstadoDonacionSegmentada.ENTREGADA,
+                String.valueOf(entidadBeneficiariaId),
                 "Entidad beneficiaria confirmó la recepción");
-        if (eventPublisher != null && this.donanteId != null) {
-            eventPublisher.publicar(new DonacionEntregadaEvent(this.donanteId, entidadBeneficiariaId,
-                    this.subCategoria.getCategoria(), LocalDate.now()));
-        }
     }
 
     public void registrarEntregaFallida(String actor, String justificacion) {
@@ -95,7 +88,8 @@ public class DonacionSegmentada {
     }
 
     public void marcarVencida(String actor) {
-        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene bienes perdecederos)
+        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene
+        // bienes perdecederos)
         transicionar(EstadoDonacionSegmentada.VENCIDA, actor, "Donación marcada como vencida por administrador");
     }
 
@@ -112,13 +106,13 @@ public class DonacionSegmentada {
     public boolean transicionPosible(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo) {
         return switch (anterior) {
             case EN_DEPOSITO ->
-                    nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
-                            || nuevo == EstadoDonacionSegmentada.VENCIDA;
+                nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
+                        || nuevo == EstadoDonacionSegmentada.VENCIDA;
             case ASIGNACION_REALIZADA -> nuevo == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR;
             case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
             case EN_TRASLADO ->
-                    nuevo == EstadoDonacionSegmentada.ENTREGADA
-                            || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
+                nuevo == EstadoDonacionSegmentada.ENTREGADA
+                        || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
             case ENTREGA_FALLIDA -> nuevo == EstadoDonacionSegmentada.EN_DEPOSITO;
             case ENTREGADA, VENCIDA -> false; // Estados finales
             default -> false;

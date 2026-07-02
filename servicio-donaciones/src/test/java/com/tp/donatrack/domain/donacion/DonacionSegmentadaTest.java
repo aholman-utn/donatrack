@@ -15,9 +15,8 @@ import com.tp.donatrack.domain.bien.Bien;
 import com.tp.donatrack.domain.bien.BienPerecedero;
 import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
-import com.tp.donatrack.domain.bien.EstadoBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.bien.Unidad;
+import com.tp.commons.domain.donaciones.Unidad;
 
 import com.tp.donatrack.domain.donante.Donante;
 import org.junit.jupiter.api.Test;

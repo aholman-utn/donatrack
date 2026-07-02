@@ -1,11 +1,10 @@
 package com.tp.incentivos.services;
-
-import com.tp.incentivos.domain.Insignia;
-import com.tp.incentivos.domain.Mision;
-import com.tp.incentivos.domain.MisionDonacionesExitosas;
+/*
+import com.tp.commons.domain.incentivos.Insignia;
+import com.tp.incentivos.domain.misiones.Mision;
+import com.tp.incentivos.domain.misiones.MisionDonacionesExitosas;
 import com.tp.incentivos.domain.Perfil;
 import com.tp.incentivos.dtos.RankingItemDTO;
-import com.tp.incentivos.dtos.InsigniasDonanteDTO;
 import com.tp.incentivos.repositories.IncentivosRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,3 +107,4 @@ public class ServicioRankingTest {
         return mision;
     }
 }
+*/

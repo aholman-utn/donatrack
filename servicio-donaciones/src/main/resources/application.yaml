@@ -12,4 +12,6 @@ spring:
 
 services:
   incentivos:
-    url: http://localhost:8081/perfil/entrega
+    url: http://localhost:8081/incentivos
+  logistica:
+    url: http://localhost:8083

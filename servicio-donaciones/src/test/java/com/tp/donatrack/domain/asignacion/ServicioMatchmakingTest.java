@@ -1,10 +1,10 @@
 package com.tp.donatrack.domain.asignacion;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
-import com.tp.donatrack.domain.necesidad.EstadoNecesidad;
 import com.tp.donatrack.domain.necesidad.NecesidadExtraordinaria;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
 import com.tp.donatrack.domain.persona.TipoOrganizacion;

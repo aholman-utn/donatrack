@@ -91,6 +91,8 @@ El proyecto usa **JUnit 5** con `maven-surefire-junit5-tree-reporter` para una s
 ./mvnw spring-boot:run -pl servicio-donaciones                                  
 ./mvnw spring-boot:run -pl servicio-incentivos                                  
 ./mvnw spring-boot:run -pl servicio-notificaciones                                  
+./mvnw spring-boot:run -pl servicio-logistica
+
 
 ## Capas
 ### 🛂 Controller.
@@ -349,3 +351,4 @@ Una vez levantado el servicio, abrí en el navegador:
 | servicio-donaciones | 8080 |
 | servicio-incentivos | 8081 |
 | servicio-notificaciones | 8082 |
+| servicio-logistica | 8083 |

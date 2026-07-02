@@ -1,0 +1,126 @@
+@startuml general
+!include ../_style.puml
+
+title Diagrama General de Casos de Uso — DonaTrack
+
+left to right direction
+
+actor "Persona\nDonante" as Donante
+actor "Entidad\nBeneficiaria" as Entidad
+actor "Persona\nAdministradora" as Admin
+actor "Chofer" as Chofer
+
+package "Acceso (transversal — servicio de autenticación, consigna futura)" {
+    usecase "Registrarse\n(persona humana o jurídica)" as UC_Registro
+    usecase "Iniciar Sesión" as UC_Login
+}
+
+Donante --> UC_Registro
+Entidad --> UC_Registro
+Donante --> UC_Login
+Entidad --> UC_Login
+Admin --> UC_Login
+Chofer --> UC_Login
+
+package "Servicio de Donaciones" {
+    usecase "Importar Donantes\npor archivo CSV" as UC_ImportarCSV
+    usecase "Gestionar Personas\nDonantes (ABM)" as UC_GestionarDonantes
+    usecase "Registrar Donación\nrecibida en depósito" as UC_RegistrarDonacion
+    usecase "Consultar Mis Donaciones\n(filtro por estado/categoría)" as UC_ConsultarMisDonaciones
+    usecase "Consultar Perfil e\nIndicadores de Donante" as UC_PerfilDonante
+    usecase "Navegar Entidades\nBeneficiarias" as UC_NavegarEntidades
+    usecase "Gestionar Entidades\nBeneficiarias (ABM)" as UC_GestionarEntidades
+    usecase "Registrar Necesidad Material\n(recurrente o extraordinaria)" as UC_RegistrarNecesidad
+    usecase "Consultar Donaciones\nAsignadas" as UC_ConsultarAsignadas
+    usecase "Ejecutar Algoritmos de\nAsignación (matchmaking)" as UC_EjecutarMatchmaking
+    usecase "Seleccionar Entidad\nBeneficiaria Final" as UC_SeleccionarEntidad
+    usecase "Actualizar Estado de Donación\n(ej. marcar vencida)" as UC_ActualizarEstado
+    usecase "Confirmar Recepción\nde Donación (con fotos)" as UC_ConfirmarRecepcionDon
+    usecase "Consultar Trazabilidad\nde una Donación" as UC_Trazabilidad
+
+    UC_SeleccionarEntidad .> UC_EjecutarMatchmaking : <<extend>>
+}
+
+Admin --> UC_ImportarCSV
+Admin --> UC_GestionarDonantes
+Admin --> UC_RegistrarDonacion
+Admin --> UC_GestionarEntidades
+Admin --> UC_EjecutarMatchmaking
+Admin --> UC_SeleccionarEntidad
+Admin --> UC_ActualizarEstado
+
+Donante --> UC_ConsultarMisDonaciones
+Donante --> UC_PerfilDonante
+Donante --> UC_NavegarEntidades
+Donante --> UC_Trazabilidad
+
+Entidad --> UC_RegistrarNecesidad
+Entidad --> UC_ConsultarAsignadas
+Entidad --> UC_ConfirmarRecepcionDon
+Entidad --> UC_Trazabilidad
+
+package "Servicio de Incentivos" {
+    usecase "Consultar Misiones\ne Insignias" as UC_Misiones
+    usecase "Consultar Ranking\nde Donantes" as UC_Ranking
+}
+
+Donante --> UC_Misiones
+Donante --> UC_Ranking
+Admin --> UC_Ranking
+
+package "Servicio de Notificaciones" {
+    usecase "Recibir Notificaciones\n(donación, misión, categoría)" as UC_NotifDonante
+    usecase "Recibir Notificaciones\n(asignación, entrega, ruta)" as UC_NotifEntidad
+}
+
+Donante --> UC_NotifDonante
+Entidad --> UC_NotifEntidad
+
+package "Servicio de Logística" {
+    usecase "Administrar\nCamiones" as UC_Camiones
+    usecase "Administrar\nChoferes" as UC_Choferes
+    usecase "Ver Ruta Asignada" as UC_VerRuta
+    usecase "Iniciar Ruta\nde Entrega" as UC_IniciarRuta
+    usecase "Registrar Recepción\nde Envío" as UC_RegistrarRecepcionEnvio
+    usecase "Reportar Entrega\nNo Satisfactoria" as UC_EntregaFallida
+    usecase "Seguir Entrega en Mapa\nen Tiempo Real" as UC_SeguirMapa
+}
+
+Admin --> UC_Camiones
+Admin --> UC_Choferes
+Chofer --> UC_VerRuta
+Chofer --> UC_IniciarRuta
+Entidad --> UC_RegistrarRecepcionEnvio
+Entidad --> UC_EntregaFallida
+Admin --> UC_EntregaFallida
+Donante --> UC_SeguirMapa
+Entidad --> UC_SeguirMapa
+
+' ===== Relaciones entre casos de uso de distintos servicios (disparan notificaciones) =====
+UC_ConfirmarRecepcionDon ..> UC_NotifDonante : <<include>>
+UC_ConfirmarRecepcionDon ..> UC_NotifEntidad : <<include>>
+UC_IniciarRuta ..> UC_NotifDonante : <<include>>
+UC_IniciarRuta ..> UC_NotifEntidad : <<include>>
+UC_SeleccionarEntidad ..> UC_NotifEntidad : <<include>>
+UC_SeleccionarEntidad ..> UC_NotifDonante : <<include>>
+
+note bottom of UC_SeguirMapa
+    Requerimiento de UI/UX de la consigna (mapa interactivo con
+    ubicación del camión). No se halló un endpoint de geolocalización
+    en tiempo real en el código relevado a la fecha de esta entrega.
+end note
+
+note bottom of UC_Login
+    El PDF de la cátedra menciona un "servicio de autenticación"
+    como componente propio del sistema (no cubierto todavía por
+    ninguno de los 4 servicios de negocio relevados en este TP).
+end note
+
+note bottom of UC_RegistrarRecepcionEnvio
+    Es un caso de uso distinto de "Confirmar Recepción de Donación"
+    del Servicio de Donaciones: por consigna, Logística no se
+    comunica con Donaciones, por lo que ambos servicios llevan
+    su propio registro de la recepción (Envio vs. DonacionSegmentada).
+end note
+
+@enduml

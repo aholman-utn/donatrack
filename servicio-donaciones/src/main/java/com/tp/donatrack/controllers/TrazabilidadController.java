@@ -1,17 +1,17 @@
 package com.tp.donatrack.controllers;
 
-import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.dtos.CrearEventoRequest;
 import com.tp.donatrack.dtos.TrazaDonacionDTO;
 import com.tp.donatrack.dtos.TrazaSegmentoDTO;
-import com.tp.donatrack.services.DonacionService;
 import com.tp.donatrack.services.TrazabilidadService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+/**
+ * Controller REST para la trazabilidad de donaciones segmentadas.
+ * Expone endpoints para consultar el historial de estados y realizar transiciones.
+ */
 @RestController
 @RequestMapping("/trazabilidad")
 public class TrazabilidadController {
@@ -22,7 +22,9 @@ public class TrazabilidadController {
         this.trazabilidadService = trazabilidadService;
     }
 
-    // Trazabilizar una donacion completa -> todos sus segmentos
+    /**
+     * Obtiene la trazabilidad completa de una donación, incluyendo todos sus segmentos.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> trazabilizarDonacion(@PathVariable Integer id) {
         try {
@@ -33,7 +35,9 @@ public class TrazabilidadController {
         }
     }
 
-    // Trazabilizar una donacion segmentada
+    /**
+     * Obtiene la trazabilidad de un segmento específico de una donación.
+     */
     @GetMapping("/{idDonacion}/{idSegmento}")
     public ResponseEntity<?> trazabilizarDonacionSegmentada(
             @PathVariable Integer idDonacion,
@@ -47,6 +51,9 @@ public class TrazabilidadController {
         }
     }
 
+    /**
+     * Realiza una transición genérica de estado sobre una donación segmentada.
+     */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar")
     public ResponseEntity<?> transicionarDonacion(
         @PathVariable Integer idDonacion,
@@ -61,6 +68,9 @@ public class TrazabilidadController {
         }
     }
 
+    /**
+     * Marca una donación segmentada como lista para entregar (ruta planificada).
+     */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/lista_entregar")
     public ResponseEntity<?> transicionarListaEntregar(
         @PathVariable Integer idDonacion,
@@ -75,6 +85,9 @@ public class TrazabilidadController {
         }
     }
 
+    /**
+     * Transiciona una donación segmentada a estado EN_TRASLADO (camión inició recorrido).
+     */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/en_traslado")
     public ResponseEntity<?> transicionarEnTraslado(
         @PathVariable Integer idDonacion,
@@ -89,6 +102,9 @@ public class TrazabilidadController {
         }
     }
 
+    /**
+     * Registra una entrega fallida con justificación. La donación vuelve al depósito.
+     */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/entrega_fallida")
     public ResponseEntity<?> transicionarEntregaFallida(
         @PathVariable Integer idDonacion,
@@ -104,6 +120,9 @@ public class TrazabilidadController {
         }
     }
 
+    /**
+     * Marca una donación segmentada como vencida por decisión de un administrador.
+     */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/marcar_vencida")
     public ResponseEntity<?> transicionarMarcarVencida(
             @PathVariable Integer idDonacion,
@@ -115,6 +134,23 @@ public class TrazabilidadController {
             return ResponseEntity.ok(traza);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Permite a la entidad beneficiaria confirmar la recepción de una donación.
+     * Transiciona a ENTREGADA y dispara notificación de entrega exitosa.
+     */
+    @PatchMapping("/{idDonacion}/{idSegmento}/recepcionar")
+    public ResponseEntity<?> recepcionarEntrega(
+            @PathVariable Integer idDonacion,
+            @PathVariable Integer idSegmento
+    ) {
+        try {
+            TrazaSegmentoDTO traza = trazabilidadService.recepcionarEntrega(idDonacion, idSegmento);
+            return ResponseEntity.ok(traza);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

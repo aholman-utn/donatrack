@@ -1,0 +1,89 @@
+@startuml despliegue
+!include ../_style.puml
+
+title Diagrama de Despliegue — DonaTrack (solución completa)
+
+actor "Persona usuaria\n(Donante / Entidad / Admin)" as Usuario
+
+cloud "Render.com (plan Free)\n«render.yaml»" as Render {
+
+    node "Contenedor Docker\n«Dockerfile.donaciones»\neclipse-temurin:21-jre-alpine" as NodeDon {
+        artifact "servicio-donaciones.jar\n(Spring Boot, puerto 8080)" as JarDon
+    }
+
+    node "Contenedor Docker\n«Dockerfile.notificaciones»\neclipse-temurin:21-jre-alpine" as NodeNot {
+        artifact "servicio-notificaciones.jar\n(Spring Boot, puerto 8082)" as JarNot
+    }
+
+    node "Contenedor Docker\n«Dockerfile.incentivos»\neclipse-temurin:21-jre-alpine" as NodeInc {
+        artifact "servicio-incentivos.jar\n(Spring Boot, puerto 8081)" as JarInc
+    }
+}
+
+node "Entorno local / de desarrollo\n(sin definición de despliegue en la nube todavía)" as LocalEnv {
+
+    node "Proceso Java sin contenedor\n«mvnw spring-boot:run»" as NodeLog <<sin Docker>> {
+        artifact "servicio-logistica.jar\n(Spring Boot, puerto 8083)" as JarLog
+    }
+
+    node "Contenedor Docker\n«herramientas/docker-compose.yml»\nn8nio/n8n:latest" as NodeN8N {
+        artifact "Flujo: Insignias (webhook)" as FlowInsignias
+        artifact "Flujo: Ranking mensual (schedule)" as FlowRanking
+    }
+
+    node "Contenedor Docker\n«herramientas/docker-compose.yml»\nbrowserless/chrome:latest" as NodeBrowserless {
+        artifact "Endpoint /screenshot" as ArtScreenshot
+    }
+}
+
+cloud "LinkedIn\n(API pública)" as LinkedIn
+cloud "Google Sheets\n(API pública)" as GSheets
+
+' ===================== Cliente =====================
+Usuario --> NodeDon : HTTPS\n(Render TLS)
+Usuario --> NodeInc : HTTPS\n(Render TLS)
+Usuario --> NodeNot : HTTPS\n(Render TLS)
+Usuario --> NodeLog : HTTP :8083\n(entorno local, sin TLS)
+
+' ===================== Integraciones entre nodos (protocolo real: HTTP/JSON síncrono) =====================
+NodeDon --> NodeInc : HTTP :8081\nPOST /entrega
+NodeInc --> NodeDon : HTTP :8080\nGET /donaciones-segmentadas/indicadores/{id}\nGET /donantes\nGET /donantes/{id}/contacto-notificacion
+NodeDon --> NodeNot : HTTP :8082\nPOST /api/notificaciones/notificar
+NodeInc --> NodeNot : HTTP :8082\nPOST /api/notificaciones/notificar
+NodeDon --> NodeLog : HTTP :8083\nPOST /planificar
+NodeDon --> NodeLog : HTTP :8083\nGET /api/logistica/rutas/eventos\n(polling cada 10s)
+
+NodeInc --> NodeN8N : HTTP :5678\nPOST /webhook/nueva_insignia
+NodeN8N --> NodeBrowserless : HTTP :3000\nPOST /screenshot
+NodeN8N --> LinkedIn : HTTPS\n(API LinkedIn, OAuth2)
+NodeN8N --> NodeInc : HTTP :8081\nGET /perfil/ranking (schedule mensual)
+NodeN8N --> GSheets : HTTPS\n(API Google Sheets)
+
+note bottom of NodeLog
+    **servicio-logistica** no tiene Dockerfile propio ni entrada en
+    render.yaml (a diferencia de los otros 3 servicios) — se muestra
+    como proceso Java sin contenedor, reflejando el estado real del
+    repositorio al momento de esta entrega.
+end note
+
+note bottom of Render
+    **Acoplamiento por configuración**: las URLs entre servicios están
+    hardcodeadas a `localhost` (services.incentivos.url, services.donaciones.url,
+    services.logistica.url, n8n.webhook.url). Funciona en desarrollo local
+    (un solo host), pero en Render cada servicio vive en un host público
+    distinto: cada variable debe sobreescribirse por entorno (ej.
+    `SERVICES_INCENTIVOS_URL`) apuntando al dominio *.onrender.com
+    correspondiente — parcialmente documentado en docs/DEPLOY.md.
+    Ningún nodo incluye base de datos: los 4 servicios persisten en
+    memoria (List/Map), sin `spring.datasource.*` configurado.
+end note
+
+legend right
+    |= Elemento |= Origen real en el repo |
+    | Contenedor Docker (Donaciones/Incentivos/Notificaciones) | Dockerfile.{servicio} + render.yaml |
+    | Proceso Java sin contenedor (Logística) | servicio-logistica/pom.xml + application.properties (sin Dockerfile) |
+    | Contenedor n8n / browserless | herramientas/docker-compose.yml |
+    | LinkedIn / Google Sheets | herramientas/Flujos n8n/Insignias.json y Ranking.json |
+endlegend
+
+@enduml

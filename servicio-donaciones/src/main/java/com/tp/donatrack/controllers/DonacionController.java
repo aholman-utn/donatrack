@@ -61,6 +61,7 @@ public class DonacionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
     @PostMapping
     public ResponseEntity<?> crearDonacion(@RequestBody com.tp.donatrack.dtos.CrearDonacionRequest request) {
         try {
@@ -84,6 +85,6 @@ public class DonacionController {
     @lombok.Getter
     @lombok.Setter
     public static class EntregaRequest {
-        private Integer donacionSegmentadaId;
+        private Long donacionSegmentadaId;
     }
 }

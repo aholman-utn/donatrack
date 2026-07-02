@@ -24,7 +24,6 @@ public class EntidadBeneficiaria {
     public EntidadBeneficiaria(PersonaJuridica personaJuridica) {
         this.datosDeEntidad = personaJuridica;
         //TODO: aca puedo poner una notificacion de bienvenida o similar
-
     }
 
     public void agregarNecesidad(NecesidadMaterial necesidad) {

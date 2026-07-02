@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @Setter
 public abstract class Persona {
-    private static final java.util.concurrent.atomic.AtomicLong ID_GENERATOR = new java.util.concurrent.atomic.AtomicLong(1);
+    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
 
     public static Long nextId() {
         return ID_GENERATOR.getAndIncrement();

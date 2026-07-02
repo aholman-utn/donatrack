@@ -4,6 +4,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import org.junit.jupiter.api.BeforeEach;
