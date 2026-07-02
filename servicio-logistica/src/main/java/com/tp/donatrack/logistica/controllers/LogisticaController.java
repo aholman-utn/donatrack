@@ -50,7 +50,7 @@ public class LogisticaController {
     public ResponseEntity<List<Envio>> listarEnvios() {
         return ResponseEntity.ok(logisticaService.listarEnvios());
     }
-
+    
     @PostMapping("/rutas")
     public ResponseEntity<Ruta> registrarRuta(@RequestBody Ruta ruta) {
         return ResponseEntity.ok(logisticaService.registrarRuta(ruta));

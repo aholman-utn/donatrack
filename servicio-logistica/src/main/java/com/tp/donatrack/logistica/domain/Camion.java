@@ -13,6 +13,8 @@ import lombok.Setter;
 @Builder
 public class Camion {
     private Long id;
+    private double volumen;
+    private double altura;
     private String patente;
     private String marca;
     private String modelo;
