@@ -1,9 +1,9 @@
 @startuml logistica
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Logística\n(Flota, Rutas, Envíos y Planificación)
+title Modelo de Dominio — Servicio de Logística\n(packages reales bajo com.tp.donatrack.logistica.domain)
 
-package "Flota y Rutas" {
+package "domain" {
     class Camion {
         -id: Long
         -patente: String
@@ -34,17 +34,6 @@ package "Flota y Rutas" {
         -enviosIds: List<Long>
     }
 
-    note bottom of Ruta
-        iniciarRuta() valida que la ruta no haya
-        sido iniciada previamente (guarda de estado).
-    end note
-}
-
-Ruta "1" o-- "1" Camion : camion
-Ruta "1" o-- "1" Chofer : chofer
-Ruta "1" *-- "0..*" Parada : paradas
-
-package "Envíos" {
     class Envio {
         -id: Long
         -donacionSegmentadaId: Long
@@ -71,68 +60,71 @@ package "Envíos" {
         -detalles: String
     }
 
+    note bottom of Ruta
+        iniciarRuta() valida que la ruta no haya
+        sido iniciada previamente (guarda de estado).
+    end note
+
     note top of Envio
         **State**: las transiciones válidas se validan
         dentro de la propia entidad (IllegalStateException
-        si se intenta confirmar/fallar un envío que no
-        está EN_TRASLADO o ASIGNACION_REALIZADA).
+        si el envío no está EN_TRASLADO o ASIGNACION_REALIZADA).
     end note
 
     note bottom of EventoLogistica
-        Bitácora de auditoría (INICIO_RUTA,
-        ENTREGA_EXITOSA, ENTREGA_FALLIDA), expuesta
-        por polling a servicio-donaciones — ver
-        diagrama de componentes.
+        Bitácora de auditoría (INICIO_RUTA, ENTREGA_EXITOSA,
+        ENTREGA_FALLIDA) expuesta por polling a servicio-donaciones.
     end note
+
+    package "domain.planificacion" {
+        interface Planificacion {
+            +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
+        }
+
+        class CapacidadFisica {
+            +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
+        }
+
+        class CalculadorDimensiones {
+            -PESO_POR_UNIDAD_KG: double
+            -VOLUMEN_POR_UNIDAD_M3: double
+            --
+            +calcular(cantidad: Integer, unidad: Unidad): DimensionesFisicas
+        }
+
+        class DimensionesFisicas <<record>> {
+            +pesoKg: double
+            +volumenM3: double
+        }
+
+        note bottom of CapacidadFisica
+            **Strategy**: única implementación activa hoy; el
+            contrato permite incorporar nuevos criterios de
+            planificación sin tocar el resto del servicio. Agrupa
+            donaciones por capacidad de peso/volumen y las paradas
+            por dirección de la entidad beneficiaria.
+        end note
+    }
 }
 
+' ---- Relaciones dentro de domain ----
+Ruta "1" o-- "1" Camion : camion
+Ruta "1" o-- "1" Chofer : chofer
+Ruta "1" *-- "0..*" Parada : paradas
 Envio --> EstadoEnvio : estado
-Parada "1" o-- "1..*" Envio : envíos de la parada (por ID)
+Parada "1" o-- "1..*" Envio : envíos (por ID)
 
-package "Planificación de Rutas" {
-    interface Planificacion {
-        +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
-    }
-
-    class CapacidadFisica {
-        +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
-    }
-
-    class CalculadorDimensiones {
-        -PESO_POR_UNIDAD_KG: double
-        -VOLUMEN_POR_UNIDAD_M3: double
-        --
-        +calcular(cantidad: Integer, unidad: Unidad): DimensionesFisicas
-    }
-
-    class DimensionesFisicas <<record>> {
-        +pesoKg: double
-        +volumenM3: double
-    }
-
-    note left of Planificacion
-        **Strategy**: única implementación activa
-        (CapacidadFisica) hoy, pero el contrato permite
-        incorporar nuevos criterios de planificación
-        (ej. por cercanía geográfica) sin modificar
-        el resto del servicio.
-    end note
-
-    note bottom of CapacidadFisica
-        Agrupa donaciones en camiones respetando
-        capacidad de peso/volumen y agrupa las paradas
-        por dirección de la entidad beneficiaria.
-    end note
-}
-
+' ---- Relaciones dentro de domain.planificacion ----
 Planificacion <|.. CapacidadFisica
 CapacidadFisica "1" --> "1" CalculadorDimensiones
 CalculadorDimensiones ..> DimensionesFisicas : crea >
+
+' ---- planificacion -> domain (construye rutas) ----
 CapacidadFisica ..> Ruta : construye >
 CapacidadFisica ..> Camion
 CapacidadFisica ..> Chofer
 
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     class DonacionSegmentadaListaParaEntregarALogisticaDTO <<record>> {
         +donacionSegmentadaId: Long
         +entidadBeneficiariaId: Long
@@ -153,11 +145,10 @@ Planificacion ..> DonacionSegmentadaListaParaEntregarALogisticaDTO : recibe de D
 CalculadorDimensiones --> Unidad
 
 note as N1
-    **Alcance acotado por consigna**: servicio-logistica
-    no invoca a Donaciones, Incentivos ni Notificaciones.
-    Solo recibe el lote a planificar (POST /planificar)
-    y expone sus eventos para que Donaciones los consulte
-    por polling — ver docs/uml/architecture/componentes.puml.
+    **Alcance acotado por consigna**: servicio-logistica no invoca
+    a Donaciones, Incentivos ni Notificaciones. Solo recibe el lote
+    a planificar (POST /planificar) y expone sus eventos para que
+    Donaciones los consulte por polling — ver componentes.puml.
 end note
 
 legend right

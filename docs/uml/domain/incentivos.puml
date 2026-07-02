@@ -1,57 +1,59 @@
 @startuml incentivos
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Incentivos\n(Misiones, Insignias y Categorías de Donante)
+title Modelo de Dominio — Servicio de Incentivos\n(packages reales bajo com.tp.incentivos.domain)
 
-abstract class Mision {
-    -id: Long
-    -objetivo: int
-    -nivel: Nivel
-    -titulo: String
-    -descripcion: String
-    -orden: int
-    --
-    +tieneSiguiente(): boolean
-    +{abstract} calcularNuevoProgreso(entrega, indicadores): double
-    +{abstract} estaCumplida(entrega, indicadores): boolean
+package "domain.misiones" {
+    abstract class Mision {
+        -id: Long
+        -objetivo: int
+        -nivel: Nivel
+        -titulo: String
+        -descripcion: String
+        -orden: int
+        --
+        +tieneSiguiente(): boolean
+        +{abstract} calcularNuevoProgreso(entrega, indicadores): double
+        +{abstract} estaCumplida(entrega, indicadores): boolean
+    }
+
+    class MisionRacha extends Mision {
+        +calcularNuevoProgreso(entrega, indicadores): double
+        +estaCumplida(entrega, indicadores): boolean
+    }
+
+    class MisionCompletitud extends Mision {
+        +calcularNuevoProgreso(entrega, indicadores): double
+        +estaCumplida(entrega, indicadores): boolean
+    }
+
+    class MisionHabilDonador extends Mision {
+        +calcularNuevoProgreso(entrega, indicadores): double
+        +estaCumplida(entrega, indicadores): boolean
+    }
+
+    class MisionDonacionesExitosas extends Mision {
+        +tieneSiguiente(): boolean
+        +calcularNuevoProgreso(entrega, indicadores): double
+        +estaCumplida(entrega, indicadores): boolean
+    }
+
+    note top of Mision
+        **Strategy / Template Method por herencia**: cada
+        subclase define su propia regla de progreso y de
+        cumplimiento. El servicio de aplicación (fuera de
+        este diagrama) opera de forma polimórfica sobre la
+        "misión actual" del donante, sin switch/instanceof.
+        Las 4 misiones concretas y su orden de progresión
+        (1→4) están catalogadas en un repositorio en memoria.
+    end note
+
+    note right of MisionDonacionesExitosas
+        Única misión sin siguiente en la cadena
+        (tieneSiguiente() = false): es el techo de
+        la progresión secuencial de misiones.
+    end note
 }
-
-class MisionRacha extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionCompletitud extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionHabilDonador extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionDonacionesExitosas extends Mision {
-    +tieneSiguiente(): boolean
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-note top of Mision
-    **Strategy / Template Method por herencia**: cada
-    subclase define su propia regla de progreso y de
-    cumplimiento. El servicio de aplicación (fuera de
-    este diagrama) opera de forma polimórfica sobre la
-    "misión actual" del donante, sin switch/instanceof.
-    Las 4 misiones concretas y su orden de progresión
-    (1→4) están catalogadas en un repositorio en memoria.
-end note
-
-note right of MisionDonacionesExitosas
-    Única misión sin siguiente en la cadena
-    (tieneSiguiente() = false): es el techo de
-    la progresión secuencial de misiones.
-end note
 
 package "commons (compartido entre servicios)" #F7F7F7 {
     class Insignia {

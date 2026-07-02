@@ -1,9 +1,9 @@
 @startuml donaciones
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Donaciones\n(Donantes, Bienes, Donaciones, Necesidades, Asignación)
+title Modelo de Dominio — Servicio de Donaciones\n(packages reales bajo com.tp.donatrack.domain)
 
-package "Personas y Donantes" {
+package "domain.persona" {
     abstract class Persona {
         -id: Long
         -direccion: Direccion
@@ -48,6 +48,13 @@ package "Personas y Donantes" {
         INSTITUCION
     }
 
+    enum TipoPersona {
+        HUMANA
+        JURIDICA
+    }
+}
+
+package "domain.donante" {
     class Donante {
         -password: String
         --
@@ -98,7 +105,7 @@ PerfilDonante "1" *-- "1" Metrica : metricasPerfil
 PerfilDonante "1" *-- "0..*" ItemHistoralDonaciones : historialDonaciones
 Metrica "1" o-- "0..*" EntidadAyudada : entidadesAyudadas
 
-package "Bienes" {
+package "domain.bien" {
     abstract class Bien {
         #nombre: String
         #descripcion: String
@@ -157,7 +164,7 @@ Bien ..> ClaveAgrupacion : construye >
 SubCategoria --> CategoriaBien
 BienDuradero --> EstadoBien
 
-package "Donación y Trazabilidad" {
+package "domain.donacion" {
     class Donacion {
         -id: Integer
         -descripcion: String
@@ -207,14 +214,6 @@ package "Donación y Trazabilidad" {
 
     class DonacionEntregadaEvent <<record>>
 
-    class EventoTrazabilidad {
-        -estadoAnterior: EstadoDonacionSegmentada
-        -estadoNuevo: EstadoDonacionSegmentada
-        -fecha: LocalDateTime
-        -actor: String
-        -descripcion: String
-    }
-
     note bottom of DonacionEventPublisher
         **Puerto de dominio** (Observer desacoplado):
         el dominio dispara el evento "donación entregada"
@@ -230,6 +229,16 @@ package "Donación y Trazabilidad" {
     end note
 }
 
+package "domain.trazabilidad" {
+    class EventoTrazabilidad {
+        -estadoAnterior: EstadoDonacionSegmentada
+        -estadoNuevo: EstadoDonacionSegmentada
+        -fecha: LocalDateTime
+        -actor: String
+        -descripcion: String
+    }
+}
+
 Donacion "1" o-- "1" Donante : donante
 Donacion "1" *-- "1..*" Bien : bienes
 Donacion "1" *-- "1..*" DonacionSegmentada : donacionesSegmentadas
@@ -239,7 +248,7 @@ DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad : historial
 DonacionSegmentada --> EstadoDonacionSegmentada : estado
 DonacionSegmentada ..> EntidadBeneficiaria : asigna >
 
-package "Necesidades y Entidad Beneficiaria" {
+package "domain.necesidad" {
     abstract class NecesidadMaterial {
         -id: Long
         -entidadBeneficiariaId: Long
@@ -275,6 +284,14 @@ package "Necesidades y Entidad Beneficiaria" {
         INSATISFECHO
     }
 
+    note top of NecesidadRecurrente
+        activo() sobrescribe el comportamiento heredado:
+        una necesidad recurrente deja de estar activa
+        (y se finaliza) si venció su período (dias).
+    end note
+}
+
+package "domain.entidad" {
     class EntidadBeneficiaria {
         --
         +agregarNecesidad(necesidad: NecesidadMaterial)
@@ -283,12 +300,6 @@ package "Necesidades y Entidad Beneficiaria" {
         +getCantNececidadesActivas(): int
         +implementarDonacion(donacion: DonacionSegmentada)
     }
-
-    note top of NecesidadRecurrente
-        activo() sobrescribe el comportamiento heredado:
-        una necesidad recurrente deja de estar activa
-        (y se finaliza) si venció su período (dias).
-    end note
 }
 
 NecesidadMaterial <|-- NecesidadRecurrente
@@ -299,7 +310,7 @@ NecesidadMaterial "1" o-- "0..*" DonacionSegmentada : donaciones recibidas
 EntidadBeneficiaria "1" *-- "1" PersonaJuridica : datosDeEntidad
 EntidadBeneficiaria "1" *-- "0..*" NecesidadMaterial : nececidades
 
-package "Asignación de Donaciones" {
+package "domain.asignacion" {
     interface AlgoritmoAsignacion {
         +rankear(donacion: DonacionSegmentada, entidades: List<EntidadBeneficiaria>): List<EntidadBeneficiaria>
     }
@@ -344,7 +355,7 @@ ServicioMatchmaking "1" o-- "2" AlgoritmoAsignacion : algoritmos
 ServicioMatchmaking ..> ResultadoMatchmaking : crea >
 ResultadoMatchmaking "1" o-- "0..*" EntidadBeneficiaria : propuestas
 
-package "Ubicación" {
+package "domain.ubicacion" {
     class Direccion {
         -calle1: String
         -calle2: String
@@ -373,7 +384,7 @@ Ciudad "1" --> "1" Provincia : provincia
 Provincia "1" --> "1" Pais : pais
 Persona "1" *-- "1" Direccion : direccion
 
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     enum Nivel {
         COLABORADOR
         SOSTENEDOR
@@ -397,6 +408,14 @@ package "commons (compartido entre servicios)" #F7F7F7 {
 PerfilDonante --> Nivel : nivelDonante
 SubCategoria --> Unidad : unidad
 Persona ..> TipoNotificador : retorna >
+
+note as N1
+    Los packages de este diagrama reflejan la estructura real
+    de `com.tp.donatrack.domain`. Se omiten los packages de
+    infraestructura de importación (domain.importador y
+    domain.lectoresDeArchivos, la estrategia de lectura CSV)
+    por no formar parte del dominio de negocio central.
+end note
 
 legend right
     |= Color |= Significado |
