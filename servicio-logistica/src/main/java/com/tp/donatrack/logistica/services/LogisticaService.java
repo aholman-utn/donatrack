@@ -22,7 +22,6 @@ import com.tp.donatrack.logistica.repository.RutaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LogisticaService {
@@ -56,7 +55,6 @@ public class LogisticaService {
         return camion;
     }
 
-    @Transactional
     public void planificarLote(List<DonacionSegmentadaListaParaEntregarALogisticaDTO> loteDonaciones) {
         if (loteDonaciones == null || loteDonaciones.isEmpty()) {
             logger.warn("Se recibió un lote de planificación vacío.");
