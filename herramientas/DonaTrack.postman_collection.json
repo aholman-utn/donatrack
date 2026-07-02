@@ -1,10 +1,9 @@
 {
   "info": {
-    "_postman_id": "0d6a388e-6ec1-415b-9939-83b389e02968",
+    "_postman_id": "6f0d5c40-5448-4522-98c3-08d335d1f73d",
     "name": "DonaTrack",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "44722010",
-    "_collection_link": "https://go.postman.co/collection/44722010-0d6a388e-6ec1-415b-9939-83b389e02968?source=collection_link"
+    "_exporter_id": "44968810"
   },
   "item": [
     {
@@ -17,7 +16,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Fundaci\u00f3n Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Fundación Ayuda Solidaria\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia social\",\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 12345678\n    }\n  ],\n  \"direccion\": {\n    \"calle1\": \"Av. Siempre Viva\",\n    \"calle2\": \"Piso 3\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 3,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@fundacion.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"contacto@fundacion.org\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -168,7 +167,7 @@
                 {
                   "key": "file",
                   "type": "file",
-                  "src": ""
+                  "value": ""
                 }
               ]
             },
@@ -241,7 +240,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -272,7 +271,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria",
@@ -298,7 +297,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"P\u00e9rez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Donaciones\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Asistencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Gaona\",\n    \"calle2\": \"Repetto\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491112345678\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"EMAIL\": \"contacto@comedorlossoles.org\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria/3",
@@ -322,7 +321,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -351,7 +350,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -380,7 +379,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Mar\u00eda\",\n      \"apellido\": \"G\u00f3mez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
+              "raw": "{\n  \"razonSocial\": \"Comedor Los SOLES (Sede Sur)\",\n  \"tipo\": \"ONG\",\n  \"rubro\": \"Asistencia General e Infantil\",\n  \"direccion\": {\n    \"calle1\": \"Mozart\",\n    \"calle2\": \"\",\n    \"altura\": 4500,\n    \"sinAltura\": false,\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"María\",\n      \"apellido\": \"Gómez\",\n      \"nroDocumento\": 32123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491112345678\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"WHATSAPP\": \"+5491112345678\"\n  }\n}"
             },
             "url": {
               "raw": "http://localhost:8080/entidadBeneficiaria/1",
@@ -537,7 +536,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donaci\u00f3n de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algod\u00f3n talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -658,7 +657,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"descripcion\": \"Donaci\u00f3n actualizada de alimentos y vestimenta\"\n}",
+              "raw": "{\n  \"descripcion\": \"Donación actualizada de alimentos y vestimenta\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -860,7 +859,7 @@
       ]
     },
     {
-      "name": "Prueba conexi\u00f3n entre servicios de Donaciones e Incentivos",
+      "name": "Prueba conexión entre servicios de Donaciones e Incentivos",
       "item": [
         {
           "name": "1) Creacion del donante",
@@ -898,7 +897,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donaci\u00f3n de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algod\u00f3n talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
+              "raw": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos y vestimenta\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"lentejas\",\n      \"descripcion\": \"lata de lentejas\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },{\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"fideos\",\n      \"descripcion\": \"Paquete de fideos 500gr\",\n      \"foto\": \"mostachol.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz Blanco\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Remera\",\n      \"descripcion\": \"Remera de algodón talle M\",\n      \"foto\": \"remera.jpg\",\n      \"estadoBien\": \"NUEVO\",\n      \"subCategoria\": {\n        \"categoria\": \"VESTIMENTA\",\n        \"descripcion\": \"Ropa de Abrigo\",\n        \"unidad\": \"UNIDADES\" \n      }\n    }\n  ]\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1208,7 +1207,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nuevoEstado\": \"EN_TRASLADO\",\r\n  \"actor\": \"ServicioDonaciones\",\r\n  \"descripcion\": \"La donaci\u00f3n fue retirada del dep\u00f3sito y se encuentra en camino al punto de entrega.\"\r\n}",
+              "raw": "{\r\n  \"nuevoEstado\": \"EN_TRASLADO\",\r\n  \"actor\": \"ServicioDonaciones\",\r\n  \"descripcion\": \"La donación fue retirada del depósito y se encuentra en camino al punto de entrega.\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1351,6 +1350,311 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Logistica",
+      "item": [
+        {
+          "name": "choferes",
+          "item": [
+            {
+              "name": "obtener todos los choferes",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"id\":1,\r\n    \"nombre\":\"nacho\",\r\n    \"apellido\":\"scocco\",\r\n    \"dni\":\"1234567\"\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/choferes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "choferes"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crear chofer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"id\":1,\r\n    \"nombre\":\"nacho\",\r\n    \"apellido\":\"scocco\",\r\n    \"dni\":\"1234567\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/choferes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "choferes"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "camiones",
+          "item": [
+            {
+              "name": "obtener todos los camiones",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/camiones",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "camiones"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crear camion",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"id\":1,\r\n    \"volumen\":150.0,\r\n    \"altura\":150.0,\r\n    \"patente\":\"AAA102F\",\r\n    \"marca\":\"scania\",\r\n    \"modelo\":\"ni idea perro\",\r\n    \"capacidadCarga\":500.0\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/camiones",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "camiones"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "rutas",
+          "item": [
+            {
+              "name": "iniciar ruta",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/rutas/1/iniciar",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "rutas",
+                    "1",
+                    "iniciar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener rutas generadas",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\r\n    {\r\n        \"donacionSegmentadaId\":1,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":2,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":3,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    }\r\n]\r\n"
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/rutas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "rutas"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "planificacion",
+          "item": [
+            {
+              "name": "crear planificacion",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\r\n    {\r\n        \"donacionSegmentadaId\":1,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":2,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":3,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":4,\r\n        \"entidadBeneficiariaId\":2,\r\n        \"direccionEntidadBeneficiaria\":\"direccion 2\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":5,\r\n        \"entidadBeneficiariaId\":3,\r\n        \"direccionEntidadBeneficiaria\":\"direccion 3\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":6,\r\n        \"entidadBeneficiariaId\":3,\r\n        \"direccionEntidadBeneficiaria\":\"direccion 3\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    }\r\n]\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/planificar",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "planificar"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "envios",
+          "item": [
+            {
+              "name": "entregar envio",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\r\n    {\r\n        \"donacionSegmentadaId\":1,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":2,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":3,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    }\r\n]\r\n"
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/envios/1/entregar",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "envios",
+                    "1",
+                    "entregar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener envios",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\r\n    {\r\n        \"donacionSegmentadaId\":1,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":2,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    },\r\n    {\r\n        \"donacionSegmentadaId\":3,\r\n        \"entidadBeneficiariaId\":1,\r\n        \"direccionEntidadBeneficiaria\":\"test test 123\",\r\n        \"cantidad\":10,\r\n        \"unidad\":\"KG\"\r\n    }\r\n]\r\n"
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/envios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "envios"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "registrar entrega",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"id\":1,\r\n    \"donacionSegmentadaId\":\"1\",\r\n    \"entidadBeneficiariaId\":\"1\",\r\n    \"estado\":\"ASIGNACION_REALIZADA\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8083/api/logistica/envios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8083",
+                  "path": [
+                    "api",
+                    "logistica",
+                    "envios"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
