@@ -55,7 +55,6 @@ class TrazabilidadServiceNotificacionesTest {
                 notificacionRestClient
         );
 
-        // Crear donante con medio de contacto predeterminado
         PersonaHumana personaDonante = new PersonaHumana();
         personaDonante.setNombre("Juan");
         personaDonante.setApellido("Pérez");
@@ -63,21 +62,18 @@ class TrazabilidadServiceNotificacionesTest {
         donante = new Donante(personaDonante);
         donanteRepository.create(donante);
 
-        // Crear entidad beneficiaria con medio de contacto predeterminado
         PersonaJuridica personaEntidad = new PersonaJuridica();
         personaEntidad.setRazonSocial("Comedor Los Pibes");
         personaEntidad.setMedioPredeterminado(Map.of("medio", "EMAIL", "valor", "comedor@mail.com"));
         entidad = new EntidadBeneficiaria(personaEntidad);
         entidadBeneficiariaRepository.create(entidad);
 
-        // Crear donación con bienes
         SubCategoria subCategoria = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos", Unidad.KILOGRAMOS);
         BienPerecedero bien = new BienPerecedero("Fideos", "Fideos secos 500g", null, subCategoria, new Date());
         List<Bien> bienes = List.of(bien);
         donacion = new Donacion(donante, "Donación de fideos", new Date(), bienes);
         donacionRepository.save(donacion);
 
-        // Asignar la donación a la entidad (simular flujo completo previo)
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
@@ -85,14 +81,13 @@ class TrazabilidadServiceNotificacionesTest {
     }
 
     @Test
-    @DisplayName("Al transicionar a EN_TRASLADO se notifica al donante y a la entidad beneficiaria")
+    @DisplayName("notificarInicioDeRuta envía notificación al donante y a la entidad beneficiaria")
     void notificaInicioDeRuta() {
-        Integer idDonacion = donacion.getId();
-        Integer idSegmento = donacion.getDonacionesSegmentadas().get(0).getId();
+        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.iniciarTraslado("Sistema (Logística Polling)");
 
-        trazabilidadService.transicionEnTraslado(idDonacion, idSegmento, "Chofer García");
+        trazabilidadService.notificarInicioDeRuta(segmento);
 
-        // Verificar que se notificó al donante
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
@@ -101,7 +96,6 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        // Verificar que se notificó a la entidad
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
@@ -112,19 +106,16 @@ class TrazabilidadServiceNotificacionesTest {
     }
 
     @Test
-    @DisplayName("Al transicionar a ENTREGADA se notifica al donante y a la entidad beneficiaria")
+    @DisplayName("recepcionarEntrega notifica al donante y a la entidad beneficiaria")
     void notificaEntregaExitosa() {
-        Integer idDonacion = donacion.getId();
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
-        Integer idSegmento = segmento.getId();
+        Integer idDonacion = donacion.getId();
+        Integer idSegmento = Math.toIntExact(segmento.getId());
 
-        // Primero pasar a EN_TRASLADO
         segmento.iniciarTraslado("Chofer");
-        reset(notificacionRestClient); // Limpiar invocaciones previas
 
-        trazabilidadService.transicionEntregaExitosa(idDonacion, idSegmento, "EntidadBeneficiaria");
+        trazabilidadService.recepcionarEntrega(idDonacion, idSegmento);
 
-        // Verificar que se notificó al donante
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
@@ -133,7 +124,6 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        // Verificar que se notificó a la entidad
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
@@ -144,20 +134,16 @@ class TrazabilidadServiceNotificacionesTest {
     }
 
     @Test
-    @DisplayName("Al transicionar a ENTREGA_FALLIDA se notifica al donante y a la entidad con justificación")
+    @DisplayName("notificarEntregaNoSatisfactoria envía notificación con justificación al donante y a la entidad")
     void notificaEntregaNoSatisfactoria() {
-        Integer idDonacion = donacion.getId();
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
-        Integer idSegmento = segmento.getId();
-
-        // Primero pasar a EN_TRASLADO
         segmento.iniciarTraslado("Chofer");
-        reset(notificacionRestClient);
 
         String justificacion = "Tocamos timbre pero nadie respondió";
-        trazabilidadService.transicionEntregaFallida(idDonacion, idSegmento, "Chofer", justificacion);
+        segmento.registrarEntregaFallida("Sistema (Logística)", justificacion);
 
-        // Verificar que se notificó al donante con la justificación
+        trazabilidadService.notificarEntregaNoSatisfactoria(segmento, justificacion);
+
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
@@ -166,7 +152,6 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        // Verificar que se notificó a la entidad con la justificación
         verify(notificacionRestClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
@@ -177,29 +162,22 @@ class TrazabilidadServiceNotificacionesTest {
     }
 
     @Test
-    @DisplayName("Si falla el envío de notificación, la transición de estado no se interrumpe")
-    void falloEnNotificacionNoInterrumpeTransicion() {
-        Integer idDonacion = donacion.getId();
-        Integer idSegmento = donacion.getDonacionesSegmentadas().get(0).getId();
+    @DisplayName("Si falla el envío de notificación, no se lanza excepción (fire-and-forget)")
+    void falloEnNotificacionNoLanzaExcepcion() {
+        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.iniciarTraslado("Chofer");
 
-        // Simular fallo en el envío de notificación
         when(notificacionRestClient.notificar(any(), any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("Servicio de notificaciones no disponible"));
 
-        // No debe lanzar excepción
         assertDoesNotThrow(() ->
-                trazabilidadService.transicionEnTraslado(idDonacion, idSegmento, "Chofer")
+                trazabilidadService.notificarInicioDeRuta(segmento)
         );
-
-        // Verificar que la transición de estado sí se realizó
-        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
-        assertEquals(EstadoDonacionSegmentada.EN_TRASLADO, segmento.getEstado());
     }
 
     @Test
-    @DisplayName("Si la donación no tiene donante, no se intenta notificar al donante")
+    @DisplayName("Si la donación no tiene donante, no se intenta notificar")
     void sinDonanteNoNotifica() {
-        // Crear donación sin donante
         SubCategoria sub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KILOGRAMOS);
         BienPerecedero bien = new BienPerecedero("Arroz", "Arroz 1kg", null, sub, new Date());
         Donacion donacionSinDonante = new Donacion(null, "Donación anónima", new Date(), List.of(bien));
@@ -208,26 +186,19 @@ class TrazabilidadServiceNotificacionesTest {
         DonacionSegmentada segmento = donacionSinDonante.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.listarParaEntrega("Logística");
+        segmento.iniciarTraslado("Chofer");
 
-        Integer idDonacion = donacionSinDonante.getId();
-        Integer idSegmento = segmento.getId();
+        trazabilidadService.notificarInicioDeRuta(segmento);
 
-        assertDoesNotThrow(() ->
-                trazabilidadService.transicionEnTraslado(idDonacion, idSegmento, "Chofer")
-        );
-
-        // No se notifica a nadie (no hay donante ni entidad asignada)
         verify(notificacionRestClient, never()).notificar(any(), any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("Si el donante no tiene contacto predeterminado, no se intenta enviar notificación")
+    @DisplayName("Si el donante no tiene contacto predeterminado, no se envía notificación")
     void sinContactoPredeterminadoNoNotifica() {
-        // Crear donante sin medio predeterminado
         PersonaHumana personaSinContacto = new PersonaHumana();
         personaSinContacto.setNombre("María");
         personaSinContacto.setApellido("López");
-        // No se setea medioPredeterminado → getContactoPredeterminado() retorna null
         Donante donanteSinContacto = new Donante(personaSinContacto);
         donanteRepository.create(donanteSinContacto);
 
@@ -239,15 +210,10 @@ class TrazabilidadServiceNotificacionesTest {
         DonacionSegmentada segmento = donacionNueva.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.listarParaEntrega("Logística");
+        segmento.iniciarTraslado("Chofer");
 
-        Integer idDonacion = donacionNueva.getId();
-        Integer idSegmento = segmento.getId();
+        trazabilidadService.notificarInicioDeRuta(segmento);
 
-        assertDoesNotThrow(() ->
-                trazabilidadService.transicionEnTraslado(idDonacion, idSegmento, "Chofer")
-        );
-
-        // No se invoca al servicio de notificaciones
         verify(notificacionRestClient, never()).notificar(any(), any(), any(), any(), any());
     }
 }
