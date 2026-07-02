@@ -1,83 +1,84 @@
 @startuml notificaciones
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Notificaciones\n(packages reales bajo com.tp.donatrack.notificaciones.domain)
+title Módulo servicio-notificaciones\n(capas controllers / services / repositories / domain, según el código)
 
-package "domain.entities" {
-    class Notificacion {
-        -id: Long
-        -id_persona: Long
-        -asunto: String
-        -mensaje: String
-        -destinatario: String
-        -fecha: LocalDateTime
-    }
+skinparam componentStyle uml2
 
-    interface iNotificador {
-        +enviarNotificacion(destinatario: String, mensaje: String, asunto: String)
-        +getMedio(): TipoNotificador
-    }
+component "servicio-notificaciones" as Modulo {
 
-    note top of iNotificador
-        **Strategy (nivel 1 — medio de envío)**: el servicio
-        de aplicación selecciona la implementación filtrando
-        por getMedio() == TipoNotificador solicitado.
-    end note
-}
-
-package "domain.notificadores.email" {
-    interface iEmailProvider {
-        +enviarEmail(destinatario, mensaje, asunto)
-    }
-
-    class NotificadorEmail {
-        +enviarNotificacion(destinatario, mensaje, asunto)
-        +getMedio(): TipoNotificador
-    }
-
-    class EmailProvider {
-        +enviarEmail(destinatario, mensaje, asunto)
-    }
-
-    package "providers" {
-        class Resend {
-            +enviarEmail(destinatario, mensaje, asunto)
+    package "controllers" {
+        class NotificacionController <<Controller>> {
+            +notificar(body: NotificacionRequestDTO)
+            +listarTodas()
+            +listarPorPersona(idPersona: Long)
         }
     }
 
-    note bottom of Resend
-        Implementación alternativa presente en el código
-        pero **no activa** (sin @Component, método vacío).
-    end note
-}
-
-package "domain.notificadores.sms" {
-    interface iSMSProvider {
-        +enviarSMS(numero, mensaje)
+    package "services" {
+        class NotificacionService <<Service>> {
+            +notificar(body: NotificacionRequestDTO)
+            +buscar(idPersona: Long): List<Notificacion>
+            +buscarTodas(): List<Notificacion>
+            -seleccionarNotificador(medio): Optional<iNotificador>
+        }
     }
 
-    class NotificadorSMS {
-        +enviarNotificacion(destinatario, mensaje, asunto)
-        +getMedio(): TipoNotificador
+    package "repositories" {
+        class NotificacionRepository <<Repository>> {
+            +save(n: Notificacion): Notificacion
+            +findByIdPersona(id: Long): List<Notificacion>
+            +findAll(): List<Notificacion>
+        }
     }
 
-    class SMSProvider {
-        +enviarSMS(numero, mensaje)
-    }
-}
+    package "domain.entities" {
+        class Notificacion {
+            -id: Long
+            -id_persona: Long
+            -asunto: String
+            -mensaje: String
+            -destinatario: String
+            -fecha: LocalDateTime
+        }
 
-package "domain.notificadores.whatsapp" {
-    interface iWhatsAppProvider {
-        +enviarWhatsApp(numero, mensaje)
+        interface iNotificador {
+            +enviarNotificacion(destinatario, mensaje, asunto)
+            +getMedio(): TipoNotificador
+        }
     }
 
-    class NotificadorWhatsApp {
-        +enviarNotificacion(destinatario, mensaje, asunto)
-        +getMedio(): TipoNotificador
+    package "domain.notificadores.email" {
+        interface iEmailProvider {
+            +enviarEmail(destinatario, mensaje, asunto)
+        }
+        class NotificadorEmail {
+            +getMedio(): TipoNotificador
+        }
+        class EmailProvider
+        package "providers" {
+            class Resend
+        }
     }
 
-    class WhatsAppProvider {
-        +enviarWhatsApp(numero, mensaje)
+    package "domain.notificadores.sms" {
+        interface iSMSProvider {
+            +enviarSMS(numero, mensaje)
+        }
+        class NotificadorSMS {
+            +getMedio(): TipoNotificador
+        }
+        class SMSProvider
+    }
+
+    package "domain.notificadores.whatsapp" {
+        interface iWhatsAppProvider {
+            +enviarWhatsApp(numero, mensaje)
+        }
+        class NotificadorWhatsApp {
+            +getMedio(): TipoNotificador
+        }
+        class WhatsAppProvider
     }
 }
 
@@ -87,41 +88,46 @@ package "commons (módulo compartido)" #F7F7F7 {
         SMS
         WHATSAPP
     }
+    class NotificacionRequestDTO <<DTO>>
 }
 
-' ---- Realizaciones (Strategy nivel 1: medio de envío) ----
+' ===================== Cableado entre capas =====================
+NotificacionController ..> NotificacionService : usa >
+NotificacionService ..> NotificacionRepository : persiste >
+NotificacionService ..> iNotificador : selecciona por medio >
+NotificacionController ..> NotificacionRequestDTO
+NotificacionService ..> Notificacion : crea >
+
+' ===================== Realizaciones de dominio (Strategy) =====================
 iNotificador <|.. NotificadorEmail
 iNotificador <|.. NotificadorSMS
 iNotificador <|.. NotificadorWhatsApp
-
-' ---- Realizaciones (Strategy nivel 2: proveedor concreto) ----
 iEmailProvider <|.. EmailProvider
 iEmailProvider <|.. Resend
 iSMSProvider <|.. SMSProvider
 iWhatsAppProvider <|.. WhatsAppProvider
-
-' ---- Composición: cada notificador delega en su proveedor ----
 NotificadorEmail "1" o-- "1" iEmailProvider : emailProvider
 NotificadorSMS "1" o-- "1" iSMSProvider : smsProvider
 NotificadorWhatsApp "1" o-- "1" iWhatsAppProvider : whatsappProvider
-
-iNotificador ..> TipoNotificador : getMedio() >
+iNotificador ..> TipoNotificador
 
 note as N1
-    **Strategy anidado / Bridge (nivel 2 — proveedor concreto)**:
-    cada Notificador* delega el envío real en un proveedor inyectado
-    por composición, desacoplando "cómo se decide el medio" de "cómo
-    se envía efectivamente". Hoy los 3 proveedores activos son
-    simulaciones (imprimen por consola); no hay integración real con
-    un servicio externo de email/SMS/WhatsApp todavía.
+    **Strategy de dos niveles**: NotificacionService selecciona el
+    iNotificador cuyo getMedio() coincide con el TipoNotificador pedido
+    (nivel 1); cada Notificador* delega el envío en un proveedor concreto
+    inyectado por composición (nivel 2). Los 3 proveedores activos son
+    simulaciones; Resend es una impl. alternativa no wireada (sin @Component).
 end note
 
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
     | <back:#FFF3E0>     </back> | Interfaz (Strategy) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipo compartido definido en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
 endlegend
 
 @enduml

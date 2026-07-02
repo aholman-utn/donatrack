@@ -1,82 +1,124 @@
 @startuml incentivos
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Incentivos\n(packages reales bajo com.tp.incentivos.domain)
+title Módulo servicio-incentivos\n(capas controllers / services / repositories / clients / domain, según el código)
 
-package "domain.misiones" {
-    abstract class Mision {
-        -id: Long
-        -objetivo: int
-        -nivel: Nivel
-        -titulo: String
-        -descripcion: String
-        -orden: int
-        --
-        +tieneSiguiente(): boolean
-        +{abstract} calcularNuevoProgreso(entrega, indicadores): double
-        +{abstract} estaCumplida(entrega, indicadores): boolean
+skinparam componentStyle uml2
+
+component "servicio-incentivos" as Modulo {
+
+    package "controllers" {
+        class IncentivosController <<Controller>> {
+            +procesarEntrega(dto): EvaluacionMisionResponseDTO
+            +obtenerRanking(): List<RankingItemDTO>
+        }
     }
 
-    class MisionRacha extends Mision {
-        +calcularNuevoProgreso(entrega, indicadores): double
-        +estaCumplida(entrega, indicadores): boolean
+    package "services" {
+        class IncentivosService <<Service>> {
+            +procesarNuevaEntrega(dto): EvaluacionMisionResponseDTO
+        }
+        class ServicioRanking <<Service>> {
+            +obtenerRankingCompleto(): List<RankingItemDTO>
+        }
     }
 
-    class MisionCompletitud extends Mision {
-        +calcularNuevoProgreso(entrega, indicadores): double
-        +estaCumplida(entrega, indicadores): boolean
+    package "repositories" {
+        class MisionRepository <<Repository>> {
+            +findById(id): Mision
+            +findSiguiente(misionActualId): Mision
+        }
     }
 
-    class MisionHabilDonador extends Mision {
-        +calcularNuevoProgreso(entrega, indicadores): double
-        +estaCumplida(entrega, indicadores): boolean
+    package "clients" {
+        class DonacionesRestClient <<Client>> {
+            +obtenerIndicadores(...): IndicadoresDonanteDTO
+            +obtenerTodosDonantes(): List
+            +obtenerDatosParaNotificar(id): NotificacionRequestDTO
+        }
+        class InsigniasRestClient <<Client>> {
+            +notificarInsigniaObtenida(user, mision, desc)
+        }
     }
 
-    class MisionDonacionesExitosas extends Mision {
-        +tieneSiguiente(): boolean
-        +calcularNuevoProgreso(entrega, indicadores): double
-        +estaCumplida(entrega, indicadores): boolean
+    package "domain.misiones" {
+        abstract class Mision {
+            -id: Long
+            -objetivo: int
+            -nivel: Nivel
+            -titulo: String
+            -orden: int
+            --
+            +tieneSiguiente(): boolean
+            +{abstract} calcularNuevoProgreso(entrega, indicadores): double
+            +{abstract} estaCumplida(entrega, indicadores): boolean
+        }
+        class MisionRacha extends Mision
+        class MisionCompletitud extends Mision
+        class MisionHabilDonador extends Mision
+        class MisionDonacionesExitosas extends Mision {
+            +tieneSiguiente(): boolean
+        }
+
+        note top of Mision
+            **Strategy / Template Method por herencia**: cada subclase
+            define su regla de progreso y de cumplimiento; el servicio
+            opera polimórficamente sobre la "misión actual" sin
+            switch/instanceof.
+        end note
     }
-
-    note top of Mision
-        **Strategy / Template Method por herencia**: cada
-        subclase define su propia regla de progreso y de
-        cumplimiento. El servicio de aplicación (fuera de
-        este diagrama) opera de forma polimórfica sobre la
-        "misión actual" del donante, sin switch/instanceof.
-        Las 4 misiones concretas y su orden de progresión
-        (1→4) están catalogadas en un repositorio en memoria.
-    end note
-
-    note right of MisionDonacionesExitosas
-        Única misión sin siguiente en la cadena
-        (tieneSiguiente() = false): es el techo de
-        la progresión secuencial de misiones.
-    end note
 }
 
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     class Insignia {
         -titulo: String
         -descripcion: String
         -fechaObtencion: Date
     }
-
     enum Nivel {
         COLABORADOR
         SOSTENEDOR
         TRANSFORMADOR
     }
+    class NotificacionRestClient <<Client>>
 }
 
+package "Sistemas externos" #EEEEEE {
+    class "servicio-donaciones" as ExtDon <<external>>
+    class "N8N — webhook insignias" as ExtN8N <<external>>
+    class "servicio-notificaciones" as ExtNot <<external>>
+}
+
+' ===================== Cableado entre capas =====================
+IncentivosController ..> IncentivosService : usa >
+IncentivosController ..> ServicioRanking : usa >
+IncentivosService ..> MisionRepository : consulta misiones >
+IncentivosService ..> DonacionesRestClient : pide indicadores >
+IncentivosService ..> InsigniasRestClient : notifica insignia >
+IncentivosService ..> NotificacionRestClient : despacha notificación >
+IncentivosService ..> Mision : evalúa cumplimiento >
+ServicioRanking ..> DonacionesRestClient : lee donantes >
+MisionRepository ..> Mision : cataloga >
+
+' ===================== Dominio =====================
 Mision "1" *-- "1" Insignia : insigniaAsociada
 Mision --> Nivel : nivel
 
+' ===================== Clients -> sistemas externos =====================
+DonacionesRestClient ..> ExtDon : HTTP GET
+InsigniasRestClient ..> ExtN8N : HTTP POST webhook
+NotificacionRestClient ..> ExtNot : HTTP POST /notificar
+
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
+    | <<Client>> | Cliente HTTP saliente (RestTemplate) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
+    | <<external>> | Servicio externo al módulo |
 endlegend
 
 @enduml

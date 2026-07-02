@@ -4,18 +4,20 @@ Este directorio contiene toda la documentación UML del proyecto, generada en **
 
 Los diagramas siguen las convenciones UML estándar que la cátedra referencia en la **Unidad 2 — Herramientas de Concepción y Comunicación del Diseño** del programa (diagramas estáticos orientados al diseño: clases, componentes y despliegue; Modelo 4+1), sobre la base bibliográfica de Booch/Rumbaugh/Jacobson y Larman (*UML y Patrones*). Los patrones de diseño representados se corresponden con la **Unidad 3** (Diseño con Objetos y Patrones) y las decisiones de integración con la **Unidad 6 (Arquitectura)** y **Unidad 7 (Integración de Sistemas)**.
 
-No se modeló nada que no tuviera respaldo verificable en el repositorio. Donde el código presenta una inconsistencia real (por ejemplo una URL que no coincide con el endpoint que dice invocar), se dejó documentada en la sección de *Hallazgos* de este README en lugar de "corregirla" silenciosamente en el diagrama.
+**Cada diagrama de servicio modela el módulo completo** envuelto en un **componente UML** (`servicio-XXX`), con sus capas reales como packages Java: `controllers`, `services`, `repositories`, `clients` y `tasks` (según corresponda) además del `domain` con sus sub-packages. El cableado refleja las dependencias reales del código: **controller → service → repository / domain**, y los `clients` hacia los servicios externos. El código es la fuente de verdad.
+
+No se modeló nada que no tuviera respaldo verificable en el repositorio. Donde el código presenta una inconsistencia real (por ejemplo una URL que no coincide con el endpoint que dice invocar), se dejó documentada en la sección de *Hallazgos* de este README.
 
 ## Estructura
 
 ```
 docs/uml/
 ├── _style.puml                     # skinparam compartido, incluido por !include en todos los diagramas
-├── domain/
-│   ├── donaciones.puml / .png      # Modelo de dominio — Servicio de Donaciones
-│   ├── incentivos.puml / .png      # Modelo de dominio — Servicio de Incentivos
-│   ├── notificaciones.puml / .png  # Modelo de dominio — Servicio de Notificaciones
-│   └── logistica.puml / .png       # Modelo de dominio — Servicio de Logística
+├── domain/                         # un diagrama de MÓDULO por servicio (todas las capas)
+│   ├── donaciones.puml / .png
+│   ├── incentivos.puml / .png
+│   ├── notificaciones.puml / .png
+│   └── logistica.puml / .png
 ├── architecture/
 │   ├── componentes.puml / .png     # Diagrama de Componentes — solución completa (único)
 │   └── despliegue.puml / .png      # Diagrama de Despliegue — solución completa (único)
@@ -27,84 +29,64 @@ docs/uml/
 
 | # | Diagrama | Archivo | Alcance |
 |---|----------|---------|---------|
-| 1 | Modelo de Dominio — Donaciones | [domain/donaciones.puml](domain/donaciones.puml) | Personas/Donantes, Bienes, Donación y Trazabilidad, Necesidades/Entidad Beneficiaria, Asignación (matchmaking), Ubicación. ~40 clases agrupadas en packages UML. |
-| 2 | Modelo de Dominio — Incentivos | [domain/incentivos.puml](domain/incentivos.puml) | Jerarquía `Mision` (4 misiones concretas), `Insignia` y `Nivel` (de `commons`). |
-| 3 | Modelo de Dominio — Notificaciones | [domain/notificaciones.puml](domain/notificaciones.puml) | Strategy anidado de notificadores (`iNotificador`) y proveedores (`iEmailProvider`/`iSMSProvider`/`iWhatsAppProvider`). |
-| 4 | Modelo de Dominio — Logística | [domain/logistica.puml](domain/logistica.puml) | Flota y Rutas, Envíos, Planificación de rutas (Strategy `Planificacion`/`CapacidadFisica`). |
-| 5 | Diagrama de Componentes | [architecture/componentes.puml](architecture/componentes.puml) | **Único**, toda la solución: los 4 servicios + `commons` con componentes internos estereotipados, integrados por **interfaces provistas/requeridas** (REST), más los sistemas externos reales. |
+| 1 | Módulo servicio-donaciones | [domain/donaciones.puml](domain/donaciones.puml) | Capas controllers (7), services (8), repositories (4), clients (1), tasks (2) + `domain` (9 sub-packages). |
+| 2 | Módulo servicio-incentivos | [domain/incentivos.puml](domain/incentivos.puml) | Capas controllers, services (2), repository, clients (2) + `domain.misiones`. |
+| 3 | Módulo servicio-notificaciones | [domain/notificaciones.puml](domain/notificaciones.puml) | Capas controller, service, repository + `domain.entities` y `domain.notificadores.{email,sms,whatsapp}` (sin clients). |
+| 4 | Módulo servicio-logistica | [domain/logistica.puml](domain/logistica.puml) | Capas controllers (2), service, repositories (2) + `domain` y `domain.planificacion` (sin clients). |
+| 5 | Diagrama de Componentes | [architecture/componentes.puml](architecture/componentes.puml) | **Único**, toda la solución: los 4 servicios + `commons`, integrados por **interfaces provistas/requeridas** (REST), más los sistemas externos reales. |
 | 6 | Diagrama de Despliegue | [architecture/despliegue.puml](architecture/despliegue.puml) | **Único**, toda la solución: nodos `<<device>>`/`<<execution environment>>`, artefactos y communication paths con protocolo. **Sin actores** (vista física). |
-| 7 | Diagrama General de Casos de Uso | [casos-de-uso/general.puml](casos-de-uso/general.puml) | **Único**: 4 actores (Persona Donante, Entidad Beneficiaria, Persona Administradora, Chofer) y ~25 casos de uso agrupados por servicio dentro del límite del sistema. |
+| 7 | Diagrama General de Casos de Uso | [casos-de-uso/general.puml](casos-de-uso/general.puml) | **Único**: 4 actores y ~25 casos de uso agrupados por servicio dentro del límite del sistema. |
 
-## Correcciones UML aplicadas en esta revisión
+## Correcciones UML aplicadas
 
 Se realizó una revisión de buenas prácticas de modelado UML por tipo de diagrama, según lo que la cátedra evalúa:
 
-- **Despliegue**: se **eliminó el actor** que figuraba erróneamente (un diagrama de despliegue es una vista física y no lleva actores ni casos de uso). El cliente pasó a representarse como un **nodo `<<device>>`** con el navegador/Postman como artefacto. Los contenedores se modelan como nodos `<<execution environment>>`, los `.jar` como `<<artifact>>`, y las conexiones como *communication paths* rotulados con el protocolo (`<<HTTP>>` / `<<HTTPS>>`).
-- **Componentes**: las integraciones entre servicios dejaron de representarse con flechas directas entre componentes internos y ahora usan **interfaces provistas (lollipop ○—)** y **requeridas (dependencia `..>` «use»)**, que es la notación canónica de un diagrama de componentes. Cada servicio sigue siendo un *package* con sus componentes internos estereotipados. Las notas de *hallazgos* (bugs) se movieron a este README para dejar el diagrama limpio.
-- **Casos de uso**: las asociaciones actor–caso de uso pasaron a ser **líneas simples sin punta de flecha**; se agregó el **límite del sistema** (`rectangle "DonaTrack"`); y las relaciones `<<include>>`/`<<extend>>` se corrigieron en dirección y semántica (p. ej. *Reportar Entrega No Satisfactoria* **extiende** a *Registrar Recepción de Envío*, por ser el flujo excepcional).
-- **Dominio**: se corrigió una imprecisión de agregación/composición (un `Bien` no puede estar en **composición** —propiedad exclusiva del ciclo de vida— desde `Donacion` y `DonacionSegmentada` a la vez; la segmentada pasó a **agregación**).
+- **Diagramas de servicio → módulo completo con todas las capas**: cada diagrama por servicio se envolvió en un **componente UML** y ahora incluye, además del `domain`, los packages reales `controllers`, `services`, `repositories`, `clients` y `tasks` (según corresponda). El cableado muestra la semántica de capas: **controller → service**, **service → repository** y **service → clases de dominio**, y los `clients`/`tasks` hacia los servicios externos.
+- **Dominio — packages reales**: los packages reflejan la estructura Java real (PlantUML los anida automáticamente por su nombre con puntos): `domain.persona`, `domain.notificadores.email.providers`, `domain.planificacion`, `domain.misiones`, etc., en lugar de agrupaciones conceptuales inventadas.
+- **Despliegue**: se **eliminó el actor** (vista física, sin actores). Cliente como nodo `<<device>>`; contenedores como `<<execution environment>>`; `.jar` como `<<artifact>>`; conexiones como *communication paths* con protocolo (`<<HTTP>>` / `<<HTTPS>>`).
+- **Componentes**: integraciones entre servicios con **interfaces provistas (lollipop ○—)** y **requeridas (dependencia `..>` «use»)**.
+- **Casos de uso**: asociaciones actor–caso como **líneas simples sin punta de flecha**; **límite del sistema**; `<<include>>`/`<<extend>>` con dirección correcta.
+- **Dominio — agregación/composición**: `Bien` pasó de composición a **agregación** desde `DonacionSegmentada` (no puede tener dos dueños de ciclo de vida).
 
-## Justificación de diseño: dominio separado por servicio, arquitectura y despliegue únicos
+## Justificación de diseño: un módulo por servicio, arquitectura y despliegue únicos
 
-Esta asimetría es intencional y refleja la propia arquitectura distribuida de DonaTrack, no una decisión arbitraria de documentación:
+- **Un diagrama de módulo por servicio** porque cada servicio (Donaciones, Incentivos, Notificaciones, Logística) es un **bounded context independiente** (módulo Maven separado), con su propio dominio, sus propias capas y su propio ciclo de vida. La consigna pide "un diagrama de clases por servicio"; mostrar cada servicio como un módulo con sus capas hace explícita la arquitectura en capas (controllers/services/repositories) de cada uno sin mezclar dominios que en el código no se referencian por objetos sino por HTTP.
 
-- **El dominio se modela un diagrama por servicio** porque cada servicio (Donaciones, Incentivos, Notificaciones, Logística) es un **bounded context independiente**, con su propio modelo de objetos, su propio ciclo de vida y su propio código base (módulo Maven separado). Mezclar los 4 dominios en un único diagrama de clases:
-  - Ocultaría que, por ejemplo, `Donaciones` y `Logística` modelan la "recepción de una entrega" con dos entidades completamente distintas y desacopladas (`DonacionSegmentada` vs. `Envio`) — justamente porque la consigna exige que Logística no dependa de Donaciones.
-  - Forzaría relaciones de objeto directas entre agregados de distintos servicios que **no existen en el código real** (la comunicación real es HTTP entre procesos independientes, no una asociación de objetos en memoria).
-  - Sería ilegible: solo el dominio de Donaciones ya tiene ~40 clases.
-  - No es lo que la cátedra evalúa en esta sección: la consigna pide explícitamente "un diagrama de clases por servicio".
+- **La arquitectura (componentes) y el despliegue en un único diagrama** porque describen la **solución distribuida como un todo**: las integraciones cruzadas, los protocolos entre nodos y los puntos de acoplamiento. La consigna lo pide así: "diagrama de componentes y diagrama de despliegue **de la solución completa**".
 
-- **La arquitectura (componentes) y el despliegue se modelan en un único diagrama** porque describen la **solución distribuida como un todo**: su valor está precisamente en mostrar cómo los servicios —cada uno con su propio dominio interno— se integran entre sí y con sistemas externos (N8N, Browserless, LinkedIn, Google Sheets) y cómo se distribuyen físicamente (contenedores Docker en Render, proceso local para Logística, contenedores locales de n8n/browserless). Partir estos diagramas por servicio haría invisible la información más importante que aportan: las integraciones cruzadas, los protocolos entre nodos y los puntos de acoplamiento real del sistema. La propia consigna lo pide así: "debe presentarse el diagrama de componentes y diagrama de despliegue **de la solución completa**".
+- **El diagrama de casos de uso es único** porque los actores interactúan con el sistema como un todo; se usan *packages* internos para trazar cada caso de uso a su servicio.
 
-- **El diagrama de casos de uso es único** porque los actores (persona donante, entidad beneficiaria, administradora, chofer) interactúan con el sistema como un todo, sin necesidad de conocer en qué servicio se resuelve cada caso de uso; se usan *packages* UML internos dentro del límite del sistema para mantener la trazabilidad hacia el servicio de negocio que lo implementa, sin fragmentar el diagrama.
+## Hallazgos documentados durante el relevamiento
 
-## Hallazgos documentados durante el relevamiento (útiles para "Revisión general de aspectos destacados de Entrega 1 y 2")
-
-Estos hallazgos surgieron de leer el código fuente real. No se corrigieron (no era parte del alcance de esta tarea de documentación):
+Surgieron de leer el código real. No se corrigieron (fuera del alcance de esta tarea de documentación):
 
 1. **`LogisticaRestClient` (servicio-donaciones) arma la URL sin el prefijo `/api/logistica`**: hace `POST {services.logistica.url}/planificar`, pero `LogisticaController` expone `POST /api/logistica/planificar`.
 2. **El flujo N8N de ranking mensual llama a `GET /perfil/ranking`**, pero el endpoint real en `IncentivosController` es `GET /incentivos/ranking`.
-3. **`servicio-incentivos` declara una dependencia Maven de compilación y `scanBasePackages` sobre `servicio-notificaciones` (y también sobre `servicio-donaciones`)**, además de `commons`. Esto embebe los beans de Notificaciones dentro del proceso de Incentivos, aunque en runtime la comunicación observada sigue siendo HTTP hacia el proceso independiente de Notificaciones (puerto 8082) vía `NotificacionRestClient`.
-4. **`servicio-logistica` no tiene `Dockerfile` propio ni entrada en `render.yaml`**, a diferencia de los otros 3 servicios. Se documentó en el diagrama de despliegue como proceso Java sobre la JVM local, en lugar de inventar una configuración Docker inexistente.
-5. **Acoplamiento por configuración a `localhost`**: las URLs de integración entre servicios (`services.incentivos.url`, `services.donaciones.url`, `services.logistica.url`, `n8n.webhook.url`) están hardcodeadas a `localhost` en los `application.yml/.properties`. Funciona en desarrollo local; en Render (donde cada servicio corre en un host público distinto) requiere sobreescribir esas variables por entorno.
-6. **Ningún servicio tiene persistencia real configurada** (no hay `spring.datasource.*` en ningún módulo): los 4 servicios usan colecciones en memoria (`List`, `ArrayList`, `ConcurrentHashMap`, `CopyOnWriteArrayList`). Por eso ningún diagrama de arquitectura incluye un componente de base de datos — se documentó con una nota en vez de representar algo que no existe.
-7. **`servicio-logistica/pom.xml` declara la dependencia `spring-boot-starter-data-jpa`** pero no se usa en ningún lado del código (no hay `@Entity` ni configuración de datasource).
+3. **`servicio-incentivos` declara dependencia Maven y `scanBasePackages` sobre `servicio-notificaciones` y `servicio-donaciones`** además de `commons`, embebiendo beans de Notificaciones en su proceso, aunque en runtime la comunicación observada es HTTP hacia el proceso independiente (puerto 8082).
+4. **`servicio-logistica` no tiene `Dockerfile` propio ni entrada en `render.yaml`**. Se documentó como proceso Java sobre la JVM local.
+5. **Acoplamiento por configuración a `localhost`** en las URLs de integración; en Render requieren sobreescribirse por entorno.
+6. **Ningún servicio tiene persistencia real** (`spring.datasource.*` ausente): colecciones en memoria.
+7. **`servicio-logistica/pom.xml` declara `spring-boot-starter-data-jpa`** sin usarlo (no hay `@Entity`).
 
 ## Cómo se renderizaron los diagramas
 
-Los `.png` de este directorio ya están generados y versionados. Se renderizaron localmente con:
-
 ```bash
 # PlantUML 1.2026.6 (jar oficial: https://github.com/plantuml/plantuml/releases)
-java -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.jar docs/uml/domain/*.puml
+java -DPLANTUML_LIMIT_SIZE=32768 -jar plantuml.jar docs/uml/domain/*.puml
 java -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.jar docs/uml/architecture/*.puml
 java -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.jar docs/uml/casos-de-uso/*.puml
 ```
 
-> **Nota:** el flag `-DPLANTUML_LIMIT_SIZE=16384` es necesario porque el diagrama de dominio de Donaciones y el de componentes superan el límite por defecto de PlantUML (4096 px de ancho), lo que generaría un PNG recortado sin avisar.
+> **Nota:** el flag `-DPLANTUML_LIMIT_SIZE` (16384 / 32768) es necesario porque el módulo de Donaciones y el de componentes superan el límite por defecto de PlantUML (4096 px), lo que generaría un PNG recortado sin avisar.
 
-### Si necesitás volver a renderizar
-
-**Opción A — jar local (la que se usó acá):**
-```bash
-curl -L -o plantuml.jar https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar
-java -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.jar docs/uml/**/*.puml
-```
-
-**Opción B — Docker (sin instalar nada):**
-```bash
-docker run --rm -v "${PWD}:/data" plantuml/plantuml -tpng /data/docs/uml/domain/*.puml
-```
-
-**Opción C — VS Code:** extensión "PlantUML" (jebbs.plantuml), `Alt+D` para previsualizar. Requiere Java y Graphviz instalados, o el server remoto configurado por la extensión.
-
-**Opción D — online:** pegar el contenido del `.puml` (con el `!include ../_style.puml` reemplazado inline, ya que el editor online no resuelve rutas relativas) en https://www.plantuml.com/plantuml/uml/.
+### Alternativas de render
+- **Docker:** `docker run --rm -v "${PWD}:/data" plantuml/plantuml -tpng /data/docs/uml/domain/*.puml`
+- **VS Code:** extensión "PlantUML" (jebbs.plantuml), `Alt+D`.
+- **Online:** https://www.plantuml.com/plantuml/uml/ (reemplazando el `!include ../_style.puml` inline).
 
 ---
 
 ## 1. Estilo compartido — `_style.puml`
-
-Todos los diagramas incluyen este archivo con `!include ../_style.puml` para mantener una paleta de colores y tipografía consistente entre el modelo de dominio, la arquitectura y los casos de uso.
 
 ```plantuml
 ' =========================================================
@@ -212,419 +194,292 @@ skinparam ranksep 55
 
 ---
 
-## 2. Modelo de Dominio — Servicio de Donaciones
+## 2. Módulo servicio-donaciones
 
-![Dominio Donaciones](domain/donaciones.png)
+![Módulo Donaciones](domain/donaciones.png)
 
-Excluye deliberadamente controllers, services de orquestación, repositories y DTOs. Incluye 3 patrones de diseño: **Strategy** (`AlgoritmoAsignacion` con sus dos implementaciones de matchmaking), **Facade** (`ServicioMatchmaking`, que orquesta ambas estrategias) y **Template Method** (`Bien.getClaveAgrupacion()` sobre el hook `getCriterioSegmentacion()`), además del **puerto de dominio** `DonacionEventPublisher` (Observer desacoplado de infraestructura) y el **State** implícito de `DonacionSegmentada`/`EstadoDonacionSegmentada`.
+El módulo completo con sus capas reales: `controllers` (7), `services` (8, incluye el `HttpDonacionEventPublisher` como Adapter y `LogisticaPollingTask` como Scheduled), `repositories` (4), `clients` (`LogisticaRestClient`), `tasks` (2 crons) y `domain` (9 sub-packages). Cableado: cada controller usa su service; los services usan sus repositories y las raíces de agregado del dominio; el `HttpDonacionEventPublisher` implementa el puerto `DonacionEventPublisher` y sale hacia Incentivos; los clients/tasks salen hacia Logística y (vía `commons.NotificacionRestClient`) hacia Notificaciones. Patrones: **Strategy** (`AlgoritmoAsignacion`), **Facade** (`ServicioMatchmaking`), **Template Method** (`Bien`), **State** (`DonacionSegmentada`) y **puerto/Observer** (`DonacionEventPublisher`).
 
 ```plantuml
 @startuml donaciones
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Donaciones\n(Donantes, Bienes, Donaciones, Necesidades, Asignación)
+title Módulo servicio-donaciones\n(capas controllers / services / repositories / clients / tasks / domain, según el código)
 
-package "Personas y Donantes" {
-    abstract class Persona {
-        -id: Long
-        -direccion: Direccion
-        -medioDeContacto: Map<String, List<String>>
-        -medioPredeterminado: Map<String, String>
-        -fechaUltimaInteraccion: LocalDateTime
-        --
-        +agregarMedioDeContacto(clave, valor)
-        +getTipoNotificadorPreferido(): TipoNotificador
-        +getContactoPredeterminado(): String
-        +{static} nextId(): Long
+skinparam componentStyle uml2
+
+component "servicio-donaciones" as Modulo {
+
+    package "controllers" {
+        class DonanteController <<Controller>>
+        class DonacionController <<Controller>>
+        class DonacionSegmentadaController <<Controller>>
+        class EndidadBeneficiariaController <<Controller>>
+        class NecesidadController <<Controller>>
+        class MatchmakingController <<Controller>>
+        class TrazabilidadController <<Controller>>
     }
 
-    class PersonaHumana extends Persona {
-        -nombre: String
-        -apellido: String
-        -genero: String
-        -fechaNacimiento: Date
-        -edad: Integer
-        -nroDocumento: String
+    package "services" {
+        class DonanteService <<Service>>
+        class DonacionService <<Service>>
+        class EntidadBeneficiariaService <<Service>>
+        class NecesidadService <<Service>>
+        class MatchmakingService <<Service>>
+        class TrazabilidadService <<Service>>
+        class HttpDonacionEventPublisher <<Adapter>>
+        class LogisticaPollingTask <<Scheduled>>
     }
 
-    class PersonaJuridica extends Persona {
-        -razonSocial: String
-        -tipo: TipoOrganizacion
-        -cuit: String
-        -rubro: String
-        --
-        +agregarRepresentante(r: PersonaRepresentante)
+    package "repositories" {
+        class DonanteRepository <<Repository>>
+        class DonacionRepository <<Repository>>
+        class EntidadBeneficiariaRepository <<Repository>>
+        class NecesidadRepository <<Repository>>
     }
 
-    class PersonaRepresentante {
-        -nombre: String
-        -apellido: String
-        -nroDocumento: int
+    package "clients" {
+        class LogisticaRestClient <<Client>>
     }
 
-    enum TipoOrganizacion {
-        GUBERNAMENTAL
-        ONG
-        EMPRESA
-        INSTITUCION
+    package "tasks" {
+        class DonantesInactivosCron <<Scheduled>>
+        class DonacionesListasParaEntregarCron <<Scheduled>>
     }
 
-    class Donante {
-        -password: String
-        --
-        +getNombreCompleto(): String
+    package "domain.persona" {
+        abstract class Persona {
+            -id: Long
+            -medioDeContacto: Map
+            -fechaUltimaInteraccion: LocalDateTime
+            --
+            +getTipoNotificadorPreferido(): TipoNotificador
+        }
+        class PersonaHumana extends Persona
+        class PersonaJuridica extends Persona {
+            -razonSocial: String
+            +agregarRepresentante(r)
+        }
+        class PersonaRepresentante
+        enum TipoOrganizacion
+        enum TipoPersona
     }
 
-    class PerfilDonante {
-        -visibilidadInsignia: boolean
-        -misionActualId: Long
-        -insigniasGanadas: List<String>
-        -progreso: Double
-        -nivelDonante: Nivel
-        --
-        +registrarEntrega(segmentada: DonacionSegmentada)
-        +contarCategoriasUnicas(): int
-        +calcularRachaMeses(): int
-        +calcularDonacionesAEntidadesBeneficiarias(): int
-        +calcularCantidadDonacionesEntregadas(): int
+    package "domain.donante" {
+        class Donante {
+            -password: String
+            +getNombreCompleto(): String
+        }
+        class PerfilDonante {
+            -nivelDonante: Nivel
+            +registrarEntrega(segmentada)
+            +calcularRachaMeses(): int
+            +contarCategoriasUnicas(): int
+        }
+        class Metrica
+        class ItemHistoralDonaciones
+        class EntidadAyudada
     }
 
-    class Metrica {
-        -totalDonacionesExitosas: Integer
-        -categoriasAyudadas: List<CategoriaBien>
-        -misionesCompletadas: List<Long>
+    package "domain.bien" {
+        abstract class Bien {
+            #subCategoria: SubCategoria
+            +{abstract} getCriterioSegmentacion(): Object
+            +getClaveAgrupacion(): ClaveAgrupacion
+        }
+        class BienDuradero extends Bien
+        class BienPerecedero extends Bien
+        enum EstadoBien
+        enum CategoriaBien
+        class SubCategoria
+        class ClaveAgrupacion <<record>>
+        note top of Bien : **Template Method** sobre getCriterioSegmentacion()
     }
 
-    class ItemHistoralDonaciones {
-        -id: Long
-        -entidadBeneficiariaId: Long
-        -fecha: LocalDate
-        -categoria: CategoriaBien
-        -estado: EstadoDonacionSegmentada
+    package "domain.donacion" {
+        class Donacion {
+            -segmentar(bienes): List<DonacionSegmentada>
+            +getEstado(): EstadoDonacion
+        }
+        enum EstadoDonacion
+        class DonacionSegmentada {
+            -estado: EstadoDonacionSegmentada
+            +transicionar(nuevoEstado, actor, desc)
+            +asignar(entidad, actor)
+            +confirmarEntrega(id)
+            +registrarEntregaFallida(actor, just)
+            +transicionPosible(ant, nuevo): boolean
+        }
+        enum EstadoDonacionSegmentada
+        interface DonacionEventPublisher {
+            +publicar(event)
+        }
+        class DonacionEntregadaEvent <<record>>
+        note bottom of EstadoDonacionSegmentada : **State**: máquina de estados en transicionPosible()
+        note bottom of DonacionEventPublisher : **Puerto de dominio** (Observer desacoplado)
     }
 
-    class EntidadAyudada {
-        -entidadBeneficiariaId: Long
-        -donacionSegmentadaId: Long
+    package "domain.trazabilidad" {
+        class EventoTrazabilidad {
+            -estadoAnterior: EstadoDonacionSegmentada
+            -estadoNuevo: EstadoDonacionSegmentada
+            -fecha: LocalDateTime
+            -actor: String
+        }
+    }
+
+    package "domain.necesidad" {
+        abstract class NecesidadMaterial {
+            -cantidadObjetivo: int
+            -cantidadRecibida: int
+            +activo(): boolean
+            +recibirDonacion(donacion)
+        }
+        class NecesidadRecurrente extends NecesidadMaterial {
+            +enPeriodo(): boolean
+        }
+        class NecesidadExtraordinaria extends NecesidadMaterial
+        enum EstadoNecesidad
+    }
+
+    package "domain.entidad" {
+        class EntidadBeneficiaria {
+            +agregarNecesidad(n)
+            +implementarDonacion(donacion)
+        }
+    }
+
+    package "domain.asignacion" {
+        interface AlgoritmoAsignacion {
+            +rankear(donacion, entidades): List<EntidadBeneficiaria>
+        }
+        class AlgoritmoCompatibilidadSemantica
+        class AlgoritmoPrioridadSubAtendidos
+        class ServicioMatchmaking {
+            +ejecutar(donacion, entidades): ResultadoMatchmaking
+        }
+        class ResultadoMatchmaking
+        note bottom of AlgoritmoAsignacion : **Strategy** (2 criterios)
+        note bottom of ServicioMatchmaking : **Facade** que orquesta ambas estrategias
+    }
+
+    package "domain.ubicacion" {
+        class Direccion {
+            +getDireccion(): String
+        }
+        class Ciudad
+        class Provincia
+        class Pais
     }
 }
 
+package "commons (módulo compartido)" #F7F7F7 {
+    enum Nivel
+    enum TipoNotificador
+    enum Unidad
+    class NotificacionRestClient <<Client>>
+    class DonacionSegmentadaListaParaEntregarALogisticaDTO <<record>>
+}
+
+package "Sistemas externos" #EEEEEE {
+    class "servicio-incentivos" as ExtInc <<external>>
+    class "servicio-logistica" as ExtLog <<external>>
+    class "servicio-notificaciones" as ExtNot <<external>>
+}
+
+' ===================== Controllers -> Services =====================
+DonanteController ..> DonanteService
+DonacionSegmentadaController ..> DonanteService
+DonacionController ..> DonacionService
+EndidadBeneficiariaController ..> EntidadBeneficiariaService
+NecesidadController ..> NecesidadService
+MatchmakingController ..> MatchmakingService
+TrazabilidadController ..> TrazabilidadService
+
+' ===================== Services -> Repositories =====================
+DonanteService ..> DonanteRepository
+DonanteService ..> DonacionRepository
+DonacionService ..> DonacionRepository
+EntidadBeneficiariaService ..> EntidadBeneficiariaRepository
+NecesidadService ..> NecesidadRepository
+NecesidadService ..> EntidadBeneficiariaRepository
+MatchmakingService ..> DonacionRepository
+MatchmakingService ..> EntidadBeneficiariaRepository
+TrazabilidadService ..> DonacionRepository
+TrazabilidadService ..> DonanteRepository
+TrazabilidadService ..> EntidadBeneficiariaRepository
+HttpDonacionEventPublisher ..> DonanteRepository
+
+' ===================== Services -> Services =====================
+DonacionService ..> DonanteService
+DonacionService ..> EntidadBeneficiariaService
+DonacionService ..> DonacionEventPublisher : publica evento >
+LogisticaPollingTask ..> DonacionService
+LogisticaPollingTask ..> TrazabilidadService
+LogisticaPollingTask ..> DonacionRepository
+DonacionEventPublisher <|.. HttpDonacionEventPublisher
+
+' ===================== Services -> Dominio (raíces de agregado) =====================
+DonanteService ..> Donante
+DonacionService ..> Donacion
+EntidadBeneficiariaService ..> EntidadBeneficiaria
+NecesidadService ..> NecesidadMaterial
+MatchmakingService ..> ServicioMatchmaking
+TrazabilidadService ..> DonacionSegmentada
+
+' ===================== Tasks -> clients / services =====================
+DonacionesListasParaEntregarCron ..> LogisticaRestClient
+DonacionesListasParaEntregarCron ..> DonacionRepository
+DonantesInactivosCron ..> DonanteService
+
+' ===================== Uso de commons y sistemas externos =====================
+DonanteService ..> NotificacionRestClient
+EntidadBeneficiariaService ..> NotificacionRestClient
+TrazabilidadService ..> NotificacionRestClient
+DonantesInactivosCron ..> NotificacionRestClient
+NotificacionRestClient ..> ExtNot : HTTP POST /notificar
+HttpDonacionEventPublisher ..> ExtInc : HTTP POST /entrega
+LogisticaRestClient ..> ExtLog : HTTP POST /planificar
+LogisticaPollingTask ..> ExtLog : HTTP GET /rutas/eventos (polling)
+LogisticaRestClient ..> DonacionSegmentadaListaParaEntregarALogisticaDTO
+
+' ===================== Relaciones internas del dominio (resumen) =====================
 Persona <|-- PersonaHumana
 Persona <|-- PersonaJuridica
-PersonaJuridica "1" *-- "0..*" PersonaRepresentante : representantes
-PersonaJuridica --> TipoOrganizacion
-Donante "1" *-- "1" Persona : persona
-Donante "1" *-- "1" PerfilDonante : perfil
-PerfilDonante "1" *-- "1" Metrica : metricasPerfil
-PerfilDonante "1" *-- "0..*" ItemHistoralDonaciones : historialDonaciones
-Metrica "1" o-- "0..*" EntidadAyudada : entidadesAyudadas
-
-package "Bienes" {
-    abstract class Bien {
-        #nombre: String
-        #descripcion: String
-        #foto: String
-        #subCategoria: SubCategoria
-        --
-        +{abstract} getCriterioSegmentacion(): Object
-        +getClaveAgrupacion(): ClaveAgrupacion
-    }
-
-    class BienDuradero extends Bien {
-        -estado: EstadoBien
-        +getCriterioSegmentacion(): Object
-    }
-
-    class BienPerecedero extends Bien {
-        -fechaVencimiento: Date
-        +getCriterioSegmentacion(): Object
-    }
-
-    enum EstadoBien {
-        NUEVO
-        USADO
-    }
-
-    enum CategoriaBien {
-        MOBILIARIO
-        ALIMENTOS
-        VESTIMENTA
-        HIGIENE
-    }
-
-    class SubCategoria {
-        -categoria: CategoriaBien
-        -descripcion: String
-        -unidad: Unidad
-    }
-
-    class ClaveAgrupacion <<record>> {
-        +subCategoria: SubCategoria
-        +criterio: Object
-    }
-
-    note top of Bien
-        **Template Method**: getClaveAgrupacion() es el
-        método concreto que invoca el hook abstracto
-        getCriterioSegmentacion(), redefinido por cada
-        subclase (estado vs. fecha de vencimiento).
-    end note
-}
-
+Donante "1" *-- "1" Persona
+Donante "1" *-- "1" PerfilDonante
+PerfilDonante --> Nivel
 Bien <|-- BienDuradero
 Bien <|-- BienPerecedero
-Bien "0..*" --> "1" SubCategoria : subCategoria
-Bien ..> ClaveAgrupacion : construye >
-SubCategoria --> CategoriaBien
-BienDuradero --> EstadoBien
-
-package "Donación y Trazabilidad" {
-    class Donacion {
-        -id: Integer
-        -descripcion: String
-        -fechaIngreso: Date
-        --
-        -segmentar(bienes: List<Bien>): List<DonacionSegmentada>
-        +getEstado(): EstadoDonacion
-        +buscarPorSubcategoria(sub: SubCategoria): Optional<DonacionSegmentada>
-    }
-
-    enum EstadoDonacion {
-        PENDIENTE
-        ADJUDICADA
-    }
-
-    class DonacionSegmentada {
-        -id: Long
-        -cantidad: int
-        -estado: EstadoDonacionSegmentada
-        -donanteId: Long
-        -entidadBeneficiariaAsignadaId: Long
-        --
-        +transicionar(nuevoEstado, actor, descripcion)
-        +asignar(entidad: EntidadBeneficiaria, actor: String)
-        +listarParaEntrega(actor: String)
-        +iniciarTraslado(actor: String)
-        +confirmarEntrega(entidadBeneficiariaId: Long)
-        +registrarEntregaFallida(actor, justificacion)
-        +marcarVencida(actor: String)
-        +transicionPosible(anterior, nuevo): boolean
-        +getUltimoEvento(): EventoTrazabilidad
-    }
-
-    enum EstadoDonacionSegmentada {
-        EN_DEPOSITO
-        ASIGNACION_REALIZADA
-        LISTA_PARA_ENTREGAR
-        EN_TRASLADO
-        ENTREGADA
-        ENTREGA_FALLIDA
-        VENCIDA
-    }
-
-    interface DonacionEventPublisher {
-        +publicar(event: DonacionEntregadaEvent)
-    }
-
-    class DonacionEntregadaEvent <<record>>
-
-    class EventoTrazabilidad {
-        -estadoAnterior: EstadoDonacionSegmentada
-        -estadoNuevo: EstadoDonacionSegmentada
-        -fecha: LocalDateTime
-        -actor: String
-        -descripcion: String
-    }
-
-    note bottom of DonacionEventPublisher
-        **Puerto de dominio** (Observer desacoplado):
-        el dominio dispara el evento "donación entregada"
-        sin conocer que existe una llamada HTTP detrás.
-        Implementado por HttpDonacionEventPublisher
-        en la capa de aplicación (no se muestra aquí).
-    end note
-
-    note top of EstadoDonacionSegmentada
-        **State**: transicionPosible() en DonacionSegmentada
-        define, mediante un switch exhaustivo, la máquina
-        de estados finita de este enum.
-    end note
-}
-
-Donacion "1" o-- "1" Donante : donante
-Donacion "1" *-- "1..*" Bien : bienes
-Donacion "1" *-- "1..*" DonacionSegmentada : donacionesSegmentadas
-Donacion --> EstadoDonacion : deriva >
-DonacionSegmentada "1" o-- "1..*" Bien : bienes
-DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad : historial
-DonacionSegmentada --> EstadoDonacionSegmentada : estado
+Bien --> SubCategoria
+SubCategoria --> Unidad
+Donacion "1" *-- "1..*" DonacionSegmentada
+Donacion "1" o-- "1" Donante
+DonacionSegmentada --> EstadoDonacionSegmentada
+DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad
 DonacionSegmentada ..> EntidadBeneficiaria : asigna >
-
-package "Necesidades y Entidad Beneficiaria" {
-    abstract class NecesidadMaterial {
-        -id: Long
-        -entidadBeneficiariaId: Long
-        -subCategoria: SubCategoria
-        -fechaDelPedido: Date
-        -cantidadObjetivo: int
-        -cantidadRecibida: int
-        -estado: EstadoNecesidad
-        --
-        +activo(): boolean
-        +cantidadFaltanteDelPedido(): int
-        +recibirDonacion(donacion: DonacionSegmentada)
-        +recibirBienes(cantidad: int)
-        +finalizarNecesidad()
-    }
-
-    class NecesidadRecurrente extends NecesidadMaterial {
-        -dias: int
-        --
-        +enPeriodo(): boolean
-        +activo(): boolean
-    }
-
-    class NecesidadExtraordinaria extends NecesidadMaterial {
-        -causa: String
-        --
-        +adeudadas(): int
-    }
-
-    enum EstadoNecesidad {
-        ACTIVO
-        SATISFECHO
-        INSATISFECHO
-    }
-
-    class EntidadBeneficiaria {
-        --
-        +agregarNecesidad(necesidad: NecesidadMaterial)
-        +removerNecesidad(necesidad: NecesidadMaterial)
-        +getCantNecesidades(): int
-        +getCantNececidadesActivas(): int
-        +implementarDonacion(donacion: DonacionSegmentada)
-    }
-
-    note top of NecesidadRecurrente
-        activo() sobrescribe el comportamiento heredado:
-        una necesidad recurrente deja de estar activa
-        (y se finaliza) si venció su período (dias).
-    end note
-}
-
 NecesidadMaterial <|-- NecesidadRecurrente
 NecesidadMaterial <|-- NecesidadExtraordinaria
-NecesidadMaterial --> EstadoNecesidad : estado
-NecesidadMaterial "0..*" --> "1" SubCategoria : subCategoria
-NecesidadMaterial "1" o-- "0..*" DonacionSegmentada : donaciones recibidas
-EntidadBeneficiaria "1" *-- "1" PersonaJuridica : datosDeEntidad
-EntidadBeneficiaria "1" *-- "0..*" NecesidadMaterial : nececidades
-
-package "Asignación de Donaciones" {
-    interface AlgoritmoAsignacion {
-        +rankear(donacion: DonacionSegmentada, entidades: List<EntidadBeneficiaria>): List<EntidadBeneficiaria>
-    }
-
-    class AlgoritmoCompatibilidadSemantica {
-        +rankear(donacion, entidades): List<EntidadBeneficiaria>
-    }
-
-    class AlgoritmoPrioridadSubAtendidos {
-        +rankear(donacion, entidades): List<EntidadBeneficiaria>
-    }
-
-    class ServicioMatchmaking {
-        -algoritmos: List<AlgoritmoAsignacion>
-        --
-        +ejecutar(donacion: DonacionSegmentada, entidades): ResultadoMatchmaking
-        +ejecutarTodas(donaciones, entidades): List<ResultadoMatchmaking>
-    }
-
-    class ResultadoMatchmaking {
-        -huboCoincidencias: boolean
-        --
-        +getEntidadesPropuestas(): List<EntidadBeneficiaria>
-    }
-
-    note left of AlgoritmoAsignacion
-        **Strategy**: dos criterios intercambiables
-        para rankear hasta 10 entidades beneficiarias
-        candidatas a recibir una donación.
-    end note
-
-    note bottom of ServicioMatchmaking
-        **Facade**: orquesta ambas estrategias sobre
-        una misma donación y combina los resultados
-        (intersección de rankings) en un único objeto.
-    end note
-}
-
+EntidadBeneficiaria "1" *-- "1" PersonaJuridica
+EntidadBeneficiaria "1" *-- "0..*" NecesidadMaterial
 AlgoritmoAsignacion <|.. AlgoritmoCompatibilidadSemantica
 AlgoritmoAsignacion <|.. AlgoritmoPrioridadSubAtendidos
-ServicioMatchmaking "1" o-- "2" AlgoritmoAsignacion : algoritmos
-ServicioMatchmaking ..> ResultadoMatchmaking : crea >
-ResultadoMatchmaking "1" o-- "0..*" EntidadBeneficiaria : propuestas
-
-package "Ubicación" {
-    class Direccion {
-        -calle1: String
-        -calle2: String
-        -altura: int
-        -piso: int
-        -departamento: String
-        --
-        +getDireccion(): String
-    }
-
-    class Ciudad {
-        -nombre: String
-    }
-
-    class Provincia {
-        -nombre: String
-    }
-
-    class Pais {
-        -nombre: String
-    }
-}
-
-Direccion "1" --> "1" Ciudad : ciudad
-Ciudad "1" --> "1" Provincia : provincia
-Provincia "1" --> "1" Pais : pais
-Persona "1" *-- "1" Direccion : direccion
-
-package "commons (compartido entre servicios)" #F7F7F7 {
-    enum Nivel {
-        COLABORADOR
-        SOSTENEDOR
-        TRANSFORMADOR
-    }
-
-    enum TipoNotificador {
-        EMAIL
-        SMS
-        WHATSAPP
-    }
-
-    enum Unidad {
-        UNIDADES
-        KG
-        METROS
-        LITROS
-    }
-}
-
-PerfilDonante --> Nivel : nivelDonante
-SubCategoria --> Unidad : unidad
-Persona ..> TipoNotificador : retorna >
+ServicioMatchmaking "1" o-- "2" AlgoritmoAsignacion
+Persona "1" *-- "1" Direccion
 
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
+    | <<Client>> | Cliente HTTP saliente |
+    | <<Scheduled>> | Tarea programada (@Scheduled) |
+    | <<Adapter>> | Adaptador evento de dominio → HTTP |
     | <back:#FFF3E0>     </back> | Interfaz (Strategy / puerto) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
+    | <<external>> | Servicio externo al módulo |
 endlegend
 
 @enduml
@@ -632,90 +487,134 @@ endlegend
 
 ---
 
-## 3. Modelo de Dominio — Servicio de Incentivos
+## 3. Módulo servicio-incentivos
 
-![Dominio Incentivos](domain/incentivos.png)
+![Módulo Incentivos](domain/incentivos.png)
 
-Patrón **Strategy / Template Method por herencia**: `Mision` es abstracta y cada una de las 4 misiones concretas define su propia regla de progreso (`calcularNuevoProgreso`) y de cumplimiento (`estaCumplida`), permitiendo que la capa de aplicación opere polimórficamente sobre la "misión actual" sin `switch`/`instanceof`.
+Capas `controllers` (IncentivosController), `services` (IncentivosService, ServicioRanking), `repositories` (MisionRepository), `clients` (DonacionesRestClient, InsigniasRestClient) y `domain.misiones`. Cableado: el controller usa ambos services; `IncentivosService` consulta el repositorio de misiones, evalúa el cumplimiento sobre `Mision` (Strategy/Template Method) y sale hacia Donaciones, N8N y Notificaciones vía sus clients; `ServicioRanking` lee donantes de Donaciones.
 
 ```plantuml
 @startuml incentivos
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Incentivos\n(Misiones, Insignias y Categorías de Donante)
+title Módulo servicio-incentivos\n(capas controllers / services / repositories / clients / domain, según el código)
 
-abstract class Mision {
-    -id: Long
-    -objetivo: int
-    -nivel: Nivel
-    -titulo: String
-    -descripcion: String
-    -orden: int
-    --
-    +tieneSiguiente(): boolean
-    +{abstract} calcularNuevoProgreso(entrega, indicadores): double
-    +{abstract} estaCumplida(entrega, indicadores): boolean
+skinparam componentStyle uml2
+
+component "servicio-incentivos" as Modulo {
+
+    package "controllers" {
+        class IncentivosController <<Controller>> {
+            +procesarEntrega(dto): EvaluacionMisionResponseDTO
+            +obtenerRanking(): List<RankingItemDTO>
+        }
+    }
+
+    package "services" {
+        class IncentivosService <<Service>> {
+            +procesarNuevaEntrega(dto): EvaluacionMisionResponseDTO
+        }
+        class ServicioRanking <<Service>> {
+            +obtenerRankingCompleto(): List<RankingItemDTO>
+        }
+    }
+
+    package "repositories" {
+        class MisionRepository <<Repository>> {
+            +findById(id): Mision
+            +findSiguiente(misionActualId): Mision
+        }
+    }
+
+    package "clients" {
+        class DonacionesRestClient <<Client>> {
+            +obtenerIndicadores(...): IndicadoresDonanteDTO
+            +obtenerTodosDonantes(): List
+            +obtenerDatosParaNotificar(id): NotificacionRequestDTO
+        }
+        class InsigniasRestClient <<Client>> {
+            +notificarInsigniaObtenida(user, mision, desc)
+        }
+    }
+
+    package "domain.misiones" {
+        abstract class Mision {
+            -id: Long
+            -objetivo: int
+            -nivel: Nivel
+            -titulo: String
+            -orden: int
+            --
+            +tieneSiguiente(): boolean
+            +{abstract} calcularNuevoProgreso(entrega, indicadores): double
+            +{abstract} estaCumplida(entrega, indicadores): boolean
+        }
+        class MisionRacha extends Mision
+        class MisionCompletitud extends Mision
+        class MisionHabilDonador extends Mision
+        class MisionDonacionesExitosas extends Mision {
+            +tieneSiguiente(): boolean
+        }
+
+        note top of Mision
+            **Strategy / Template Method por herencia**: cada subclase
+            define su regla de progreso y de cumplimiento; el servicio
+            opera polimórficamente sobre la "misión actual" sin
+            switch/instanceof.
+        end note
+    }
 }
 
-class MisionRacha extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionCompletitud extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionHabilDonador extends Mision {
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-class MisionDonacionesExitosas extends Mision {
-    +tieneSiguiente(): boolean
-    +calcularNuevoProgreso(entrega, indicadores): double
-    +estaCumplida(entrega, indicadores): boolean
-}
-
-note top of Mision
-    **Strategy / Template Method por herencia**: cada
-    subclase define su propia regla de progreso y de
-    cumplimiento. El servicio de aplicación (fuera de
-    este diagrama) opera de forma polimórfica sobre la
-    "misión actual" del donante, sin switch/instanceof.
-    Las 4 misiones concretas y su orden de progresión
-    (1→4) están catalogadas en un repositorio en memoria.
-end note
-
-note right of MisionDonacionesExitosas
-    Única misión sin siguiente en la cadena
-    (tieneSiguiente() = false): es el techo de
-    la progresión secuencial de misiones.
-end note
-
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     class Insignia {
         -titulo: String
         -descripcion: String
         -fechaObtencion: Date
     }
-
     enum Nivel {
         COLABORADOR
         SOSTENEDOR
         TRANSFORMADOR
     }
+    class NotificacionRestClient <<Client>>
 }
 
+package "Sistemas externos" #EEEEEE {
+    class "servicio-donaciones" as ExtDon <<external>>
+    class "N8N — webhook insignias" as ExtN8N <<external>>
+    class "servicio-notificaciones" as ExtNot <<external>>
+}
+
+' ===================== Cableado entre capas =====================
+IncentivosController ..> IncentivosService : usa >
+IncentivosController ..> ServicioRanking : usa >
+IncentivosService ..> MisionRepository : consulta misiones >
+IncentivosService ..> DonacionesRestClient : pide indicadores >
+IncentivosService ..> InsigniasRestClient : notifica insignia >
+IncentivosService ..> NotificacionRestClient : despacha notificación >
+IncentivosService ..> Mision : evalúa cumplimiento >
+ServicioRanking ..> DonacionesRestClient : lee donantes >
+MisionRepository ..> Mision : cataloga >
+
+' ===================== Dominio =====================
 Mision "1" *-- "1" Insignia : insigniaAsociada
 Mision --> Nivel : nivel
 
+' ===================== Clients -> sistemas externos =====================
+DonacionesRestClient ..> ExtDon : HTTP GET
+InsigniasRestClient ..> ExtN8N : HTTP POST webhook
+NotificacionRestClient ..> ExtNot : HTTP POST /notificar
+
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
+    | <<Client>> | Cliente HTTP saliente (RestTemplate) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
+    | <<external>> | Servicio externo al módulo |
 endlegend
 
 @enduml
@@ -723,115 +622,143 @@ endlegend
 
 ---
 
-## 4. Modelo de Dominio — Servicio de Notificaciones
+## 4. Módulo servicio-notificaciones
 
-![Dominio Notificaciones](domain/notificaciones.png)
+![Módulo Notificaciones](domain/notificaciones.png)
 
-**Strategy anidado en dos niveles**: nivel 1 (medio de envío) resuelto por `iNotificador`/`NotificadorEmail`/`NotificadorSMS`/`NotificadorWhatsApp`; nivel 2 (proveedor concreto) delegado por composición a `iEmailProvider`/`iSMSProvider`/`iWhatsAppProvider` — un diseño también interpretable como **Bridge** entre "qué medio se eligió" y "cómo se envía realmente".
+Capas `controllers` (NotificacionController), `services` (NotificacionService), `repositories` (NotificacionRepository) y `domain` (`domain.entities` + `domain.notificadores.{email,sms,whatsapp}` con el sub-package `email.providers`). Sin clients (es el destino de las notificaciones). Cableado: el controller usa el service; el service persiste en el repositorio y selecciona el `iNotificador` cuyo `getMedio()` coincide. **Strategy de dos niveles / Bridge**: medio de envío (nivel 1) y proveedor concreto (nivel 2).
 
 ```plantuml
 @startuml notificaciones
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Notificaciones\n(Strategy anidado por medio y por proveedor)
+title Módulo servicio-notificaciones\n(capas controllers / services / repositories / domain, según el código)
 
-class Notificacion {
-    -id: Long
-    -id_persona: Long
-    -asunto: String
-    -mensaje: String
-    -destinatario: String
-    -fecha: LocalDateTime
+skinparam componentStyle uml2
+
+component "servicio-notificaciones" as Modulo {
+
+    package "controllers" {
+        class NotificacionController <<Controller>> {
+            +notificar(body: NotificacionRequestDTO)
+            +listarTodas()
+            +listarPorPersona(idPersona: Long)
+        }
+    }
+
+    package "services" {
+        class NotificacionService <<Service>> {
+            +notificar(body: NotificacionRequestDTO)
+            +buscar(idPersona: Long): List<Notificacion>
+            +buscarTodas(): List<Notificacion>
+            -seleccionarNotificador(medio): Optional<iNotificador>
+        }
+    }
+
+    package "repositories" {
+        class NotificacionRepository <<Repository>> {
+            +save(n: Notificacion): Notificacion
+            +findByIdPersona(id: Long): List<Notificacion>
+            +findAll(): List<Notificacion>
+        }
+    }
+
+    package "domain.entities" {
+        class Notificacion {
+            -id: Long
+            -id_persona: Long
+            -asunto: String
+            -mensaje: String
+            -destinatario: String
+            -fecha: LocalDateTime
+        }
+
+        interface iNotificador {
+            +enviarNotificacion(destinatario, mensaje, asunto)
+            +getMedio(): TipoNotificador
+        }
+    }
+
+    package "domain.notificadores.email" {
+        interface iEmailProvider {
+            +enviarEmail(destinatario, mensaje, asunto)
+        }
+        class NotificadorEmail {
+            +getMedio(): TipoNotificador
+        }
+        class EmailProvider
+        package "providers" {
+            class Resend
+        }
+    }
+
+    package "domain.notificadores.sms" {
+        interface iSMSProvider {
+            +enviarSMS(numero, mensaje)
+        }
+        class NotificadorSMS {
+            +getMedio(): TipoNotificador
+        }
+        class SMSProvider
+    }
+
+    package "domain.notificadores.whatsapp" {
+        interface iWhatsAppProvider {
+            +enviarWhatsApp(numero, mensaje)
+        }
+        class NotificadorWhatsApp {
+            +getMedio(): TipoNotificador
+        }
+        class WhatsAppProvider
+    }
 }
 
-interface iNotificador {
-    +enviarNotificacion(destinatario: String, mensaje: String, asunto: String)
-    +getMedio(): TipoNotificador
-}
-
-class NotificadorEmail {
-    +enviarNotificacion(destinatario, mensaje, asunto)
-    +getMedio(): TipoNotificador
-}
-
-class NotificadorSMS {
-    +enviarNotificacion(destinatario, mensaje, asunto)
-    +getMedio(): TipoNotificador
-}
-
-class NotificadorWhatsApp {
-    +enviarNotificacion(destinatario, mensaje, asunto)
-    +getMedio(): TipoNotificador
-}
-
-interface iEmailProvider {
-    +enviarEmail(destinatario, mensaje, asunto)
-}
-
-interface iSMSProvider {
-    +enviarSMS(numero, mensaje)
-}
-
-interface iWhatsAppProvider {
-    +enviarWhatsApp(numero, mensaje)
-}
-
-class EmailProvider {
-    +enviarEmail(destinatario, mensaje, asunto)
-}
-
-class SMSProvider {
-    +enviarSMS(numero, mensaje)
-}
-
-class WhatsAppProvider {
-    +enviarWhatsApp(numero, mensaje)
-}
-
-iNotificador <|.. NotificadorEmail
-iNotificador <|.. NotificadorSMS
-iNotificador <|.. NotificadorWhatsApp
-
-iEmailProvider <|.. EmailProvider
-iSMSProvider <|.. SMSProvider
-iWhatsAppProvider <|.. WhatsAppProvider
-
-NotificadorEmail "1" o-- "1" iEmailProvider : emailProvider
-NotificadorSMS "1" o-- "1" iSMSProvider : smsProvider
-NotificadorWhatsApp "1" o-- "1" iWhatsAppProvider : whatsappProvider
-
-iNotificador ..> TipoNotificador : getMedio() >
-
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     enum TipoNotificador {
         EMAIL
         SMS
         WHATSAPP
     }
+    class NotificacionRequestDTO <<DTO>>
 }
 
-note top of iNotificador
-    **Strategy (nivel 1 — medio de envío)**: el servicio
-    de aplicación selecciona la implementación filtrando
-    por getMedio() == TipoNotificador solicitado.
-end note
+' ===================== Cableado entre capas =====================
+NotificacionController ..> NotificacionService : usa >
+NotificacionService ..> NotificacionRepository : persiste >
+NotificacionService ..> iNotificador : selecciona por medio >
+NotificacionController ..> NotificacionRequestDTO
+NotificacionService ..> Notificacion : crea >
 
-note bottom of iEmailProvider
-    **Strategy anidado / Bridge (nivel 2 — proveedor concreto)**:
-    cada Notificador* delega el envío real en un proveedor
-    inyectado por composición, desacoplando "cómo se decide
-    el medio" de "cómo se envía efectivamente".
-    Hoy los 3 proveedores son simulaciones (imprimen por
-    consola); no hay integración real con un servicio
-    externo de email/SMS/WhatsApp todavía.
+' ===================== Realizaciones de dominio (Strategy) =====================
+iNotificador <|.. NotificadorEmail
+iNotificador <|.. NotificadorSMS
+iNotificador <|.. NotificadorWhatsApp
+iEmailProvider <|.. EmailProvider
+iEmailProvider <|.. Resend
+iSMSProvider <|.. SMSProvider
+iWhatsAppProvider <|.. WhatsAppProvider
+NotificadorEmail "1" o-- "1" iEmailProvider : emailProvider
+NotificadorSMS "1" o-- "1" iSMSProvider : smsProvider
+NotificadorWhatsApp "1" o-- "1" iWhatsAppProvider : whatsappProvider
+iNotificador ..> TipoNotificador
+
+note as N1
+    **Strategy de dos niveles**: NotificacionService selecciona el
+    iNotificador cuyo getMedio() coincide con el TipoNotificador pedido
+    (nivel 1); cada Notificador* delega el envío en un proveedor concreto
+    inyectado por composición (nivel 2). Los 3 proveedores activos son
+    simulaciones; Resend es una impl. alternativa no wireada (sin @Component).
 end note
 
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
     | <back:#FFF3E0>     </back> | Interfaz (Strategy) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
 endlegend
 
 @enduml
@@ -839,148 +766,138 @@ endlegend
 
 ---
 
-## 5. Modelo de Dominio — Servicio de Logística
+## 5. Módulo servicio-logistica
 
-![Dominio Logística](domain/logistica.png)
+![Módulo Logística](domain/logistica.png)
 
-**Strategy** de planificación (`Planificacion`/`CapacidadFisica`, con espacio para incorporar nuevos criterios sin tocar el resto del servicio) y **State** implícito en `Envio`/`EstadoEnvio`. Incluye una nota explícita sobre el alcance acotado que exige la consigna: Logística no invoca a Donaciones, Incentivos ni Notificaciones.
+Capas `controllers` (LogisticaController, LogisticaEventController), `services` (LogisticaService), `repositories` (RutaRepository, LogisticaEventRepository) y `domain` (+ `domain.planificacion`). Sin clients (servicio pasivo por consigna). Cableado: `LogisticaController` usa el service; `LogisticaEventController` lee directamente el repositorio de eventos (es lo que consume Donaciones por polling); el service persiste rutas/eventos y delega la planificación en la Strategy `Planificacion`/`CapacidadFisica`.
 
 ```plantuml
 @startuml logistica
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Logística\n(Flota, Rutas, Envíos y Planificación)
+title Módulo servicio-logistica\n(capas controllers / services / repositories / domain, según el código)
 
-package "Flota y Rutas" {
-    class Camion {
-        -id: Long
-        -patente: String
-        -marca: String
-        -modelo: String
-        -volumen: double
-        -altura: double
-        -capacidadCarga: double
+skinparam componentStyle uml2
+
+component "servicio-logistica" as Modulo {
+
+    package "controllers" {
+        class LogisticaController <<Controller>> {
+            +registrarCamion() / listarCamiones()
+            +registrarChofer() / listarChoferes()
+            +registrarEnvio() / listarEnvios()
+            +planificarRutas(lote)
+            +registrarRuta() / listarRutas()
+            +iniciarRuta(id)
+            +entregarEnvio(id) / fallarEnvio(id)
+        }
+        class LogisticaEventController <<Controller>> {
+            +obtenerEventos(): List<EventoLogistica>
+        }
     }
 
-    class Chofer {
-        -id: Long
-        -nombre: String
-        -apellido: String
-        -dni: String
+    package "services" {
+        class LogisticaService <<Service>> {
+            +planificarLote(lote)
+            +registrarCamion() / registrarChofer()
+            +registrarEnvio() / registrarRuta()
+            +iniciarRuta(id)
+            +registrarEntregaExitosa(id, detalles)
+            +registrarEntregaFallida(id, motivo)
+        }
     }
 
-    class Ruta {
-        -id: Long
-        -iniciada: Boolean
-        --
-        +iniciarRuta()
+    package "repositories" {
+        class RutaRepository <<Repository>> {
+            +save(r: Ruta) / saveAll()
+            +findById() / findAll() / delete()
+        }
+        class LogisticaEventRepository <<Repository>> {
+            +registrar(e: EventoLogistica)
+            +obtenerTodos(): List<EventoLogistica>
+        }
     }
 
-    class Parada {
-        -orden: Integer
-        -direccion: String
-        -enviosIds: List<Long>
-    }
+    package "domain" {
+        class Camion {
+            -id: Long
+            -patente: String
+            -volumen: double
+            -altura: double
+            -capacidadCarga: double
+        }
+        class Chofer {
+            -id: Long
+            -nombre: String
+            -apellido: String
+            -dni: String
+        }
+        class Ruta {
+            -id: Long
+            -iniciada: Boolean
+            --
+            +iniciarRuta()
+        }
+        class Parada {
+            -orden: Integer
+            -direccion: String
+            -enviosIds: List<Long>
+        }
+        class Envio {
+            -id: Long
+            -donacionSegmentadaId: Long
+            -entidadBeneficiariaId: Long
+            -estado: EstadoEnvio
+            --
+            +registrarRecepcionExitosa()
+            +registrarRecepcionFallida()
+        }
+        enum EstadoEnvio {
+            PENDIENTE
+            ASIGNACION_REALIZADA
+            EN_TRASLADO
+            ENTREGADA
+            NO_RECIBIDA
+        }
+        class EventoLogistica {
+            -tipoEvento: String
+            -donacionSegmentadaId: Long
+            -entidadBeneficiariaId: Long
+            -timestamp: LocalDateTime
+            -detalles: String
+        }
 
-    note bottom of Ruta
-        iniciarRuta() valida que la ruta no haya
-        sido iniciada previamente (guarda de estado).
-    end note
+        note top of Envio
+            **State**: las transiciones válidas se validan dentro de la
+            propia entidad (IllegalStateException si el envío no está
+            EN_TRASLADO o ASIGNACION_REALIZADA).
+        end note
+
+        package "planificacion" {
+            interface Planificacion {
+                +planificar(donaciones, camiones, choferes): List<Ruta>
+            }
+            class CapacidadFisica {
+                +planificar(donaciones, camiones, choferes): List<Ruta>
+            }
+            class CalculadorDimensiones {
+                +calcular(cantidad, unidad: Unidad): DimensionesFisicas
+            }
+            class DimensionesFisicas <<record>> {
+                +pesoKg: double
+                +volumenM3: double
+            }
+            note bottom of CapacidadFisica
+                **Strategy**: única implementación activa; agrupa
+                donaciones por capacidad de peso/volumen y las
+                paradas por dirección de la entidad beneficiaria.
+            end note
+        }
+    }
 }
 
-Ruta "1" o-- "1" Camion : camion
-Ruta "1" o-- "1" Chofer : chofer
-Ruta "1" *-- "0..*" Parada : paradas
-
-package "Envíos" {
-    class Envio {
-        -id: Long
-        -donacionSegmentadaId: Long
-        -entidadBeneficiariaId: Long
-        -estado: EstadoEnvio
-        --
-        +registrarRecepcionExitosa()
-        +registrarRecepcionFallida()
-    }
-
-    enum EstadoEnvio {
-        PENDIENTE
-        ASIGNACION_REALIZADA
-        EN_TRASLADO
-        ENTREGADA
-        NO_RECIBIDA
-    }
-
-    class EventoLogistica {
-        -tipoEvento: String
-        -donacionSegmentadaId: Long
-        -entidadBeneficiariaId: Long
-        -timestamp: LocalDateTime
-        -detalles: String
-    }
-
-    note top of Envio
-        **State**: las transiciones válidas se validan
-        dentro de la propia entidad (IllegalStateException
-        si se intenta confirmar/fallar un envío que no
-        está EN_TRASLADO o ASIGNACION_REALIZADA).
-    end note
-
-    note bottom of EventoLogistica
-        Bitácora de auditoría (INICIO_RUTA,
-        ENTREGA_EXITOSA, ENTREGA_FALLIDA), expuesta
-        por polling a servicio-donaciones — ver
-        diagrama de componentes.
-    end note
-}
-
-Envio --> EstadoEnvio : estado
-Parada "1" o-- "1..*" Envio : envíos de la parada (por ID)
-
-package "Planificación de Rutas" {
-    interface Planificacion {
-        +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
-    }
-
-    class CapacidadFisica {
-        +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
-    }
-
-    class CalculadorDimensiones {
-        -PESO_POR_UNIDAD_KG: double
-        -VOLUMEN_POR_UNIDAD_M3: double
-        --
-        +calcular(cantidad: Integer, unidad: Unidad): DimensionesFisicas
-    }
-
-    class DimensionesFisicas <<record>> {
-        +pesoKg: double
-        +volumenM3: double
-    }
-
-    note left of Planificacion
-        **Strategy**: única implementación activa
-        (CapacidadFisica) hoy, pero el contrato permite
-        incorporar nuevos criterios de planificación
-        (ej. por cercanía geográfica) sin modificar
-        el resto del servicio.
-    end note
-
-    note bottom of CapacidadFisica
-        Agrupa donaciones en camiones respetando
-        capacidad de peso/volumen y agrupa las paradas
-        por dirección de la entidad beneficiaria.
-    end note
-}
-
-Planificacion <|.. CapacidadFisica
-CapacidadFisica "1" --> "1" CalculadorDimensiones
-CalculadorDimensiones ..> DimensionesFisicas : crea >
-CapacidadFisica ..> Ruta : construye >
-CapacidadFisica ..> Camion
-CapacidadFisica ..> Chofer
-
-package "commons (compartido entre servicios)" #F7F7F7 {
+package "commons (módulo compartido)" #F7F7F7 {
     class DonacionSegmentadaListaParaEntregarALogisticaDTO <<record>> {
         +donacionSegmentadaId: Long
         +entidadBeneficiariaId: Long
@@ -988,7 +905,6 @@ package "commons (compartido entre servicios)" #F7F7F7 {
         +cantidad: int
         +unidad: Unidad
     }
-
     enum Unidad {
         UNIDADES
         KG
@@ -997,23 +913,49 @@ package "commons (compartido entre servicios)" #F7F7F7 {
     }
 }
 
-Planificacion ..> DonacionSegmentadaListaParaEntregarALogisticaDTO : recibe de Donaciones >
+' ===================== Cableado entre capas =====================
+LogisticaController ..> LogisticaService : usa >
+LogisticaEventController ..> LogisticaEventRepository : lee eventos >
+LogisticaService ..> RutaRepository : persiste >
+LogisticaService ..> LogisticaEventRepository : registra eventos >
+LogisticaService ..> Planificacion : delega planificación >
+LogisticaService ..> Camion
+LogisticaService ..> Chofer
+LogisticaService ..> Envio
+LogisticaService ..> Ruta
+
+' ===================== Relaciones de dominio =====================
+Ruta "1" o-- "1" Camion : camion
+Ruta "1" o-- "1" Chofer : chofer
+Ruta "1" *-- "0..*" Parada : paradas
+Envio --> EstadoEnvio : estado
+Parada "1" o-- "1..*" Envio : envíos (por ID)
+Planificacion <|.. CapacidadFisica
+CapacidadFisica "1" --> "1" CalculadorDimensiones
+CalculadorDimensiones ..> DimensionesFisicas : crea >
+CapacidadFisica ..> Ruta : construye >
+
+' ===================== commons =====================
+LogisticaController ..> DonacionSegmentadaListaParaEntregarALogisticaDTO : recibe lote >
+Planificacion ..> DonacionSegmentadaListaParaEntregarALogisticaDTO
 CalculadorDimensiones --> Unidad
 
-note as N1
-    **Alcance acotado por consigna**: servicio-logistica
-    no invoca a Donaciones, Incentivos ni Notificaciones.
-    Solo recibe el lote a planificar (POST /planificar)
-    y expone sus eventos para que Donaciones los consulte
-    por polling — ver docs/uml/architecture/componentes.puml.
+note as N2
+    **Alcance acotado por consigna**: servicio-logistica no invoca a
+    Donaciones, Incentivos ni Notificaciones (no tiene package clients).
+    Solo recibe el lote a planificar (POST /planificar) y expone sus
+    eventos para que Donaciones los consulte por polling — ver componentes.puml.
 end note
 
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
     | <back:#FFF3E0>     </back> | Interfaz (Strategy) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
 endlegend
 
 @enduml
@@ -1025,7 +967,7 @@ endlegend
 
 ![Componentes](architecture/componentes.png)
 
-Cada servicio se representa como un `package` con sus componentes internos estereotipados (`<<Controller>>`, `<<Service>>`, `<<Repository>>`, `<<Scheduled>>`, `<<Client>>`, `<<Strategy>>`, `<<Adapter>>`) — no clase por clase. Las integraciones entre servicios se modelan con **interfaces provistas (lollipop ○—)** y **requeridas (dependencia `..>` «use»)**, que es la notación canónica de un diagrama de componentes: cada servicio provee su API REST y los clientes de otros servicios la requieren. Se incluyen los sistemas externos reales (N8N, Browserless/Chrome, LinkedIn, Google Sheets).
+Cada servicio se representa como un `package` con sus componentes internos estereotipados. Las integraciones entre servicios se modelan con **interfaces provistas (lollipop ○—)** y **requeridas (dependencia `..>` «use»)**. Se incluyen los sistemas externos reales (N8N, Browserless/Chrome, LinkedIn, Google Sheets).
 
 ```plantuml
 @startuml componentes
@@ -1180,13 +1122,11 @@ end note
 @enduml
 ```
 
----
-
 ## 7. Diagrama de Despliegue (único, solución completa)
 
 ![Despliegue](architecture/despliegue.png)
 
-Vista física del Modelo 4+1: **sin actores ni casos de uso**. El cliente es un nodo `<<device>>`; los servicios containerizados son nodos `<<execution environment>>` con sus `.jar` como `<<artifact>>`; las conexiones son *communication paths* rotulados con el protocolo real. Basado exclusivamente en `Dockerfile.donaciones`, `Dockerfile.incentivos`, `Dockerfile.notificaciones`, `render.yaml` y `herramientas/docker-compose.yml`. `servicio-logistica` no tiene Dockerfile propio ni entrada en `render.yaml`, por lo que se representa como proceso Java sobre la JVM local en vez de inventar una configuración inexistente.
+Vista física del Modelo 4+1: **sin actores**. Cliente como nodo `<<device>>`; servicios containerizados como `<<execution environment>>` con `.jar` como `<<artifact>>`; conexiones como *communication paths* con protocolo. `servicio-logistica` se representa como proceso Java sobre la JVM local (sin Dockerfile).
 
 ```plantuml
 @startuml despliegue
@@ -1269,13 +1209,11 @@ end note
 @enduml
 ```
 
----
-
 ## 8. Diagrama General de Casos de Uso (único)
 
 ![Casos de Uso](casos-de-uso/general.png)
 
-Actores derivados del contexto de la consigna: **Persona Donante**, **Entidad Beneficiaria**, **Persona Administradora** y **Chofer** (este último, explícito en la sección de Logística: *"el chofer deberá indicar en el sistema que dará por inicio su ruta"* y *"las rutas asignadas quedan disponibles para los choferes en su aplicación"*). Los casos de uso se derivaron cruzando los endpoints REST reales de cada controller con los requerimientos funcionales del contexto. Convenciones UML aplicadas: **asociación actor–caso de uso como línea simple sin punta de flecha**, **límite del sistema** (`rectangle "DonaTrack"`), y relaciones `<<include>>`/`<<extend>>` con dirección correcta.
+4 actores (Persona Donante, Entidad Beneficiaria, Persona Administradora, Chofer) y ~25 casos de uso agrupados por servicio dentro del límite del sistema. Asociaciones actor–caso como líneas simples sin punta de flecha; `<<include>>`/`<<extend>>` con dirección correcta.
 
 ```plantuml
 @startuml general

@@ -1,128 +1,126 @@
 @startuml logistica
 !include ../_style.puml
 
-title Modelo de Dominio — Servicio de Logística\n(packages reales bajo com.tp.donatrack.logistica.domain)
+title Módulo servicio-logistica\n(capas controllers / services / repositories / domain, según el código)
 
-package "domain" {
-    class Camion {
-        -id: Long
-        -patente: String
-        -marca: String
-        -modelo: String
-        -volumen: double
-        -altura: double
-        -capacidadCarga: double
-    }
+skinparam componentStyle uml2
 
-    class Chofer {
-        -id: Long
-        -nombre: String
-        -apellido: String
-        -dni: String
-    }
+component "servicio-logistica" as Modulo {
 
-    class Ruta {
-        -id: Long
-        -iniciada: Boolean
-        --
-        +iniciarRuta()
-    }
-
-    class Parada {
-        -orden: Integer
-        -direccion: String
-        -enviosIds: List<Long>
-    }
-
-    class Envio {
-        -id: Long
-        -donacionSegmentadaId: Long
-        -entidadBeneficiariaId: Long
-        -estado: EstadoEnvio
-        --
-        +registrarRecepcionExitosa()
-        +registrarRecepcionFallida()
-    }
-
-    enum EstadoEnvio {
-        PENDIENTE
-        ASIGNACION_REALIZADA
-        EN_TRASLADO
-        ENTREGADA
-        NO_RECIBIDA
-    }
-
-    class EventoLogistica {
-        -tipoEvento: String
-        -donacionSegmentadaId: Long
-        -entidadBeneficiariaId: Long
-        -timestamp: LocalDateTime
-        -detalles: String
-    }
-
-    note bottom of Ruta
-        iniciarRuta() valida que la ruta no haya
-        sido iniciada previamente (guarda de estado).
-    end note
-
-    note top of Envio
-        **State**: las transiciones válidas se validan
-        dentro de la propia entidad (IllegalStateException
-        si el envío no está EN_TRASLADO o ASIGNACION_REALIZADA).
-    end note
-
-    note bottom of EventoLogistica
-        Bitácora de auditoría (INICIO_RUTA, ENTREGA_EXITOSA,
-        ENTREGA_FALLIDA) expuesta por polling a servicio-donaciones.
-    end note
-
-    package "domain.planificacion" {
-        interface Planificacion {
-            +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
+    package "controllers" {
+        class LogisticaController <<Controller>> {
+            +registrarCamion() / listarCamiones()
+            +registrarChofer() / listarChoferes()
+            +registrarEnvio() / listarEnvios()
+            +planificarRutas(lote)
+            +registrarRuta() / listarRutas()
+            +iniciarRuta(id)
+            +entregarEnvio(id) / fallarEnvio(id)
         }
-
-        class CapacidadFisica {
-            +planificar(donaciones, camionesDisponibles, choferesDisponibles): List<Ruta>
+        class LogisticaEventController <<Controller>> {
+            +obtenerEventos(): List<EventoLogistica>
         }
+    }
 
-        class CalculadorDimensiones {
-            -PESO_POR_UNIDAD_KG: double
-            -VOLUMEN_POR_UNIDAD_M3: double
+    package "services" {
+        class LogisticaService <<Service>> {
+            +planificarLote(lote)
+            +registrarCamion() / registrarChofer()
+            +registrarEnvio() / registrarRuta()
+            +iniciarRuta(id)
+            +registrarEntregaExitosa(id, detalles)
+            +registrarEntregaFallida(id, motivo)
+        }
+    }
+
+    package "repositories" {
+        class RutaRepository <<Repository>> {
+            +save(r: Ruta) / saveAll()
+            +findById() / findAll() / delete()
+        }
+        class LogisticaEventRepository <<Repository>> {
+            +registrar(e: EventoLogistica)
+            +obtenerTodos(): List<EventoLogistica>
+        }
+    }
+
+    package "domain" {
+        class Camion {
+            -id: Long
+            -patente: String
+            -volumen: double
+            -altura: double
+            -capacidadCarga: double
+        }
+        class Chofer {
+            -id: Long
+            -nombre: String
+            -apellido: String
+            -dni: String
+        }
+        class Ruta {
+            -id: Long
+            -iniciada: Boolean
             --
-            +calcular(cantidad: Integer, unidad: Unidad): DimensionesFisicas
+            +iniciarRuta()
+        }
+        class Parada {
+            -orden: Integer
+            -direccion: String
+            -enviosIds: List<Long>
+        }
+        class Envio {
+            -id: Long
+            -donacionSegmentadaId: Long
+            -entidadBeneficiariaId: Long
+            -estado: EstadoEnvio
+            --
+            +registrarRecepcionExitosa()
+            +registrarRecepcionFallida()
+        }
+        enum EstadoEnvio {
+            PENDIENTE
+            ASIGNACION_REALIZADA
+            EN_TRASLADO
+            ENTREGADA
+            NO_RECIBIDA
+        }
+        class EventoLogistica {
+            -tipoEvento: String
+            -donacionSegmentadaId: Long
+            -entidadBeneficiariaId: Long
+            -timestamp: LocalDateTime
+            -detalles: String
         }
 
-        class DimensionesFisicas <<record>> {
-            +pesoKg: double
-            +volumenM3: double
-        }
-
-        note bottom of CapacidadFisica
-            **Strategy**: única implementación activa hoy; el
-            contrato permite incorporar nuevos criterios de
-            planificación sin tocar el resto del servicio. Agrupa
-            donaciones por capacidad de peso/volumen y las paradas
-            por dirección de la entidad beneficiaria.
+        note top of Envio
+            **State**: las transiciones válidas se validan dentro de la
+            propia entidad (IllegalStateException si el envío no está
+            EN_TRASLADO o ASIGNACION_REALIZADA).
         end note
+
+        package "planificacion" {
+            interface Planificacion {
+                +planificar(donaciones, camiones, choferes): List<Ruta>
+            }
+            class CapacidadFisica {
+                +planificar(donaciones, camiones, choferes): List<Ruta>
+            }
+            class CalculadorDimensiones {
+                +calcular(cantidad, unidad: Unidad): DimensionesFisicas
+            }
+            class DimensionesFisicas <<record>> {
+                +pesoKg: double
+                +volumenM3: double
+            }
+            note bottom of CapacidadFisica
+                **Strategy**: única implementación activa; agrupa
+                donaciones por capacidad de peso/volumen y las
+                paradas por dirección de la entidad beneficiaria.
+            end note
+        }
     }
 }
-
-' ---- Relaciones dentro de domain ----
-Ruta "1" o-- "1" Camion : camion
-Ruta "1" o-- "1" Chofer : chofer
-Ruta "1" *-- "0..*" Parada : paradas
-Envio --> EstadoEnvio : estado
-Parada "1" o-- "1..*" Envio : envíos (por ID)
-
-' ---- Relaciones dentro de domain.planificacion ----
-Planificacion <|.. CapacidadFisica
-CapacidadFisica "1" --> "1" CalculadorDimensiones
-CalculadorDimensiones ..> DimensionesFisicas : crea >
-
-' ---- planificacion -> domain (construye rutas) ----
-CapacidadFisica ..> Ruta : construye >
-CapacidadFisica ..> Camion
-CapacidadFisica ..> Chofer
 
 package "commons (módulo compartido)" #F7F7F7 {
     class DonacionSegmentadaListaParaEntregarALogisticaDTO <<record>> {
@@ -132,7 +130,6 @@ package "commons (módulo compartido)" #F7F7F7 {
         +cantidad: int
         +unidad: Unidad
     }
-
     enum Unidad {
         UNIDADES
         KG
@@ -141,22 +138,49 @@ package "commons (módulo compartido)" #F7F7F7 {
     }
 }
 
-Planificacion ..> DonacionSegmentadaListaParaEntregarALogisticaDTO : recibe de Donaciones >
+' ===================== Cableado entre capas =====================
+LogisticaController ..> LogisticaService : usa >
+LogisticaEventController ..> LogisticaEventRepository : lee eventos >
+LogisticaService ..> RutaRepository : persiste >
+LogisticaService ..> LogisticaEventRepository : registra eventos >
+LogisticaService ..> Planificacion : delega planificación >
+LogisticaService ..> Camion
+LogisticaService ..> Chofer
+LogisticaService ..> Envio
+LogisticaService ..> Ruta
+
+' ===================== Relaciones de dominio =====================
+Ruta "1" o-- "1" Camion : camion
+Ruta "1" o-- "1" Chofer : chofer
+Ruta "1" *-- "0..*" Parada : paradas
+Envio --> EstadoEnvio : estado
+Parada "1" o-- "1..*" Envio : envíos (por ID)
+Planificacion <|.. CapacidadFisica
+CapacidadFisica "1" --> "1" CalculadorDimensiones
+CalculadorDimensiones ..> DimensionesFisicas : crea >
+CapacidadFisica ..> Ruta : construye >
+
+' ===================== commons =====================
+LogisticaController ..> DonacionSegmentadaListaParaEntregarALogisticaDTO : recibe lote >
+Planificacion ..> DonacionSegmentadaListaParaEntregarALogisticaDTO
 CalculadorDimensiones --> Unidad
 
-note as N1
-    **Alcance acotado por consigna**: servicio-logistica no invoca
-    a Donaciones, Incentivos ni Notificaciones. Solo recibe el lote
-    a planificar (POST /planificar) y expone sus eventos para que
-    Donaciones los consulte por polling — ver componentes.puml.
+note as N2
+    **Alcance acotado por consigna**: servicio-logistica no invoca a
+    Donaciones, Incentivos ni Notificaciones (no tiene package clients).
+    Solo recibe el lote a planificar (POST /planificar) y expone sus
+    eventos para que Donaciones los consulte por polling — ver componentes.puml.
 end note
 
 legend right
-    |= Color |= Significado |
-    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    |= Color / estereotipo |= Significado |
+    | <back:#EFF6FF>     </back> | Clase de dominio |
+    | <<Controller>> | Capa de exposición REST |
+    | <<Service>> | Capa de aplicación / negocio |
+    | <<Repository>> | Persistencia en memoria |
     | <back:#FFF3E0>     </back> | Interfaz (Strategy) |
     | <back:#F1F4E8>     </back> | Enum de dominio |
-    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+    | <back:#F7F7F7>     </back> | Módulo `commons` |
 endlegend
 
 @enduml
