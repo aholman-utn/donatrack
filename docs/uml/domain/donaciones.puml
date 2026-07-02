@@ -234,7 +234,7 @@ Donacion "1" o-- "1" Donante : donante
 Donacion "1" *-- "1..*" Bien : bienes
 Donacion "1" *-- "1..*" DonacionSegmentada : donacionesSegmentadas
 Donacion --> EstadoDonacion : deriva >
-DonacionSegmentada "1" *-- "1..*" Bien : bienes
+DonacionSegmentada "1" o-- "1..*" Bien : bienes
 DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad : historial
 DonacionSegmentada --> EstadoDonacionSegmentada : estado
 DonacionSegmentada ..> EntidadBeneficiaria : asigna >
