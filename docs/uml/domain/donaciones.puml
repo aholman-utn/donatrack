@@ -1,0 +1,409 @@
+@startuml donaciones
+!include ../_style.puml
+
+title Modelo de Dominio — Servicio de Donaciones\n(Donantes, Bienes, Donaciones, Necesidades, Asignación)
+
+package "Personas y Donantes" {
+    abstract class Persona {
+        -id: Long
+        -direccion: Direccion
+        -medioDeContacto: Map<String, List<String>>
+        -medioPredeterminado: Map<String, String>
+        -fechaUltimaInteraccion: LocalDateTime
+        --
+        +agregarMedioDeContacto(clave, valor)
+        +getTipoNotificadorPreferido(): TipoNotificador
+        +getContactoPredeterminado(): String
+        +{static} nextId(): Long
+    }
+
+    class PersonaHumana extends Persona {
+        -nombre: String
+        -apellido: String
+        -genero: String
+        -fechaNacimiento: Date
+        -edad: Integer
+        -nroDocumento: String
+    }
+
+    class PersonaJuridica extends Persona {
+        -razonSocial: String
+        -tipo: TipoOrganizacion
+        -cuit: String
+        -rubro: String
+        --
+        +agregarRepresentante(r: PersonaRepresentante)
+    }
+
+    class PersonaRepresentante {
+        -nombre: String
+        -apellido: String
+        -nroDocumento: int
+    }
+
+    enum TipoOrganizacion {
+        GUBERNAMENTAL
+        ONG
+        EMPRESA
+        INSTITUCION
+    }
+
+    class Donante {
+        -password: String
+        --
+        +getNombreCompleto(): String
+    }
+
+    class PerfilDonante {
+        -visibilidadInsignia: boolean
+        -misionActualId: Long
+        -insigniasGanadas: List<String>
+        -progreso: Double
+        -nivelDonante: Nivel
+        --
+        +registrarEntrega(segmentada: DonacionSegmentada)
+        +contarCategoriasUnicas(): int
+        +calcularRachaMeses(): int
+        +calcularDonacionesAEntidadesBeneficiarias(): int
+        +calcularCantidadDonacionesEntregadas(): int
+    }
+
+    class Metrica {
+        -totalDonacionesExitosas: Integer
+        -categoriasAyudadas: List<CategoriaBien>
+        -misionesCompletadas: List<Long>
+    }
+
+    class ItemHistoralDonaciones {
+        -id: Long
+        -entidadBeneficiariaId: Long
+        -fecha: LocalDate
+        -categoria: CategoriaBien
+        -estado: EstadoDonacionSegmentada
+    }
+
+    class EntidadAyudada {
+        -entidadBeneficiariaId: Long
+        -donacionSegmentadaId: Long
+    }
+}
+
+Persona <|-- PersonaHumana
+Persona <|-- PersonaJuridica
+PersonaJuridica "1" *-- "0..*" PersonaRepresentante : representantes
+PersonaJuridica --> TipoOrganizacion
+Donante "1" *-- "1" Persona : persona
+Donante "1" *-- "1" PerfilDonante : perfil
+PerfilDonante "1" *-- "1" Metrica : metricasPerfil
+PerfilDonante "1" *-- "0..*" ItemHistoralDonaciones : historialDonaciones
+Metrica "1" o-- "0..*" EntidadAyudada : entidadesAyudadas
+
+package "Bienes" {
+    abstract class Bien {
+        #nombre: String
+        #descripcion: String
+        #foto: String
+        #subCategoria: SubCategoria
+        --
+        +{abstract} getCriterioSegmentacion(): Object
+        +getClaveAgrupacion(): ClaveAgrupacion
+    }
+
+    class BienDuradero extends Bien {
+        -estado: EstadoBien
+        +getCriterioSegmentacion(): Object
+    }
+
+    class BienPerecedero extends Bien {
+        -fechaVencimiento: Date
+        +getCriterioSegmentacion(): Object
+    }
+
+    enum EstadoBien {
+        NUEVO
+        USADO
+    }
+
+    enum CategoriaBien {
+        MOBILIARIO
+        ALIMENTOS
+        VESTIMENTA
+        HIGIENE
+    }
+
+    class SubCategoria {
+        -categoria: CategoriaBien
+        -descripcion: String
+        -unidad: Unidad
+    }
+
+    class ClaveAgrupacion <<record>> {
+        +subCategoria: SubCategoria
+        +criterio: Object
+    }
+
+    note top of Bien
+        **Template Method**: getClaveAgrupacion() es el
+        método concreto que invoca el hook abstracto
+        getCriterioSegmentacion(), redefinido por cada
+        subclase (estado vs. fecha de vencimiento).
+    end note
+}
+
+Bien <|-- BienDuradero
+Bien <|-- BienPerecedero
+Bien "0..*" --> "1" SubCategoria : subCategoria
+Bien ..> ClaveAgrupacion : construye >
+SubCategoria --> CategoriaBien
+BienDuradero --> EstadoBien
+
+package "Donación y Trazabilidad" {
+    class Donacion {
+        -id: Integer
+        -descripcion: String
+        -fechaIngreso: Date
+        --
+        -segmentar(bienes: List<Bien>): List<DonacionSegmentada>
+        +getEstado(): EstadoDonacion
+        +buscarPorSubcategoria(sub: SubCategoria): Optional<DonacionSegmentada>
+    }
+
+    enum EstadoDonacion {
+        PENDIENTE
+        ADJUDICADA
+    }
+
+    class DonacionSegmentada {
+        -id: Long
+        -cantidad: int
+        -estado: EstadoDonacionSegmentada
+        -donanteId: Long
+        -entidadBeneficiariaAsignadaId: Long
+        --
+        +transicionar(nuevoEstado, actor, descripcion)
+        +asignar(entidad: EntidadBeneficiaria, actor: String)
+        +listarParaEntrega(actor: String)
+        +iniciarTraslado(actor: String)
+        +confirmarEntrega(entidadBeneficiariaId: Long)
+        +registrarEntregaFallida(actor, justificacion)
+        +marcarVencida(actor: String)
+        +transicionPosible(anterior, nuevo): boolean
+        +getUltimoEvento(): EventoTrazabilidad
+    }
+
+    enum EstadoDonacionSegmentada {
+        EN_DEPOSITO
+        ASIGNACION_REALIZADA
+        LISTA_PARA_ENTREGAR
+        EN_TRASLADO
+        ENTREGADA
+        ENTREGA_FALLIDA
+        VENCIDA
+    }
+
+    interface DonacionEventPublisher {
+        +publicar(event: DonacionEntregadaEvent)
+    }
+
+    class DonacionEntregadaEvent <<record>>
+
+    class EventoTrazabilidad {
+        -estadoAnterior: EstadoDonacionSegmentada
+        -estadoNuevo: EstadoDonacionSegmentada
+        -fecha: LocalDateTime
+        -actor: String
+        -descripcion: String
+    }
+
+    note bottom of DonacionEventPublisher
+        **Puerto de dominio** (Observer desacoplado):
+        el dominio dispara el evento "donación entregada"
+        sin conocer que existe una llamada HTTP detrás.
+        Implementado por HttpDonacionEventPublisher
+        en la capa de aplicación (no se muestra aquí).
+    end note
+
+    note top of EstadoDonacionSegmentada
+        **State**: transicionPosible() en DonacionSegmentada
+        define, mediante un switch exhaustivo, la máquina
+        de estados finita de este enum.
+    end note
+}
+
+Donacion "1" o-- "1" Donante : donante
+Donacion "1" *-- "1..*" Bien : bienes
+Donacion "1" *-- "1..*" DonacionSegmentada : donacionesSegmentadas
+Donacion --> EstadoDonacion : deriva >
+DonacionSegmentada "1" *-- "1..*" Bien : bienes
+DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad : historial
+DonacionSegmentada --> EstadoDonacionSegmentada : estado
+DonacionSegmentada ..> EntidadBeneficiaria : asigna >
+
+package "Necesidades y Entidad Beneficiaria" {
+    abstract class NecesidadMaterial {
+        -id: Long
+        -entidadBeneficiariaId: Long
+        -subCategoria: SubCategoria
+        -fechaDelPedido: Date
+        -cantidadObjetivo: int
+        -cantidadRecibida: int
+        -estado: EstadoNecesidad
+        --
+        +activo(): boolean
+        +cantidadFaltanteDelPedido(): int
+        +recibirDonacion(donacion: DonacionSegmentada)
+        +recibirBienes(cantidad: int)
+        +finalizarNecesidad()
+    }
+
+    class NecesidadRecurrente extends NecesidadMaterial {
+        -dias: int
+        --
+        +enPeriodo(): boolean
+        +activo(): boolean
+    }
+
+    class NecesidadExtraordinaria extends NecesidadMaterial {
+        -causa: String
+        --
+        +adeudadas(): int
+    }
+
+    enum EstadoNecesidad {
+        ACTIVO
+        SATISFECHO
+        INSATISFECHO
+    }
+
+    class EntidadBeneficiaria {
+        --
+        +agregarNecesidad(necesidad: NecesidadMaterial)
+        +removerNecesidad(necesidad: NecesidadMaterial)
+        +getCantNecesidades(): int
+        +getCantNececidadesActivas(): int
+        +implementarDonacion(donacion: DonacionSegmentada)
+    }
+
+    note top of NecesidadRecurrente
+        activo() sobrescribe el comportamiento heredado:
+        una necesidad recurrente deja de estar activa
+        (y se finaliza) si venció su período (dias).
+    end note
+}
+
+NecesidadMaterial <|-- NecesidadRecurrente
+NecesidadMaterial <|-- NecesidadExtraordinaria
+NecesidadMaterial --> EstadoNecesidad : estado
+NecesidadMaterial "0..*" --> "1" SubCategoria : subCategoria
+NecesidadMaterial "1" o-- "0..*" DonacionSegmentada : donaciones recibidas
+EntidadBeneficiaria "1" *-- "1" PersonaJuridica : datosDeEntidad
+EntidadBeneficiaria "1" *-- "0..*" NecesidadMaterial : nececidades
+
+package "Asignación de Donaciones" {
+    interface AlgoritmoAsignacion {
+        +rankear(donacion: DonacionSegmentada, entidades: List<EntidadBeneficiaria>): List<EntidadBeneficiaria>
+    }
+
+    class AlgoritmoCompatibilidadSemantica {
+        +rankear(donacion, entidades): List<EntidadBeneficiaria>
+    }
+
+    class AlgoritmoPrioridadSubAtendidos {
+        +rankear(donacion, entidades): List<EntidadBeneficiaria>
+    }
+
+    class ServicioMatchmaking {
+        -algoritmos: List<AlgoritmoAsignacion>
+        --
+        +ejecutar(donacion: DonacionSegmentada, entidades): ResultadoMatchmaking
+        +ejecutarTodas(donaciones, entidades): List<ResultadoMatchmaking>
+    }
+
+    class ResultadoMatchmaking {
+        -huboCoincidencias: boolean
+        --
+        +getEntidadesPropuestas(): List<EntidadBeneficiaria>
+    }
+
+    note left of AlgoritmoAsignacion
+        **Strategy**: dos criterios intercambiables
+        para rankear hasta 10 entidades beneficiarias
+        candidatas a recibir una donación.
+    end note
+
+    note bottom of ServicioMatchmaking
+        **Facade**: orquesta ambas estrategias sobre
+        una misma donación y combina los resultados
+        (intersección de rankings) en un único objeto.
+    end note
+}
+
+AlgoritmoAsignacion <|.. AlgoritmoCompatibilidadSemantica
+AlgoritmoAsignacion <|.. AlgoritmoPrioridadSubAtendidos
+ServicioMatchmaking "1" o-- "2" AlgoritmoAsignacion : algoritmos
+ServicioMatchmaking ..> ResultadoMatchmaking : crea >
+ResultadoMatchmaking "1" o-- "0..*" EntidadBeneficiaria : propuestas
+
+package "Ubicación" {
+    class Direccion {
+        -calle1: String
+        -calle2: String
+        -altura: int
+        -piso: int
+        -departamento: String
+        --
+        +getDireccion(): String
+    }
+
+    class Ciudad {
+        -nombre: String
+    }
+
+    class Provincia {
+        -nombre: String
+    }
+
+    class Pais {
+        -nombre: String
+    }
+}
+
+Direccion "1" --> "1" Ciudad : ciudad
+Ciudad "1" --> "1" Provincia : provincia
+Provincia "1" --> "1" Pais : pais
+Persona "1" *-- "1" Direccion : direccion
+
+package "commons (compartido entre servicios)" #F7F7F7 {
+    enum Nivel {
+        COLABORADOR
+        SOSTENEDOR
+        TRANSFORMADOR
+    }
+
+    enum TipoNotificador {
+        EMAIL
+        SMS
+        WHATSAPP
+    }
+
+    enum Unidad {
+        UNIDADES
+        KG
+        METROS
+        LITROS
+    }
+}
+
+PerfilDonante --> Nivel : nivelDonante
+SubCategoria --> Unidad : unidad
+Persona ..> TipoNotificador : retorna >
+
+legend right
+    |= Color |= Significado |
+    | <back:#EFF6FF>     </back> | Clase / entidad de dominio |
+    | <back:#FFF3E0>     </back> | Interfaz (Strategy / puerto) |
+    | <back:#F1F4E8>     </back> | Enum de dominio |
+    | <back:#F7F7F7>     </back> | Tipos compartidos definidos en el módulo `commons` |
+endlegend
+
+@enduml

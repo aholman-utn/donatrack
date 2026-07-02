@@ -1,0 +1,148 @@
+@startuml componentes
+!include ../_style.puml
+
+title Diagrama de Componentes — DonaTrack (solución completa)
+
+skinparam component {
+    BackgroundColor #EFF6FF
+    BorderColor #2B5B84
+}
+
+component "Cliente HTTP\n(Postman / Swagger UI /\nfuturo Front SSR)" as Cliente <<external>>
+
+package "Servicio de Donaciones  «Spring Boot :8080»" {
+    [API REST\n(Donantes, Donaciones, Entidades,\nNecesidades, Matchmaking, Trazabilidad)] as Don_Controller <<Controller>>
+    [Lógica de Negocio\n(Donante/Donacion/EntidadBeneficiaria/\nNecesidad/Matchmaking/Trazabilidad Service)] as Don_Service <<Service>>
+    [Repositorios en memoria] as Don_Repo <<Repository>>
+    [Tareas Programadas\n(crons + polling logística)] as Don_Tasks <<Scheduled>>
+    [Cliente HTTP → Logística] as Don_ClientLog <<Client>>
+    [Publicador de Eventos\n(HttpDonacionEventPublisher)] as Don_Publisher <<Adapter>>
+
+    Don_Controller --> Don_Service
+    Don_Service --> Don_Repo
+    Don_Tasks --> Don_Repo
+    Don_Service --> Don_Publisher
+    Don_Tasks --> Don_ClientLog
+}
+
+package "Servicio de Incentivos  «Spring Boot :8081»" {
+    [API REST\n(/incentivos)] as Inc_Controller <<Controller>>
+    [Lógica de Negocio\n(IncentivosService, ServicioRanking)] as Inc_Service <<Service>>
+    [Catálogo de Misiones\n(en memoria)] as Inc_Repo <<Repository>>
+    [Cliente HTTP → Donaciones] as Inc_ClientDon <<Client>>
+    [Cliente Webhook → N8N] as Inc_ClientN8N <<Client>>
+
+    Inc_Controller --> Inc_Service
+    Inc_Service --> Inc_Repo
+    Inc_Service --> Inc_ClientDon
+    Inc_Service --> Inc_ClientN8N
+
+    note bottom of Inc_Controller
+        ⚠ **Hallazgo**: IncentivosApplication declara
+        scanBasePackages sobre "com.tp.donatrack.notificaciones"
+        y una dependencia Maven compile-time a
+        servicio-notificaciones y servicio-donaciones
+        (además de commons). Esto embebe los beans de
+        Notificaciones dentro del proceso de Incentivos,
+        aunque en runtime la comunicación real observada
+        sigue siendo HTTP vía NotificacionRestClient hacia
+        el proceso independiente (puerto 8082). Revisar si
+        esa dependencia de módulo es intencional.
+    end note
+}
+
+package "Servicio de Notificaciones  «Spring Boot :8082»" {
+    [API REST\n(/api/notificaciones)] as Not_Controller <<Controller>>
+    [Servicio de Notificación] as Not_Service <<Service>>
+    [Repositorio de Notificaciones\n(en memoria)] as Not_Repo <<Repository>>
+    [Adaptadores de Envío\n(Email / SMS / WhatsApp — simulados)] as Not_Strategy <<Strategy>>
+
+    Not_Controller --> Not_Service
+    Not_Service --> Not_Repo
+    Not_Service --> Not_Strategy
+}
+
+package "Servicio de Logística  «Spring Boot :8083»" {
+    [API REST\n(/api/logistica)] as Log_Controller <<Controller>>
+    [Lógica de Negocio\n(LogisticaService)] as Log_Service <<Service>>
+    [Planificador de Rutas\n(Strategy: CapacidadFisica)] as Log_Strategy <<Strategy>>
+    [Repositorios en memoria\n(Rutas, Eventos)] as Log_Repo <<Repository>>
+
+    Log_Controller --> Log_Service
+    Log_Service --> Log_Strategy
+    Log_Service --> Log_Repo
+
+    note bottom of Log_Controller
+        Servicio pasivo por requerimiento de consigna:
+        no invoca a Donaciones, Incentivos ni Notificaciones.
+        Solo recibe (POST /planificar) y expone eventos
+        para que Donaciones los consulte por polling.
+    end note
+}
+
+package "commons  «librería compartida (JAR)»" #F7F7F7 {
+    [Cliente HTTP → Notificaciones\n(NotificacionRestClient)] as Commons_Client <<Client>>
+    [DTOs y enums de integración\n(Nivel, Insignia, Unidad, TipoNotificador, ...)] as Commons_DTO <<DTO>>
+}
+
+cloud "N8N — automatización low-code\n«docker :5678»" as N8N <<external>> {
+    [Flujo: Insignias\n(webhook /webhook/nueva_insignia)] as N8N_Insignias
+    [Flujo: Ranking mensual\n(schedule trigger)] as N8N_Ranking
+}
+
+cloud "Browserless/Chrome\n«docker :3000»" as Browserless <<external>>
+cloud "LinkedIn API" as LinkedIn <<external>>
+cloud "Google Sheets API" as GSheets <<external>>
+
+' ===================== Cliente externo =====================
+Cliente --> Don_Controller : REST/JSON
+Cliente --> Inc_Controller : REST/JSON
+Cliente --> Not_Controller : REST/JSON
+Cliente --> Log_Controller : REST/JSON
+
+' ===================== Integraciones entre servicios (síncronas HTTP) =====================
+Don_Publisher --> Inc_Controller : POST /entrega\n(síncrono)
+Don_ClientLog --> Log_Controller : POST /planificar\n⚠ URL sin prefijo /api/logistica\nen el cliente (ver nota)
+Don_Tasks --> Log_Controller : GET /api/logistica/rutas/eventos\n(polling cada 10s)
+
+Inc_ClientDon --> Don_Controller : GET /donaciones-segmentadas/indicadores/{id}\nGET /donantes\nGET /donantes/{id}/contacto-notificacion
+
+Don_Service ..> Commons_Client : usa >
+Inc_Service ..> Commons_Client : usa >
+Commons_Client --> Not_Controller : POST /api/notificaciones/notificar
+
+' ===================== Dependencia de compilación con commons =====================
+Don_Service ..> Commons_DTO : depende (compile-time) >
+Inc_Service ..> Commons_DTO : depende (compile-time) >
+Not_Service ..> Commons_DTO : depende (compile-time) >
+Log_Service ..> Commons_DTO : depende (compile-time) >
+
+' ===================== Integraciones externas reales =====================
+Inc_ClientN8N --> N8N_Insignias : POST /webhook/nueva_insignia
+N8N_Insignias --> Browserless : POST /screenshot\n(genera imagen de la insignia)
+N8N_Insignias --> LinkedIn : publica posteo\n(menciona al donante)
+
+N8N_Ranking --> Inc_Controller : GET /perfil/ranking\n⚠ no coincide con el path real\ndel controller (/incentivos/ranking)
+N8N_Ranking --> GSheets : agrega fila\n(top 3 del mes)
+
+note as NotaPersistencia
+    **Persistencia**: los 4 servicios almacenan su estado en
+    colecciones en memoria (List / Map / ConcurrentHashMap),
+    sin datasource configurado en ningún application.yml/.properties.
+    No se representa un componente de Base de Datos porque hoy
+    no existe: la persistencia real corresponde a la Entrega 5.
+end note
+
+legend right
+    |= Estereotipo |= Significado |
+    | <<Controller>> | Expone la API REST del servicio |
+    | <<Service>> | Orquesta casos de uso / lógica de aplicación |
+    | <<Repository>> | Almacenamiento en memoria (sin BD real) |
+    | <<Scheduled>> | Tarea programada (@Scheduled) |
+    | <<Client>> | Cliente HTTP saliente (RestTemplate) |
+    | <<Strategy>> | Componente que aplica un algoritmo intercambiable |
+    | <<Adapter>> | Adaptador que traduce un evento de dominio a HTTP |
+    | <<external>> | Sistema externo al monorepo DonaTrack |
+endlegend
+
+@enduml
