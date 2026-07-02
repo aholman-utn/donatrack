@@ -58,7 +58,7 @@ public class TrazabilidadService {
     private DonacionSegmentada buscarDonacionSegmentadaPorId(Integer idDonacion, Integer idSegmentada) {
         Donacion donacion = this.buscarDonacionPorId(idDonacion);
         return donacion.getDonacionesSegmentadas().stream()
-                .filter(p -> p.getId().equals(idSegmentada))
+                .filter(p -> p.getId() != null && p.getId().equals(Long.valueOf(idSegmentada)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No se encontró la el segmento de la donación con ID: " + idSegmentada));
