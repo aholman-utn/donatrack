@@ -146,6 +146,8 @@ LogisticaController ..> LogisticaService : usa >
 LogisticaEventController ..> LogisticaEventRepository : lee eventos >
 LogisticaService ..> RutaRepository : persiste >
 LogisticaService ..> LogisticaEventRepository : registra eventos >
+LogisticaEventRepository ..> EventoLogistica : gestiona >
+LogisticaService ..> EventoLogistica : crea >
 LogisticaService ..> Planificacion : delega planificación >
 LogisticaService ..> Camion
 LogisticaService ..> Chofer
