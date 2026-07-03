@@ -60,6 +60,9 @@ component "servicio-logistica" as Modulo {
         }
         class Ruta {
             -id: Long
+            -camion: Camion
+            -chofer: Chofer
+            -paradas: List<Parada>
             -iniciada: Boolean
             --
             +iniciarRuta()
