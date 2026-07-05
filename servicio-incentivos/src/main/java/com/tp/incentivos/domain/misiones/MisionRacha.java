@@ -10,15 +10,13 @@ public class MisionRacha extends Mision {
     public MisionRacha(
             int objetivo,
             String titulo,
-            String descripcion
-    ) {
+            String descripcion) {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.insigniaAsociada = new Insignia(
-            "Racha",
-            "Donaste durante " + objetivo + " meses seguidos"
-        );
+                "Racha",
+                "Donaste durante " + objetivo + " meses seguidos");
     }
 
     @Override

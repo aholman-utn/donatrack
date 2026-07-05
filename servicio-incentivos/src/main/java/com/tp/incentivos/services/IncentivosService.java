@@ -1,14 +1,19 @@
 package com.tp.incentivos.services;
 
 import com.tp.commons.domain.donantes.Nivel;
+
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
+
 import com.tp.commons.services.notificador.NotificacionRestClient;
+
 import com.tp.incentivos.clients.DonacionesRestClient;
 import com.tp.incentivos.clients.InsigniasRestClient;
 import com.tp.incentivos.domain.misiones.Mision;
+
 import com.tp.incentivos.dtos.*;
+
 import com.tp.incentivos.repositories.MisionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +33,7 @@ public class IncentivosService {
             MisionRepository misionRepository,
             DonacionesRestClient donacionesRestClient,
             InsigniasRestClient insigniasRestClient,
-            NotificacionRestClient notificacionRestClient
-    ) {
+            NotificacionRestClient notificacionRestClient) {
         this.misionRepository = misionRepository;
         this.donacionesRestClient = donacionesRestClient;
         this.insigniasRestClient = insigniasRestClient;
@@ -44,22 +48,20 @@ public class IncentivosService {
         logger.info("Misión resuelta para procesar: {}", ultimaMisionId);
 
         Mision misionActual = this.misionRepository.findById(ultimaMisionId)
-            .orElseThrow(() -> {
-                logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
-                return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
-            });
+                .orElseThrow(() -> {
+                    logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
+                    return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
+                });
 
         logger.info("Llamando a DonacionesClient para obtener indicadores...");
         IndicadoresDonanteDTO indicadores = this.donacionesRestClient.obtenerIndicadores(
                 dto.getDonanteId(),
                 dto.getDonacionSegmentadaId(),
                 List.of(
-                    "CANTIDAD_BIENES",
-                    "MESES_CONSECUTIVOS",
-                    "CATEGORIAS_DISTINTAS",
-                    "ENTREGAS_EXITOSAS_TOTALES"
-                )
-        );
+                        "CANTIDAD_BIENES",
+                        "MESES_CONSECUTIVOS",
+                        "CATEGORIAS_DISTINTAS",
+                        "ENTREGAS_EXITOSAS_TOTALES"));
 
         boolean cumplida = misionActual.estaCumplida(dto, indicadores);
         logger.info("Resultado de evaluación de misión (Cumplida: {}): {} para donante {}",
@@ -84,16 +86,15 @@ public class IncentivosService {
             }
 
             this.insigniasRestClient.notificarInsigniaObtenida(
-                dto.getNombreDonante(),
-                misionActual.getTitulo(),
-                misionActual.getDescripcion()
-            );
+                    dto.getNombreDonante(),
+                    misionActual.getTitulo(),
+                    misionActual.getDescripcion());
 
-            //Notificamos al usuario que completo la mision.
+            // Notificamos al usuario que completo la mision.
             this.notificarMisionCumplida(dto.getDonanteId(), misionActual.getTitulo());
 
             if (subioDeCategoria) {
-                //Notificamos al usuario que subio de categoria.
+                // Notificamos al usuario que subio de categoria.
                 this.notificarSubidaNivel(dto.getDonanteId(), nuevoNivel);
             }
 
@@ -136,23 +137,25 @@ public class IncentivosService {
         try {
             NotificacionRequestDTO requestNotificacion = this.donacionesRestClient.obtenerDatosParaNotificar(donanteId);
 
-            if (requestNotificacion == null || requestNotificacion.getMedio() == null || requestNotificacion.getDestinatario() == null) {
-                logger.warn("Donante ID {} sin medio configurado. No se despacha la notificación: {}", donanteId, asunto);
+            if (requestNotificacion == null || requestNotificacion.getMedio() == null
+                    || requestNotificacion.getDestinatario() == null) {
+                logger.warn("Donante ID {} sin medio configurado. No se despacha la notificación: {}", donanteId,
+                        asunto);
                 return;
             }
 
             requestNotificacion.setMensaje(mensaje);
             requestNotificacion.setAsunto(asunto);
 
-            logger.info("Enviando request de notificación ({}) para donante {} vía {}", asunto, donanteId, requestNotificacion.getMedio());
+            logger.info("Enviando request de notificación ({}) para donante {} vía {}", asunto, donanteId,
+                    requestNotificacion.getMedio());
 
             this.notificacionRestClient.notificar(
                     requestNotificacion.getMedio(),
                     requestNotificacion.getDestinatario(),
                     requestNotificacion.getMensaje(),
                     requestNotificacion.getAsunto(),
-                    donanteId
-            );
+                    donanteId);
 
             logger.info("Notificación '{}' despachada con éxito.", asunto);
 
@@ -163,7 +166,8 @@ public class IncentivosService {
         }
     }
 
-    //TODO Debatir: Deberiamos crearle la mision inicial al usuario en donaciones ? deberiamos manejarlo desde aca pero de otra forma?
+    // TODO Debatir: Deberiamos crearle la mision inicial al usuario en donaciones ?
+    // deberiamos manejarlo desde aca pero de otra forma?
     private Long obtenerMisionInicialId() {
         return 1L;
     }

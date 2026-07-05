@@ -10,20 +10,13 @@ public class MisionDonacionesExitosas extends Mision {
     public MisionDonacionesExitosas(
             int objetivo,
             String titulo,
-            String descripcion
-    ) {
+            String descripcion) {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.insigniaAsociada = new Insignia(
                 "Donacion Exitosa",
-                "Completaste tus primeras 3 donaciones exitosas"
-        );
-    }
-
-    @Override
-    public boolean tieneSiguiente(){
-        return false;
+                "Completaste tus primeras 3 donaciones exitosas");
     }
 
     @Override

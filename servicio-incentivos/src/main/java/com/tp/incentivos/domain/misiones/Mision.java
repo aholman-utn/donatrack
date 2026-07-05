@@ -17,10 +17,7 @@ public abstract class Mision {
     protected String descripcion;
     protected int orden;
 
-    public boolean tieneSiguiente(){
-        return true;
-    }
-
     public abstract double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO metricas);
+
     public abstract boolean estaCumplida(EntregaDonacionDTO dto, IndicadoresDonanteDTO metricas);
 }
