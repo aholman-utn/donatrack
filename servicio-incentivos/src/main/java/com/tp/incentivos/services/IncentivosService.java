@@ -44,13 +44,14 @@ public class IncentivosService {
         logger.info("Iniciando procesamiento de entrega. Donante: {}, Misión original: {}",
                 dto.getDonanteId(), dto.getUltimaMisionId());
 
+        Nivel nivelActual = dto.getCategoriaDonante() != null ? dto.getCategoriaDonante() : Nivel.COLABORADOR;
         Long ultimaMisionId = (dto.getUltimaMisionId() == null) ? obtenerMisionInicialId() : dto.getUltimaMisionId();
-        logger.info("Misión resuelta para procesar: {}", ultimaMisionId);
+        logger.info("Misión resuelta para procesar: {} (Nivel: {})", ultimaMisionId, nivelActual);
 
-        Mision misionActual = this.misionRepository.findById(ultimaMisionId)
+        Mision misionActual = this.misionRepository.findById(nivelActual, ultimaMisionId)
                 .orElseThrow(() -> {
-                    logger.error("Error crítico: Misión con ID {} no encontrada en base de datos", ultimaMisionId);
-                    return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId);
+                    logger.error("Error crítico: Misión con ID {} no encontrada para nivel {}", ultimaMisionId, nivelActual);
+                    return new RuntimeException("Misión no encontrada con ID: " + ultimaMisionId + " para nivel: " + nivelActual);
                 });
 
         logger.info("Llamando a DonacionesClient para obtener indicadores...");
@@ -68,21 +69,26 @@ public class IncentivosService {
                 cumplida, misionActual.getTitulo(), dto.getDonanteId());
 
         if (cumplida) {
-            Optional<Mision> siguienteMision = this.misionRepository.findSiguiente(ultimaMisionId);
+            Optional<Mision> siguienteMision = this.misionRepository.findSiguiente(nivelActual, ultimaMisionId);
             Long siguienteMisionId = siguienteMision.map(Mision::getId).orElse(null);
 
             logger.info("Misión completada. Siguiente misión ID: {}", siguienteMisionId);
 
             boolean subioDeCategoria = false;
-            Nivel nuevoNivel = dto.getCategoriaDonante();
+            Nivel nuevoNivel = nivelActual;
 
             if (siguienteMisionId == null) {
-                if (nuevoNivel == Nivel.COLABORADOR) {
+                // Completó todas las misiones de su nivel, sube al siguiente
+                if (nivelActual == Nivel.COLABORADOR) {
                     nuevoNivel = Nivel.SOSTENEDOR;
-                } else if (nuevoNivel == Nivel.SOSTENEDOR) {
+                    siguienteMisionId = obtenerMisionInicialId();
+                    subioDeCategoria = true;
+                } else if (nivelActual == Nivel.SOSTENEDOR) {
                     nuevoNivel = Nivel.TRANSFORMADOR;
+                    siguienteMisionId = obtenerMisionInicialId();
+                    subioDeCategoria = true;
                 }
-                subioDeCategoria = true;
+                // Si es TRANSFORMADOR y completó todo, siguienteMisionId queda null
             }
 
             this.insigniasRestClient.notificarInsigniaObtenida(
