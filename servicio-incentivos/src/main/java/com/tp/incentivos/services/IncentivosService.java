@@ -172,6 +172,20 @@ public class IncentivosService {
         }
     }
 
+    public void notificarRachaPerdida(Long donanteId) {
+        String mensaje = "¡Tu racha de donaciones se ha perdido! No realizaste ninguna donación en los últimos 30 días. ¡Animate a volver a donar para comenzar una nueva racha!";
+        String asunto = "Racha de Donaciones Perdida";
+
+        this.despacharNotificacion(donanteId, mensaje, asunto);
+    }
+
+    public void notificarAdvertenciaRacha(Long donanteId, long diasRestantes) {
+        String mensaje = "¡Atención! Te quedan " + diasRestantes + " días para mantener tu racha de donaciones. ¡No la pierdas, doná antes de que se termine el plazo!";
+        String asunto = "¡Tu Racha está en Peligro!";
+
+        this.despacharNotificacion(donanteId, mensaje, asunto);
+    }
+
     // TODO Debatir: Deberiamos crearle la mision inicial al usuario en donaciones ?
     // deberiamos manejarlo desde aca pero de otra forma?
     private Long obtenerMisionInicialId() {

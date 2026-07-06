@@ -227,6 +227,68 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Listar Donantes con Mision Actual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/ids-mision-actual",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "ids-mision-actual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fecha Ultima Donacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/1/fecha-ultima-donacion",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "1",
+                "fecha-ultima-donacion"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resetear Progreso Racha",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/donantes/1/resetear-progreso-racha",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "donantes",
+                "1",
+                "resetear-progreso-racha"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },

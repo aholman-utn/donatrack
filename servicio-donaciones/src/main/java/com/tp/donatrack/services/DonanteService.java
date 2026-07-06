@@ -332,4 +332,39 @@ public class DonanteService {
                                 : new ArrayList<>())
                 .build();
     }
+
+    public List<com.tp.commons.dtos.incentivos.DonanteRachaDTO> obtenerDonantesConMisionActual() {
+        return donanteRepository.findAll().stream()
+                .filter(d -> d.getPerfil() != null && d.getPerfil().getMisionActualId() != null)
+                .map(d -> com.tp.commons.dtos.incentivos.DonanteRachaDTO.builder()
+                        .donanteId(d.getPersona().getId())
+                        .misionActualId(d.getPerfil().getMisionActualId())
+                        .nivel(d.getPerfil().getNivelDonante())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public java.time.LocalDate obtenerFechaUltimaDonacion(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null || donante.getPerfil() == null
+                || donante.getPerfil().getHistorialDonaciones() == null
+                || donante.getPerfil().getHistorialDonaciones().isEmpty()) {
+            return null;
+        }
+
+        return donante.getPerfil().getHistorialDonaciones().stream()
+                .map(item -> item.getFecha())
+                .max(java.time.LocalDate::compareTo)
+                .orElse(null);
+    }
+
+    public void resetearProgresoRacha(Long donanteId) {
+        Donante donante = buscarDonantePorId(donanteId);
+        if (donante == null) {
+            throw new RuntimeException("Donante no encontrado con ID: " + donanteId);
+        }
+        donante.getPerfil().setProgreso(0.0);
+        donanteRepository.update(donante);
+        logger.info("Progreso de racha reseteado para donante ID: {}", donanteId);
+    }
 }

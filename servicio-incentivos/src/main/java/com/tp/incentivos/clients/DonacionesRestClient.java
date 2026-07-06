@@ -58,4 +58,45 @@ public class DonacionesRestClient {
             return null;
         }
     }
+
+    public List<com.tp.commons.dtos.incentivos.DonanteRachaDTO> obtenerDonantesConMisionActual() {
+        String url = UriComponentsBuilder.fromHttpUrl(donacionesUrl)
+                .path("/donantes/ids-mision-actual")
+                .build()
+                .toUriString();
+
+        com.tp.commons.dtos.incentivos.DonanteRachaDTO[] array = restTemplate.getForObject(
+                url, com.tp.commons.dtos.incentivos.DonanteRachaDTO[].class);
+
+        if (array == null) {
+            return List.of();
+        }
+        return java.util.Arrays.asList(array);
+    }
+
+    public java.time.LocalDate obtenerFechaUltimaDonacion(Long donanteId) {
+        String url = UriComponentsBuilder.fromHttpUrl(donacionesUrl)
+                .path("/donantes/{id}/fecha-ultima-donacion")
+                .buildAndExpand(donanteId)
+                .toUriString();
+
+        try {
+            java.util.Map<String, String> response = restTemplate.getForObject(url, java.util.Map.class);
+            if (response != null && response.get("fechaUltimaDonacion") != null) {
+                return java.time.LocalDate.parse(response.get("fechaUltimaDonacion"));
+            }
+        } catch (Exception e) {
+            // Si falla, retornamos null
+        }
+        return null;
+    }
+
+    public void resetearProgresoRacha(Long donanteId) {
+        String url = UriComponentsBuilder.fromHttpUrl(donacionesUrl)
+                .path("/donantes/{id}/resetear-progreso-racha")
+                .buildAndExpand(donanteId)
+                .toUriString();
+
+        restTemplate.put(url, null);
+    }
 }

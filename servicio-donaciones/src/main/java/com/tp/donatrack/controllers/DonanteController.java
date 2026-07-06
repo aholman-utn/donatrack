@@ -196,4 +196,26 @@ public class DonanteController {
 
         return ResponseEntity.ok(responseDTO);
     }
+
+    // GET /donantes/ids-mision-actual → lista de donantes con su misión actual y nivel
+    @GetMapping("/ids-mision-actual")
+    public ResponseEntity<List<com.tp.commons.dtos.incentivos.DonanteRachaDTO>> obtenerDonantesConMisionActual() {
+        return ResponseEntity.ok(donanteService.obtenerDonantesConMisionActual());
+    }
+
+    // GET /donantes/{id}/fecha-ultima-donacion → fecha de la última donación del donante
+    @GetMapping("/{id}/fecha-ultima-donacion")
+    public ResponseEntity<Map<String, String>> obtenerFechaUltimaDonacion(@PathVariable Long id) {
+        java.time.LocalDate fecha = donanteService.obtenerFechaUltimaDonacion(id);
+        Map<String, String> response = new java.util.HashMap<>();
+        response.put("fechaUltimaDonacion", fecha != null ? fecha.toString() : null);
+        return ResponseEntity.ok(response);
+    }
+
+    // PUT /donantes/{id}/resetear-progreso-racha → resetea el progreso del donante a 0
+    @PutMapping("/{id}/resetear-progreso-racha")
+    public ResponseEntity<Void> resetearProgresoRacha(@PathVariable Long id) {
+        donanteService.resetearProgresoRacha(id);
+        return ResponseEntity.ok().build();
+    }
 }
