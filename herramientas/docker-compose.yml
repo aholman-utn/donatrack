@@ -23,5 +23,15 @@ services:
     environment:
       - MAX_CONCURRENT_SESSIONS=10
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_DonaTrack
+    ports:
+      - "5672:5672"   # Puerto para Spring Boot
+      - "15672:15672" # Puerto para el panel web de administración
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: unless-stopped
 volumes:
   n8n_data:

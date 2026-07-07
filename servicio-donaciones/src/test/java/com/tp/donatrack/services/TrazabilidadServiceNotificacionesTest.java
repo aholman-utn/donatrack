@@ -2,7 +2,7 @@ package com.tp.donatrack.services;
 
 import com.tp.commons.domain.donaciones.Unidad;
 import com.tp.commons.domain.notificador.TipoNotificador;
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.donatrack.domain.bien.*;
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 class TrazabilidadServiceNotificacionesTest {
 
     @Mock
-    private NotificacionRestClient notificacionRestClient;
+    private NotificacionQueueClient notificacionQueueClient;
 
     private DonacionRepository donacionRepository;
     private DonanteRepository donanteRepository;
@@ -53,7 +53,7 @@ class TrazabilidadServiceNotificacionesTest {
                 donacionRepository,
                 donanteRepository,
                 entidadBeneficiariaRepository,
-                notificacionRestClient
+                notificacionQueueClient
         );
 
         PersonaHumana personaDonante = new PersonaHumana();
@@ -89,7 +89,7 @@ class TrazabilidadServiceNotificacionesTest {
 
         trazabilidadService.notificarInicioDeRuta(segmento);
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
                 argThat(s -> s.contains("ya inició la ruta de entrega")),
@@ -97,7 +97,7 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
                 argThat(s -> s.contains("en traslado hacia tu ubicación")),
@@ -117,7 +117,7 @@ class TrazabilidadServiceNotificacionesTest {
 
         trazabilidadService.recepcionarEntrega(idDonacion, idSegmento);
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
                 argThat(s -> s.contains("entregada exitosamente")),
@@ -125,7 +125,7 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
                 argThat(s -> s.contains("entregada y confirmada")),
@@ -145,7 +145,7 @@ class TrazabilidadServiceNotificacionesTest {
 
         trazabilidadService.notificarEntregaNoSatisfactoria(segmento, justificacion);
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
                 argThat(s -> s.contains("Tocamos timbre pero nadie respondió")),
@@ -153,7 +153,7 @@ class TrazabilidadServiceNotificacionesTest {
                 eq(donante.getPersona().getId())
         );
 
-        verify(notificacionRestClient).notificar(
+        verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
                 argThat(s -> s.contains("Tocamos timbre pero nadie respondió")),
@@ -168,7 +168,7 @@ class TrazabilidadServiceNotificacionesTest {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
         segmento.iniciarTraslado("Chofer");
 
-        when(notificacionRestClient.notificar(any(), any(), any(), any(), any()))
+        when(notificacionQueueClient.notificar(any(), any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("Servicio de notificaciones no disponible"));
 
         assertDoesNotThrow(() ->
@@ -191,7 +191,7 @@ class TrazabilidadServiceNotificacionesTest {
 
         trazabilidadService.notificarInicioDeRuta(segmento);
 
-        verify(notificacionRestClient, never()).notificar(any(), any(), any(), any(), any());
+        verify(notificacionQueueClient, never()).notificar(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -215,6 +215,6 @@ class TrazabilidadServiceNotificacionesTest {
 
         trazabilidadService.notificarInicioDeRuta(segmento);
 
-        verify(notificacionRestClient, never()).notificar(any(), any(), any(), any(), any());
+        verify(notificacionQueueClient, never()).notificar(any(), any(), any(), any(), any());
     }
 }

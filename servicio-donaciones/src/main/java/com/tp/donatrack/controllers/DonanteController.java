@@ -2,7 +2,7 @@ package com.tp.donatrack.controllers;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.donatrack.domain.persona.Persona;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.dtos.CrearPersonaHumanaRequest;
@@ -26,14 +26,14 @@ import java.util.Map;
 public class DonanteController {
 
     private final DonanteService donanteService;
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionQueueClient;
 
     public DonanteController(
             DonanteService donanteService,
-            NotificacionRestClient notificacionRestClient
+            NotificacionQueueClient notificacionQueueClient
     ) {
         this.donanteService = donanteService;
-        this.notificacionRestClient = notificacionRestClient;
+        this.notificacionQueueClient = notificacionQueueClient;
     }
 
     // GET /donantes → listar todos
@@ -74,7 +74,7 @@ public class DonanteController {
             @Valid @RequestBody CrearPersonaHumanaRequest request) {
         Donante donante = donanteService.registrar(request.toDomain());
         Persona persona = donante.getPersona();
-        boolean enviada = notificacionRestClient.notificar(
+        boolean enviada = notificacionQueueClient.notificar(
                 persona.getTipoNotificadorPreferido(),
                 persona.getContactoPredeterminado(),
                 "Gracias por registrarte como donante.",
@@ -95,7 +95,7 @@ public class DonanteController {
         Donante donante = donanteService.registrar(request.toDomain());
         Persona persona = donante.getPersona();
         System.err.println("Persona: "+persona.getId());
-        boolean enviada = notificacionRestClient.notificar(
+        boolean enviada = notificacionQueueClient.notificar(
                 persona.getTipoNotificadorPreferido(),
                 persona.getContactoPredeterminado(),
                 "Gracias por registrarte como donante.",

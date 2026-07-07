@@ -1,7 +1,7 @@
 package com.tp.donatrack.services;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 @Service
 public class DonanteService {
     private final DonanteRepository donanteRepository;
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionQueueClient;
     private static final Logger logger = LoggerFactory.getLogger(DonanteService.class);
 
     @Autowired
@@ -42,10 +42,10 @@ public class DonanteService {
 
     public DonanteService(
             DonanteRepository donanteRepository,
-            NotificacionRestClient notifService,
+            NotificacionQueueClient notificacionQueueClient,
             List<iLectorArchivo> lectores) {
         this.donanteRepository = donanteRepository;
-        this.notificacionRestClient = notifService;
+        this.notificacionQueueClient = notificacionQueueClient;
         this.lectoresDeArchivos = lectores;
     }
 
@@ -105,7 +105,7 @@ public class DonanteService {
             for (Donante donante : nuevos_donantes) {
                 Persona persona = donante.getPersona();
                 String email = persona.getMedioDeContacto().get("email").getFirst();
-                notificacionRestClient.notificar(
+                notificacionQueueClient.notificar(
                         TipoNotificador.EMAIL,
                         email,
                         "Gracias por sumarte como donante...",
@@ -189,7 +189,7 @@ public class DonanteService {
 
                     logger.info("Notificando a donante ID: {} vía {}", persona.getId(), tipoNotificador);
 
-                    notificacionRestClient.notificar(
+                    notificacionQueueClient.notificar(
                             tipoNotificador,
                             contacto,
                             "Se ha confirmado la recepción de la donación.",

@@ -11,18 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificacionRequestDTO {
+
     @NotNull(message="El medio de notificacion debe ser enviado")
-    TipoNotificador medio;
+    private TipoNotificador medio;
 
     @NotBlank(message="El destinatario es requerido")
-    String destinatario;
+    private String destinatario;
 
     @NotBlank(message="El mensaje no puede estar vacío")
-    String mensaje;
+    private String mensaje;
 
     //Optional
-    String asunto;
+    private String asunto;
 
     //TODO: Podriamos pasarlo a un uuid
-    Long idPersona;
+    private Long idPersona;
 }

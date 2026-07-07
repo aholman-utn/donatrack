@@ -1,6 +1,6 @@
 package com.tp.donatrack.tasks;
 
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.donatrack.dtos.DonanteInactivoDTO;
 import com.tp.donatrack.services.DonanteService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 @Component
 public class DonantesInactivosCron {
     private static final Logger logger = LoggerFactory.getLogger(DonantesInactivosCron.class);
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionQueueClient;
     private final DonanteService donanteService; 
 
     public DonantesInactivosCron(
-        NotificacionRestClient notificacionRestClient,
+            NotificacionQueueClient notificacionQueueClient,
         DonanteService donanteService
     ) {
-        this.notificacionRestClient = notificacionRestClient;
+        this.notificacionQueueClient = notificacionQueueClient;
         this.donanteService = donanteService;
     }
 
@@ -35,7 +35,7 @@ public class DonantesInactivosCron {
                 String asunto = "¡Te extrañamos en Donatrack!";
                 String mensaje = "Hace un tiempo que no registrás actividad. Tu ayuda es muy importante, ¡sumate con una nueva donación!";
 
-                boolean enviado = notificacionRestClient.notificar(
+                boolean enviado = notificacionQueueClient.notificar(
                         donante.getTipoNotificadorPreferido(),
                         donante.getContacto(),
                         mensaje,

@@ -1,7 +1,8 @@
 package com.tp.donatrack.services;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.persona.Persona;
@@ -18,14 +19,14 @@ import java.util.List;
 @Service
 public class EntidadBeneficiariaService {
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionQueueClient;
     private static final Logger logger = LoggerFactory.getLogger(EntidadBeneficiariaService.class);
 
     public EntidadBeneficiariaService(
             EntidadBeneficiariaRepository entidadBeneficiariaRepository,
-            NotificacionRestClient notificacionRestClient) {
+            NotificacionQueueClient notificacionQueueClient) {
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
-        this.notificacionRestClient = notificacionRestClient;
+        this.notificacionQueueClient = notificacionQueueClient;
     }
 
     // CREATE
@@ -83,7 +84,7 @@ public class EntidadBeneficiariaService {
 
                     logger.info("Notificando a entidad ID: {} vía {}", personaEntidad.getId(), tipoNotificador);
 
-                    notificacionRestClient.notificar(
+                    notificacionQueueClient.notificar(
                             tipoNotificador,
                             contacto,
                             "Se ha confirmado la recepción de la donación.",

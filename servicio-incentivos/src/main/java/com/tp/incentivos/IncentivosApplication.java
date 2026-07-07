@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
         },
         scanBasePackages = {
                 "com.tp.incentivos",
-                "com.tp.donatrack.notificaciones",
                 "com.tp.commons"
         }
 )

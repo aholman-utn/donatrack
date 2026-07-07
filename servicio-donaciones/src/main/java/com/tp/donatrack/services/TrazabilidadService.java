@@ -1,7 +1,7 @@
 package com.tp.donatrack.services;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
-import com.tp.commons.services.notificador.NotificacionRestClient;
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
@@ -34,17 +34,17 @@ public class TrazabilidadService {
     private final DonacionRepository donacionRepository;
     private final DonanteRepository donanteRepository;
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionRestClient;
 
     public TrazabilidadService(
             DonacionRepository donacionRepository,
             DonanteRepository donanteRepository,
             EntidadBeneficiariaRepository entidadBeneficiariaRepository,
-            NotificacionRestClient notificacionRestClient) {
+            NotificacionQueueClient notificacionQueueClient) {
         this.donacionRepository = donacionRepository;
         this.donanteRepository = donanteRepository;
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
-        this.notificacionRestClient = notificacionRestClient;
+        this.notificacionRestClient = notificacionQueueClient;
     }
 
     private Donacion buscarDonacionPorId(Integer id) {

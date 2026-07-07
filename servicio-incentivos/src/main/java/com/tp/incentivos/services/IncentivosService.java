@@ -5,9 +5,7 @@ import com.tp.commons.domain.donantes.Nivel;
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
-
-import com.tp.commons.services.notificador.NotificacionRestClient;
-
+import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.incentivos.clients.DonacionesRestClient;
 import com.tp.incentivos.clients.InsigniasRestClient;
 import com.tp.incentivos.domain.misiones.Mision;
@@ -26,18 +24,19 @@ public class IncentivosService {
     private final MisionRepository misionRepository;
     private final DonacionesRestClient donacionesRestClient;
     private final InsigniasRestClient insigniasRestClient;
-    private final NotificacionRestClient notificacionRestClient;
+    private final NotificacionQueueClient notificacionQueueClient;
     private static final Logger logger = LoggerFactory.getLogger(IncentivosService.class);
 
     public IncentivosService(
             MisionRepository misionRepository,
             DonacionesRestClient donacionesRestClient,
             InsigniasRestClient insigniasRestClient,
-            NotificacionRestClient notificacionRestClient) {
+            NotificacionQueueClient notificacionQueueClient
+    ) {
         this.misionRepository = misionRepository;
         this.donacionesRestClient = donacionesRestClient;
         this.insigniasRestClient = insigniasRestClient;
-        this.notificacionRestClient = notificacionRestClient;
+        this.notificacionQueueClient = notificacionQueueClient;
     }
 
     public EvaluacionMisionResponseDTO procesarNuevaEntrega(EntregaDonacionDTO dto) {
@@ -156,7 +155,7 @@ public class IncentivosService {
             logger.info("Enviando request de notificación ({}) para donante {} vía {}", asunto, donanteId,
                     requestNotificacion.getMedio());
 
-            this.notificacionRestClient.notificar(
+            this.notificacionQueueClient.notificar(
                     requestNotificacion.getMedio(),
                     requestNotificacion.getDestinatario(),
                     requestNotificacion.getMensaje(),
