@@ -352,3 +352,24 @@ Una vez levantado el servicio, abrí en el navegador:
 | servicio-incentivos | 8081 |
 | servicio-notificaciones | 8082 |
 | servicio-logistica | 8083 |
+
+---
+
+## 📧 Configuración de Email (Resend)
+
+El servicio de notificaciones envía emails reales usando [Resend](https://resend.com).
+
+### Configurar para desarrollo local
+
+1. Crear una cuenta gratuita en https://resend.com (100 emails/día gratis)
+2. Obtener tu API key desde el dashboard de Resend
+3. Configurar la variable de entorno antes de levantar el servicio:
+
+```bash
+export RESEND_API_KEY=tu_api_key_aca
+```
+
+4. Si no configurás la variable, el servicio usa un provider simulado que imprime en consola.
+
+### Nota
+La API key del equipo está en el archivo `SECRETS.md` (no se sube al repo). Pedila al grupo.
