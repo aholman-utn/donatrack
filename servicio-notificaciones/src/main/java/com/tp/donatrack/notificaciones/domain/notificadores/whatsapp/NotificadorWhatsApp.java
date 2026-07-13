@@ -16,7 +16,7 @@ public class NotificadorWhatsApp implements iNotificador {
     @Override
     public void enviarNotificacion(String numero, String mensaje, String asunto) {
         try {
-            whatsAppProvider.enviarWhatsApp(numero, mensaje);
+            whatsAppProvider.enviarWhatsApp(numero, mensaje, asunto);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
