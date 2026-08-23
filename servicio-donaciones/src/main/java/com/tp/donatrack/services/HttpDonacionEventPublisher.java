@@ -49,7 +49,7 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
             // Log para ver qué estamos enviando
             logger.debug("Enviando request a Incentivos: {}", requestBody);
 
-            String url = incentivosUrl + "/entrega";
+            String url = incentivosUrl + "/entrega"; // mando la info de la donacion al servicio de incentivos
 
             var responseEntity = restTemplate.postForEntity(
                     url,

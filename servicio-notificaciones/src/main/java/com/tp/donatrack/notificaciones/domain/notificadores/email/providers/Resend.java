@@ -46,7 +46,7 @@ public class Resend implements iEmailProvider {
 
             Map<String, Object> body = new HashMap<>();
             body.put("from", fromEmail);
-            body.put("to", new String[]{destinatario});
+            body.put("to", new String[] { destinatario });
             body.put("subject", asunto);
             body.put("text", mensaje);
 

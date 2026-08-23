@@ -36,6 +36,7 @@ public class ServicioRanking {
             
             String categoriaDonante = "COLABORADOR";
             int totalMisionesCompletadas = 0;
+            int totalDonacionesExitosas = 0;
             
             if (perfil != null) {
                 categoriaDonante = (String) perfil.getOrDefault("nivelDonante", "COLABORADOR");
@@ -48,16 +49,31 @@ public class ServicioRanking {
                     // Si es transformador y ya no tiene mision actual, cumplio las 4.
                     totalMisionesCompletadas = 4;
                 }
+
+                Object metricasObj = perfil.get("metricasPerfil");
+                if (metricasObj instanceof Map<?, ?> metricas) {
+                    Object totalObj = metricas.get("totalDonacionesExitosas");
+                    if (totalObj instanceof Number num) {
+                        totalDonacionesExitosas = num.intValue();
+                    } else if (totalObj != null) {
+                        totalDonacionesExitosas = Integer.parseInt(totalObj.toString());
+                    }
+                } else if (perfil.get("historialDonaciones") instanceof List<?> historial) {
+                    totalDonacionesExitosas = historial.size();
+                }
             }
             
             ranking.add(RankingItemDTO.builder()
                     .donanteId(donanteId)
                     .categoriaDonante(categoriaDonante)
                     .totalMisionesCompletadas(totalMisionesCompletadas)
+                    .totalDonacionesExitosas(totalDonacionesExitosas)
                     .build());
         }
 
-        ranking.sort(Comparator.comparingInt(RankingItemDTO::getTotalMisionesCompletadas).reversed());
+        ranking.sort(Comparator.comparingInt(RankingItemDTO::getTotalMisionesCompletadas)
+                .thenComparingInt(RankingItemDTO::getTotalDonacionesExitosas)
+                .reversed());
 
         AtomicInteger posicion = new AtomicInteger(1);
         for (RankingItemDTO item : ranking) {
