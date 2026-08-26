@@ -50,6 +50,11 @@
             <artifactId>donatrack-commons</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.vonage</groupId>
+            <artifactId>server-sdk</artifactId>
+            <version>9.13.0</version>
+        </dependency>
     </dependencies>
 
 </project>
