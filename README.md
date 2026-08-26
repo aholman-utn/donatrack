@@ -373,3 +373,37 @@ export RESEND_API_KEY=tu_api_key_aca
 
 ### Nota
 La API key del equipo está en el archivo `SECRETS.md` (no se sube al repo). Pedila al grupo.
+
+### Probar envío de email paso a paso
+
+1. Levantar RabbitMQ:
+```bash
+docker compose -f herramientas/docker-compose.yml up rabbitmq -d
+```
+
+2. Exportar la API key (en la misma terminal donde vas a levantar el servicio):
+```bash
+export RESEND_API_KEY=tu_api_key_aca
+```
+
+3. Levantar el servicio de notificaciones:
+```bash
+./mvnw spring-boot:run -pl servicio-notificaciones
+```
+
+4. Enviar un mensaje de prueba a la cola. Entrar al panel de RabbitMQ en http://localhost:15672 (user: `guest`, pass: `guest`), ir a **Queues → notificaciones.queue → Publish message** y pegar:
+```json
+{
+  "medio": "EMAIL",
+  "destinatario": "tu-email@gmail.com",
+  "mensaje": "Prueba de notificación por email desde DonaTrack",
+  "asunto": "Test DonaTrack",
+  "idPersona": 1
+}
+```
+
+5. Verificar que llegó el email a tu casilla (revisar spam). En los logs del servicio deberías ver: `Email enviado exitosamente a ...`
+
+**Nota sobre el sender de prueba:** con la cuenta gratuita de Resend y el sender `onboarding@resend.dev`, solo se pueden enviar emails a la dirección con la que se registró la cuenta. Para enviar a otros destinatarios, se necesita verificar un dominio propio.
+
+**Límites del plan gratuito de Resend:** 100 emails/día, 3.000 emails/mes. La API key no vence.
