@@ -192,7 +192,7 @@ public class DonanteService {
                     notificacionQueueClient.notificar(
                             tipoNotificador,
                             contacto,
-                            "Se ha confirmado la recepción de la donación.",
+                            "Se ha confirmado la recepción de la donación que ha realizado.",
                             "Confirmación de Entrega a Entidad Beneficiaria",
                             persona.getId());
                     logger.info("Notificación de donante {} enviada con éxito.", persona.getId());

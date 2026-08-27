@@ -15,18 +15,26 @@ public class Envio {
     private Long id;
     private Long donacionSegmentadaId;
     private Long entidadBeneficiariaId;
+    private Long rutaId;
     private EstadoEnvio estado;
 
-    public void registrarRecepcionExitosa() {
+    public void registrarEnDestino() {
         if (this.estado != EstadoEnvio.EN_TRASLADO && this.estado != EstadoEnvio.ASIGNACION_REALIZADA) {
-            throw new IllegalStateException("El envío debe estar en traslado o asignado para poder registrar su recepción");
+            throw new IllegalStateException("El envío debe estar en traslado (o asignado) para marcar llegada a destino. Estado actual: " + this.estado);
+        }
+        this.estado = EstadoEnvio.EN_DESTINO;
+    }
+
+    public void registrarRecepcionExitosa() {
+        if (this.estado != EstadoEnvio.EN_DESTINO) {
+            throw new IllegalStateException("El envío debe estar en destino para confirmar recepción. Estado actual: " + this.estado);
         }
         this.estado = EstadoEnvio.ENTREGADA;
     }
 
     public void registrarRecepcionFallida() {
-        if (this.estado != EstadoEnvio.EN_TRASLADO && this.estado != EstadoEnvio.ASIGNACION_REALIZADA) {
-            throw new IllegalStateException("El envío debe estar en traslado o asignado para poder registrar una falla en su recepción");
+        if (this.estado != EstadoEnvio.EN_DESTINO && this.estado != EstadoEnvio.EN_TRASLADO) {
+            throw new IllegalStateException("Solo se puede fallar un envío que está en traslado o en destino. Estado actual: " + this.estado);
         }
         this.estado = EstadoEnvio.NO_RECIBIDA;
     }

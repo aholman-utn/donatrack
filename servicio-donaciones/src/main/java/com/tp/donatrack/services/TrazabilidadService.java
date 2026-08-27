@@ -2,6 +2,7 @@ package com.tp.donatrack.services;
 
 import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.commons.services.notificador.NotificacionQueueClient;
+import com.tp.donatrack.domain.donacion.ComprobanteRecepcionDonacion;
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
@@ -12,6 +13,7 @@ import com.tp.donatrack.dtos.CrearEventoRequest;
 import com.tp.donatrack.dtos.TrazaDonacionDTO;
 import com.tp.donatrack.dtos.TrazaSegmentoDTO;
 
+import com.tp.donatrack.repositories.ComprobanteRepository;
 import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.DonanteRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
@@ -19,6 +21,8 @@ import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +37,7 @@ public class TrazabilidadService {
 
     private final DonacionRepository donacionRepository;
     private final DonanteRepository donanteRepository;
+    private final ComprobanteRepository comprobanteRepository;
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
     private final NotificacionQueueClient notificacionRestClient;
 
@@ -40,7 +45,10 @@ public class TrazabilidadService {
             DonacionRepository donacionRepository,
             DonanteRepository donanteRepository,
             EntidadBeneficiariaRepository entidadBeneficiariaRepository,
-            NotificacionQueueClient notificacionQueueClient) {
+            NotificacionQueueClient notificacionQueueClient,
+            ComprobanteRepository comprobanteRepository
+    ) {
+        this.comprobanteRepository = comprobanteRepository;
         this.donacionRepository = donacionRepository;
         this.donanteRepository = donanteRepository;
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
@@ -158,25 +166,42 @@ public class TrazabilidadService {
      * Permite a la entidad beneficiaria confirmar la recepción de una donación.
      * Transiciona el estado a ENTREGADA y envía notificación al donante y a la entidad.
      *
-     * @param idDonacion  ID de la donación padre
      * @param idSegmento  ID de la donación segmentada a recepcionar
      * @return traza actualizada del segmento
      */
-    public TrazaSegmentoDTO recepcionarEntrega(Integer idDonacion, Integer idSegmento) {
+    public TrazaSegmentoDTO recepcionarEntrega(Integer idDonacion, Integer idSegmento, LocalDateTime fechaEntrega, String detallesLogistica) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGADA)) {
             throw new IllegalArgumentException("No es posible recepcionar esta donación en su estado actual: " + segmentada.getEstado());
         }
         segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId());
 
         Donacion donacion = buscarDonacionPorDonacionSegmentada(segmentada);
-        if (donacion != null) {
-            notificarEntregaExitosa(donacion, segmentada);
+        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(segmentada.getEntidadBeneficiariaAsignadaId());
+
+        ComprobanteRecepcionDonacion comprobante = ComprobanteRecepcionDonacion.builder()
+                .donacionSegmentadaId(segmentada.getId())
+                .nombreDonante(donacion != null ? donacion.getDonante().getNombreCompleto() : "Anónimo")
+                .nombreEntidad(entidad != null ? entidad.getDatosDeEntidad().getRazonSocial() : "Entidad Desconocida")
+                .fechaEntrega(fechaEntrega != null ? fechaEntrega : java.time.LocalDateTime.now())
+                .detallesLogistica(detallesLogistica != null ? detallesLogistica : "Pendiente de sincronizar")
+                .build();
+
+        comprobante.generarId();
+        comprobanteRepository.save(comprobante);
+
+        segmentada.setComprobanteRecepcionDonacion(comprobante);
+
+        if (donacion != null && donacion.getDonante() != null) {
+            notificarEntregaExitosa(donacion, segmentada, comprobante.getId());
         }
 
-        return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
+        return TrazaSegmentoDTO.builder()
+                .id(idSegmento)
+                .eventos(segmentada.getHistorial())
+                .build();
     }
-
     /**
      * Notifica al donante y a la entidad beneficiaria que la donación inició la ruta de entrega.
      * Invocado desde el polling de logística al detectar un evento INICIO_RUTA.
@@ -272,10 +297,12 @@ public class TrazabilidadService {
      * Notifica al donante y a la entidad beneficiaria que la entrega fue exitosa.
      * Invocado desde recepcionarEntrega cuando la entidad confirma la recepción.
      */
-    private void notificarEntregaExitosa(Donacion donacion, DonacionSegmentada segmentada) {
+    private void notificarEntregaExitosa(Donacion donacion, DonacionSegmentada segmentada, String comprobanteId) {
         String categoria = segmentada.getSubCategoria() != null
                 ? segmentada.getSubCategoria().getDescripcion()
                 : "donación";
+
+        String urlComprobante = "http://localhost:8080/api/comprobantes/" + comprobanteId;
 
         if (donacion.getDonante() != null) {
             Donante donante = donacion.getDonante();
@@ -285,12 +312,13 @@ public class TrazabilidadService {
             if (contacto != null) {
                 String asunto = "¡Tu donación fue entregada con éxito!";
                 String mensaje = String.format(
-                        "Hola %s, tu donación de %s fue entregada exitosamente a la entidad beneficiaria. ¡Gracias por hacer la diferencia!",
-                        donante.getNombreCompleto(), categoria);
+                        "Hola %s, tu donación de %s fue entregada exitosamente a la entidad beneficiaria. " +
+                                "Podés ver tu comprobante de entrega digital aquí: %s",
+                        donante.getNombreCompleto(), categoria, urlComprobante);
+
                 enviarNotificacionSegura(medio, contacto, mensaje, asunto, donante.getPersona().getId());
             }
         }
-
         if (segmentada.getEntidadBeneficiariaAsignadaId() != null) {
             EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(segmentada.getEntidadBeneficiariaAsignadaId());
             if (entidad != null && entidad.getDatosDeEntidad() != null) {
@@ -300,8 +328,10 @@ public class TrazabilidadService {
                 if (contactoEntidad != null) {
                     String asunto = "Entrega recibida exitosamente";
                     String mensaje = String.format(
-                            "La donación de %s fue entregada y confirmada en tu entidad. ¡Gracias por ser parte de la red DonaTrack!",
-                            categoria);
+                            "La donación de %s fue entregada y confirmada en tu entidad. " +
+                                    "Podés acceder al comprobante de la logística aquí: %s",
+                            categoria, urlComprobante);
+
                     enviarNotificacionSegura(medioEntidad, contactoEntidad, mensaje, asunto, entidad.getDatosDeEntidad().getId());
                 }
             }

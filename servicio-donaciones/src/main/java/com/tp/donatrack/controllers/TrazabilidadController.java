@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static java.time.LocalDateTime.now;
+
 /**
  * Controller REST para la trazabilidad de donaciones segmentadas.
  * Expone endpoints para consultar el historial de estados y realizar transiciones.
@@ -147,7 +149,12 @@ public class TrazabilidadController {
             @PathVariable Integer idSegmento
     ) {
         try {
-            TrazaSegmentoDTO traza = trazabilidadService.recepcionarEntrega(idDonacion, idSegmento);
+            TrazaSegmentoDTO traza = trazabilidadService.recepcionarEntrega(
+                    idDonacion,
+                    idSegmento,
+                    now(),
+                    "Confirmación manual de la entidad"
+            );
             return ResponseEntity.ok(traza);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

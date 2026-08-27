@@ -5,6 +5,7 @@ public enum EstadoDonacionSegmentada {
     ASIGNACION_REALIZADA,
     LISTA_PARA_ENTREGAR,
     EN_TRASLADO,
+    PENDIENTE_RECEPCION,
     ENTREGADA,
     ENTREGA_FALLIDA,
     VENCIDA

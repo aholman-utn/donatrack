@@ -23,6 +23,7 @@ public class DonacionSegmentada {
     private final List<EventoTrazabilidad> historial = new ArrayList<>();
     private Long donanteId;
     private Long entidadBeneficiariaAsignadaId;
+    private ComprobanteRecepcionDonacion comprobanteRecepcionDonacion;
 
     public DonacionSegmentada(
             int cantidad,
@@ -122,5 +123,13 @@ public class DonacionSegmentada {
     private void registrarEvento(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor,
             String descripcion) {
         historial.add(new EventoTrazabilidad(anterior, nuevo, actor, descripcion));
+    }
+
+    public void registrarLlegadaADestino(String actor) {
+        transicionar(
+                EstadoDonacionSegmentada.PENDIENTE_RECEPCION,
+                actor,
+                "El vehículo de logística reportó la llegada. Esperando confirmación de la entidad."
+        );
     }
 }

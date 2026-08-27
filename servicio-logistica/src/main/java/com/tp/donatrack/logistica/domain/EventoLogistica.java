@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class EventoLogistica {
-    private String tipoEvento; // "INICIO_RUTA", "ENTREGA_EXITOSA", "ENTREGA_FALLIDA"
+    //TO DO: tipoEvento tiene que ser un enum.
+    private String tipoEvento; // "INICIO_RUTA", "ENTREGA_EXITOSA", "ENTREGA_FALLIDA", "LLEGADA_A_DESTINO"
     private Long donacionSegmentadaId;
     private Long entidadBeneficiariaId;
     private LocalDateTime timestamp;

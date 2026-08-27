@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Comprobante de Recepción - DonatRack</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 40px; display: flex; justify-content: center; }
+            .card { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid #2b6cb0; }
+            h1 { color: #2d3748; font-size: 24px; margin-bottom: 5px; }
+            .subtitle { color: #718096; font-size: 14px; margin-bottom: 25px; }
+            .section { margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
+            .label { font-size: 12px; text-transform: uppercase; color: #a0aec0; font-weight: bold; letter-spacing: 0.5px; }
+            .value { font-size: 16px; color: #4a5568; margin-top: 4px; font-weight: 500; }
+            .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #cbd5e0; }
+            .logo-container {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .logo-container img {
+                max-width: 150px;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="logo-container">
+                <img th:src="@{/img/donatrack.jpeg}" alt="Logo DonatRack">
+            </div>
+            <h1>📦 Comprobante de Recepción</h1>
+            <div class="subtitle">ID: <span th:text="${comprobante.id}">12345</span></div>
+
+            <div class="section">
+                <div class="label">Donante</div>
+                <div class="value" th:text="${comprobante.nombreDonante}">Nombre del Donante</div>
+            </div>
+
+            <div class="section">
+                <div class="label">Entidad Beneficiaria</div>
+                <div class="value" th:text="${comprobante.nombreEntidad}">Nombre de la Entidad</div>
+            </div>
+
+            <div class="section">
+                <div class="label">Fecha y Hora de Entrega</div>
+                <div class="value" th:text="${#temporals.format(comprobante.fechaEntrega, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</div>
+            </div>
+
+            <div class="section">
+                <div class="label">Detalles de Logística</div>
+                <div class="value" th:text="${comprobante.detallesLogistica}">Detalles...</div>
+            </div>
+
+            <div class="footer">Generado automáticamente por DonatRack Logística</div>
+        </div>
+    </body>
+</html>

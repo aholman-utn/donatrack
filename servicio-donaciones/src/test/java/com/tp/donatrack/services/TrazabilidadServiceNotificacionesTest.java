@@ -11,6 +11,7 @@ import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
+import com.tp.donatrack.repositories.ComprobanteRepository;
 import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.DonanteRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
@@ -37,6 +38,7 @@ class TrazabilidadServiceNotificacionesTest {
     private DonacionRepository donacionRepository;
     private DonanteRepository donanteRepository;
     private EntidadBeneficiariaRepository entidadBeneficiariaRepository;
+    private ComprobanteRepository comprobanteRepository;
     private TrazabilidadService trazabilidadService;
 
     private Donacion donacion;
@@ -48,12 +50,15 @@ class TrazabilidadServiceNotificacionesTest {
         donacionRepository = new DonacionRepository();
         donanteRepository = new DonanteRepository();
         entidadBeneficiariaRepository = new EntidadBeneficiariaRepository();
+        comprobanteRepository = new ComprobanteRepository(); // <-- NUEVO: Inicializamos
 
+        // <-- NUEVO: Ajustamos el constructor con los 5 parámetros
         trazabilidadService = new TrazabilidadService(
                 donacionRepository,
                 donanteRepository,
                 entidadBeneficiariaRepository,
-                notificacionQueueClient
+                notificacionQueueClient,
+                comprobanteRepository
         );
 
         PersonaHumana personaDonante = new PersonaHumana();
@@ -107,20 +112,21 @@ class TrazabilidadServiceNotificacionesTest {
     }
 
     @Test
-    @DisplayName("recepcionarEntrega notifica al donante y a la entidad beneficiaria")
+    @DisplayName("recepcionarEntrega notifica al donante y a la entidad beneficiaria con comprobante")
     void notificaEntregaExitosa() {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().getFirst();
         Integer idDonacion = donacion.getId();
         Integer idSegmento = Math.toIntExact(segmento.getId());
 
         segmento.iniciarTraslado("Chofer");
+        segmento.registrarLlegadaADestino("Chofer");
 
-        trazabilidadService.recepcionarEntrega(idDonacion, idSegmento);
+        trazabilidadService.recepcionarEntrega(idDonacion, idSegmento, java.time.LocalDateTime.now(), "Patente AB123CD");
 
         verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("juan@mail.com"),
-                argThat(s -> s.contains("entregada exitosamente")),
+                argThat(s -> s.contains("Podés ver tu comprobante de entrega digital")),
                 eq("¡Tu donación fue entregada con éxito!"),
                 eq(donante.getPersona().getId())
         );
@@ -128,7 +134,7 @@ class TrazabilidadServiceNotificacionesTest {
         verify(notificacionQueueClient).notificar(
                 eq(TipoNotificador.EMAIL),
                 eq("comedor@mail.com"),
-                argThat(s -> s.contains("entregada y confirmada")),
+                argThat(s -> s.contains("Podés acceder al comprobante")),
                 eq("Entrega recibida exitosamente"),
                 eq(entidad.getDatosDeEntidad().getId())
         );

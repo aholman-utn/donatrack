@@ -26,6 +26,12 @@ public class DonacionSegmentadaController {
         this.donanteService = donanteService;
     }
 
+    @GetMapping("/{donacionSegmentadaId}")
+    public ResponseEntity<DonacionSegmentada> getById(@PathVariable("donacionSegmentadaId") Long donacionSegmentadaId) {
+        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
+        return ResponseEntity.ok(segmentada);
+    }
+
     @GetMapping("/indicadores/{donacionSegmentadaId}")
     public ResponseEntity<IndicadoresDonanteDTO> obtenerIndicadores(
             @PathVariable("donacionSegmentadaId") Long donacionSegmentadaId,

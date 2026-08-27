@@ -60,6 +60,14 @@ public class DonacionRepository {
                 .orElse(null);
     }
 
+    public Donacion findDonacionByDonacionesSegmentadaId(Long segmentadaId) {
+        return this.donaciones.stream()
+                .filter(d -> d.getDonacionesSegmentadas().stream()
+                        .anyMatch(ds -> ds.getId() != null && ds.getId().equals(segmentadaId)))
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Long donanteId) {
         return findByDonanteId(donanteId).stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())

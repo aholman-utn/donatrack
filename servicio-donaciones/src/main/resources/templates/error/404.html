@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>No Encontrado - DonatRack</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 6px solid #e53e3e; /* Borde rojo indicando error */
+            text-align: center;
+        }
+        h1 {
+            color: #2d3748;
+            font-size: 72px;
+            margin: 0;
+            line-height: 1;
+            font-weight: 800;
+        }
+        h2 {
+            color: #4a5568;
+            font-size: 22px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #718096;
+            font-size: 15px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2b6cb0;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #2c5282;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo-container">
+        <img th:src="@{/img/donatrack.jpeg}" alt="Logo DonatRack">
+    </div>
+    <h1>404</h1>
+    <h2>Comprobante no encontrado</h2>
+    <p>El enlace al que intentás acceder no existe, caducó, o el comprobante todavía no fue sincronizado en nuestro sistema.</p>
+</div>
+</body>
+</html>
