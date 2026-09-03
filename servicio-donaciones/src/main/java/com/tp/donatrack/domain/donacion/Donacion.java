@@ -59,8 +59,9 @@ public class Donacion {
         boolean todasAsignadas = this.donacionesSegmentadas.stream()
                 .allMatch(s -> s.getEstado() == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
                         || s.getEstado() == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR
+                        || s.getEstado() == EstadoDonacionSegmentada.EN_PLANIFICACION
                         || s.getEstado() == EstadoDonacionSegmentada.EN_TRASLADO
-                        || s.getEstado() == EstadoDonacionSegmentada.ENTREGADA); 
+                        || s.getEstado() == EstadoDonacionSegmentada.ENTREGADA);
         
         return todasAsignadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
     }

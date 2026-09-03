@@ -6,6 +6,9 @@ import com.tp.donatrack.logistica.domain.EstadoEnvio;
 import com.tp.donatrack.logistica.domain.EventoLogistica;
 import com.tp.donatrack.logistica.domain.Ruta;
 import com.tp.donatrack.logistica.repository.LogisticaEventRepository;
+import com.tp.donatrack.logistica.clients.DonacionesQueueClient;
+import com.tp.commons.dtos.logistica.EventoLogisticaDTO;
+import com.tp.commons.dtos.logistica.TipoEventoLogistica;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ public class EnviosService {
 
     private final RutaService rutaService;
     private final CamionService camionService;
+    private final DonacionesQueueClient donacionesQueueClient;
 
     private final Map<Long, Envio> envios = new ConcurrentHashMap<>();
     private final AtomicLong envioIdSeq = new AtomicLong(1);
@@ -27,11 +31,13 @@ public class EnviosService {
     public EnviosService(
             LogisticaEventRepository eventRepository,
             RutaService rutaService,
-            CamionService camionService
+            CamionService camionService,
+            DonacionesQueueClient donacionesQueueClient
     ) {
         this.eventRepository = eventRepository;
         this.rutaService = rutaService;
         this.camionService = camionService;
+        this.donacionesQueueClient = donacionesQueueClient;
     }
 
     public Envio registrarEnvio(Envio envio) {
@@ -64,6 +70,15 @@ public class EnviosService {
                 .build();
 
         eventRepository.registrar(evento);
+        
+        EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
+                .tipoEvento(TipoEventoLogistica.LLEGADA_A_DESTINO)
+                .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                .timestamp(evento.getTimestamp())
+                .detalles(evento.getDetalles())
+                .build();
+        donacionesQueueClient.publicarEvento(dto);
     }
 
     public void registrarEntregaExitosa(Long envioId, String detallesExtra) {
@@ -90,6 +105,15 @@ public class EnviosService {
                 .build();
 
         eventRepository.registrar(evento);
+        
+        EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
+                .tipoEvento(TipoEventoLogistica.ENTREGA_EXITOSA)
+                .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                .timestamp(evento.getTimestamp())
+                .detalles(evento.getDetalles())
+                .build();
+        donacionesQueueClient.publicarEvento(dto);
     }
 
     public void registrarEntregaFallida(Long envioId, String motivo) {
@@ -109,6 +133,15 @@ public class EnviosService {
                 .build();
 
         eventRepository.registrar(evento);
+
+        EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
+                .tipoEvento(TipoEventoLogistica.ENTREGA_FALLIDA)
+                .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                .timestamp(evento.getTimestamp())
+                .detalles(evento.getDetalles())
+                .build();
+        donacionesQueueClient.publicarEvento(dto);
     }
 
     public List<Envio> listarEnvios() {

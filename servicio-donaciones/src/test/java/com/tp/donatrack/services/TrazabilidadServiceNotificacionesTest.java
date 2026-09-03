@@ -118,6 +118,7 @@ class TrazabilidadServiceNotificacionesTest {
         Integer idDonacion = donacion.getId();
         Integer idSegmento = Math.toIntExact(segmento.getId());
 
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
         segmento.registrarLlegadaADestino("Chofer");
 

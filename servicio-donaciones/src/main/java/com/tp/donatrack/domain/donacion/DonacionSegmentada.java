@@ -70,6 +70,10 @@ public class DonacionSegmentada {
         transicionar(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, actor, "Ruta de entrega planificada");
     }
 
+    public void solicitarPlanificacion(String actor) {
+        transicionar(EstadoDonacionSegmentada.EN_PLANIFICACION, actor, "Lote enviado a logística para planificación");
+    }
+
     public void iniciarTraslado(String actor) {
         transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
     }
@@ -110,7 +114,8 @@ public class DonacionSegmentada {
                 nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
                         || nuevo == EstadoDonacionSegmentada.VENCIDA;
             case ASIGNACION_REALIZADA -> nuevo == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR;
-            case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
+            case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_PLANIFICACION;
+            case EN_PLANIFICACION -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
             case EN_TRASLADO ->
                 nuevo == EstadoDonacionSegmentada.ENTREGADA
                         || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;

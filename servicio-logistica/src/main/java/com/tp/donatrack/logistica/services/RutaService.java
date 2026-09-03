@@ -1,10 +1,13 @@
 package com.tp.donatrack.logistica.services;
 
 import com.tp.commons.dtos.logistica.DonacionSegmentadaListaParaEntregarALogisticaDTO;
+import com.tp.commons.dtos.logistica.EventoLogisticaDTO;
+import com.tp.commons.dtos.logistica.TipoEventoLogistica;
 import com.tp.donatrack.logistica.domain.*;
 import com.tp.donatrack.logistica.domain.planificacion.Planificacion;
 import com.tp.donatrack.logistica.repository.LogisticaEventRepository;
 import com.tp.donatrack.logistica.repository.RutaRepository;
+import com.tp.donatrack.logistica.clients.DonacionesQueueClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -25,6 +28,7 @@ public class RutaService {
     private final CamionService camionService;
     private final ChoferService choferService;
     private final EnviosService enviosService;
+    private final DonacionesQueueClient donacionesQueueClient;
 
     public RutaService(
             LogisticaEventRepository eventRepository,
@@ -32,7 +36,8 @@ public class RutaService {
             Planificacion planificacion,
             CamionService camionService,
             ChoferService choferService,
-            @Lazy EnviosService enviosService // Lazy es para evitar espera circular.
+            @Lazy EnviosService enviosService, // Lazy es para evitar espera circular.
+            DonacionesQueueClient donacionesQueueClient
     ) {
         this.eventRepository = eventRepository;
         this.rutaRepository = rutaRepository;
@@ -40,6 +45,7 @@ public class RutaService {
         this.camionService = camionService;
         this.choferService = choferService;
         this.enviosService = enviosService;
+        this.donacionesQueueClient = donacionesQueueClient;
     }
 
     public void planificarLote(List<DonacionSegmentadaListaParaEntregarALogisticaDTO> loteDonaciones) {
@@ -153,6 +159,15 @@ public class RutaService {
                                     .build();
 
                             eventRepository.registrar(evento);
+                            
+                            EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
+                                    .tipoEvento(TipoEventoLogistica.INICIO_RUTA)
+                                    .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                                    .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                                    .timestamp(evento.getTimestamp())
+                                    .detalles(evento.getDetalles())
+                                    .build();
+                            donacionesQueueClient.publicarEvento(dto);
                         }
                     }
                 }

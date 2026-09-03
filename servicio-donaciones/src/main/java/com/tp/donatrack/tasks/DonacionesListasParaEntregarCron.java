@@ -1,5 +1,5 @@
 package com.tp.donatrack.tasks;
-import com.tp.donatrack.clients.LogisticaRestClient;
+import com.tp.donatrack.clients.LogisticaQueueClient;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
@@ -22,20 +22,22 @@ public class DonacionesListasParaEntregarCron {
 
     private final EntidadBeneficiariaService entidadBeneficiariaService;
     private final DonacionService donacionService;
-    private final LogisticaRestClient logisticaRestClient;
+    private final LogisticaQueueClient logisticaQueueClient;
 
     public DonacionesListasParaEntregarCron(
             DonacionService donacionService,
             EntidadBeneficiariaService entidadBeneficiariaService,
-            LogisticaRestClient logisticaRestClient
+            LogisticaQueueClient logisticaQueueClient
     ) {
         this.donacionService = donacionService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
-        this.logisticaRestClient = logisticaRestClient;
+        this.logisticaQueueClient = logisticaQueueClient;
     }
 
-    // Se ejecuta todos los días a las 8:00 AM
-    @Scheduled(cron = "0 * * * * *")
+    // Se ejecuta todos los días a las 8:00 AM.
+    // La expresión se externaliza para poder acelerarla en pruebas sin tocar el código:
+    //   $env:DONATRACK_CRON_DONACIONESLISTAS = "0 * * * * *"
+    @Scheduled(cron = "${donatrack.cron.donaciones-listas:0 0 8 * * *}")
     public void enviarDonacionesListasParaEntregar() {
         logger.info("Iniciando procesamiento de cron para donaciones listas para entregar...");
 
@@ -61,7 +63,10 @@ public class DonacionesListasParaEntregarCron {
                 ));
 
 
-        List<DonacionSegmentadaListaParaEntregarALogisticaDTO> bodyEnvio = donacionesListasParaEntregar.stream()
+        // Solo se envían las que tienen una dirección de entrega resoluble.
+        // Se separa el filtro del mapeo para poder transicionar exactamente las mismas
+        // que se enviaron: marcar una que no viajó la dejaría trabada en EN_PLANIFICACION.
+        List<DonacionSegmentada> segmentadasAEnviar = donacionesListasParaEntregar.stream()
                 .filter(segmentada -> {
                     EntidadBeneficiaria entidad = mapaEntidades.get(segmentada.getEntidadBeneficiariaAsignadaId());
 
@@ -77,6 +82,20 @@ public class DonacionesListasParaEntregarCron {
 
                     return !direccionTexto.isEmpty();
                 })
+                .toList();
+
+        int descartadas = donacionesListasParaEntregar.size() - segmentadasAEnviar.size();
+        if (descartadas > 0) {
+            logger.warn("Se descartaron {} donaciones segmentadas por no tener dirección de entrega. "
+                    + "Quedan en LISTA_PARA_ENTREGAR para el próximo ciclo.", descartadas);
+        }
+
+        if (segmentadasAEnviar.isEmpty()) {
+            logger.info("Ninguna donación tiene dirección de entrega válida. No se envía lote.");
+            return;
+        }
+
+        List<DonacionSegmentadaListaParaEntregarALogisticaDTO> bodyEnvio = segmentadasAEnviar.stream()
                 .map(segmentada -> {
                     EntidadBeneficiaria entidad = mapaEntidades.get(segmentada.getEntidadBeneficiariaAsignadaId());
 
@@ -92,8 +111,14 @@ public class DonacionesListasParaEntregarCron {
                 })
                 .toList();
         try {
-            this.logisticaRestClient.enviarLoteDonaciones(bodyEnvio);
+            this.logisticaQueueClient.enviarLoteDonaciones(bodyEnvio);
             logger.info("Se enviaron exitosamente {} donaciones.", bodyEnvio.size());
+
+            // Solo se transicionan las que efectivamente se enviaron.
+            // Si el publish falla, no se ejecuta y quedan disponibles para el próximo ciclo.
+            for (DonacionSegmentada segmentada : segmentadasAEnviar) {
+                segmentada.solicitarPlanificacion("Sistema (Cron)");
+            }
         } catch (Exception e) {
             logger.error("Error al enviar lote de donaciones segmentadas: {}", e.getMessage(), e);
         }

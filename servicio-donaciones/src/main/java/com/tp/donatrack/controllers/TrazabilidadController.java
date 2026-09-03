@@ -88,6 +88,24 @@ public class TrazabilidadController {
     }
 
     /**
+     * Envía una donación segmentada a planificación logística (estado EN_PLANIFICACION).
+     * Equivale a lo que hace el cron diario, pero disparado a mano.
+     */
+    @PostMapping("/{idDonacion}/{idSegmento}/transicionar/planificacion")
+    public ResponseEntity<?> transicionarPlanificacion(
+        @PathVariable Integer idDonacion,
+        @PathVariable Integer idSegmento,
+        @RequestParam String actor
+    ) {
+        try {
+            TrazaSegmentoDTO traza = trazabilidadService.transicionSolicitarPlanificacion(idDonacion, idSegmento, actor);
+            return ResponseEntity.ok(traza);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
      * Transiciona una donación segmentada a estado EN_TRASLADO (camión inició recorrido).
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/en_traslado")
