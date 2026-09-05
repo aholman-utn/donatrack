@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Gestión de Necesidades</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>💚 DonaTrack</h2>
+            <nav>
+                <a href="entidad-dashboard.html">📊 Dashboard</a>
+                <a href="entidad-necesidades.html" class="active">📋 Necesidades</a>
+                <a href="entidad-donaciones.html">📦 Donaciones</a>
+                <a href="#">🗺️ Seguimiento</a>
+                <a href="#">🔔 Notificaciones</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="header-row">
+                <h1>Gestión de Necesidades</h1>
+                <button class="btn">+ Nueva Necesidad</button>
+            </div>
+
+            <!-- Formulario nueva necesidad -->
+            <div class="modal">
+                <h3>Registrar Nueva Necesidad</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de necesidad</label>
+                        <select>
+                            <option>Recurrente</option>
+                            <option>Extraordinaria</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subcategoría</label>
+                        <select>
+                            <option>Fideos secos</option>
+                            <option>Arroz</option>
+                            <option>Sillas</option>
+                            <option>Camperas de abrigo</option>
+                            <option>Frazadas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" placeholder="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Periodo (solo recurrente)</label>
+                        <select>
+                            <option>Semanal</option>
+                            <option>Mensual</option>
+                            <option>Quincenal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Causa (solo extraordinaria)</label>
+                    <input type="text" placeholder="Ej: Inundación en aula principal">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Descripción</label>
+                    <textarea rows="2" placeholder="Breve descripción de la necesidad..."></textarea>
+                </div>
+                <button class="btn">Guardar Necesidad</button>
+            </div>
+
+            <!-- Lista de necesidades -->
+            <div class="table-section">
+                <table>
+                    <thead>
+                        <tr><th>Subcategoría</th><th>Tipo</th><th>Cantidad</th><th>Periodo/Causa</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fideos secos</td>
+                            <td><span class="badge badge-purple">Recurrente</span></td>
+                            <td>100 u.</td>
+                            <td>Semanal</td>
+                            <td><span class="badge badge-orange">Parcial (75/100)</span></td>
+                            <td class="actions"><a href="#" title="Editar">✏️</a><a href="#" title="Eliminar">🗑️</a></td>
+                        </tr>
+                        <tr>
+                            <td>Arroz</td>
+                            <td><span class="badge badge-purple">Recurrente</span></td>
+                            <td>50 kg</td>
+                            <td>Semanal</td>
+                            <td><span class="badge badge-green">Satisfecha</span></td>
+                            <td class="actions"><a href="#" title="Editar">✏️</a><a href="#" title="Eliminar">🗑️</a></td>
+                        </tr>
+                        <tr>
+                            <td>Sillas</td>
+                            <td><span class="badge badge-orange">Extraordinaria</span></td>
+                            <td>30 u.</td>
+                            <td>Inundación aula</td>
+                            <td><span class="badge badge-red">Insatisfecha (12/30)</span></td>
+                            <td class="actions"><a href="#" title="Editar">✏️</a><a href="#" title="Eliminar">🗑️</a></td>
+                        </tr>
+                        <tr>
+                            <td>Bancos</td>
+                            <td><span class="badge badge-orange">Extraordinaria</span></td>
+                            <td>30 u.</td>
+                            <td>Inundación aula</td>
+                            <td><span class="badge badge-red">Insatisfecha (0/30)</span></td>
+                            <td class="actions"><a href="#" title="Editar">✏️</a><a href="#" title="Eliminar">🗑️</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

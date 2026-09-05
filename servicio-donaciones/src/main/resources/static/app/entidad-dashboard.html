@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Panel Entidad Beneficiaria</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>💚 DonaTrack</h2>
+            <nav>
+                <a href="entidad-dashboard.html" class="active">📊 Dashboard</a>
+                <a href="entidad-necesidades.html">📋 Necesidades</a>
+                <a href="entidad-donaciones.html">📦 Donaciones</a>
+                <a href="#">🗺️ Seguimiento</a>
+                <a href="#">🔔 Notificaciones</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <h1>Comedor Escobar Sonrisas</h1>
+            <p class="subtitle">Panel de gestión de la entidad beneficiaria</p>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number">5</div>
+                    <div class="label">Necesidades activas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">3</div>
+                    <div class="label">Donaciones en camino</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">18</div>
+                    <div class="label">Donaciones recibidas</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Estado de Necesidades</h3>
+                <div class="need-item">
+                    <div class="need-info">
+                        <h4>Fideos secos - 100 u./semana</h4>
+                        <p>Recurrente | 75 de 100 recibidos esta semana</p>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill mid" style="width:75%"></div></div>
+                </div>
+                <div class="need-item">
+                    <div class="need-info">
+                        <h4>Arroz - 50 kg/semana</h4>
+                        <p>Recurrente | 50 de 50 recibidos esta semana</p>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill high" style="width:100%"></div></div>
+                </div>
+                <div class="need-item">
+                    <div class="need-info">
+                        <h4>Sillas - 30 unidades</h4>
+                        <p>Extraordinaria (inundación) | 12 de 30 recibidas</p>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill low" style="width:40%"></div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
