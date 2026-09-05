@@ -27,20 +27,27 @@ Si preferís crear los servicios uno por uno:
 
 ### 3. URLs resultantes
 
-Después del deploy, cada servicio tendrá una URL pública:
+Después del deploy, cada servicio tiene una URL pública.
+
+**Servicio actualmente desplegado y activo:**
+
+| Servicio | URL desplegada |
+|----------|----------------|
+| Donaciones | `https://donaciones-lfmk.onrender.com` |
+
+URLs de ejemplo para los demás servicios (según el nombre configurado en `render.yaml`):
 
 | Servicio | URL (ejemplo) |
 |----------|---------------|
-| Donaciones | `https://donatrack-donaciones.onrender.com` |
 | Incentivos | `https://donatrack-incentivos.onrender.com` |
 | Notificaciones | `https://donatrack-notificaciones.onrender.com` |
 
 ### 4. Swagger público
 
-Una vez desplegado, Swagger estará disponible en:
+El Swagger del servicio de donaciones desplegado está disponible en:
 
 ```
-https://donatrack-donaciones.onrender.com/swagger-ui/index.html
+https://donaciones-lfmk.onrender.com/swagger-ui/index.html
 ```
 
 ### 5. Variables de entorno

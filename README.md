@@ -355,6 +355,16 @@ Una vez levantado el servicio, abrí en el navegador:
 
 ---
 
+## ☁️ Servicios desplegados (Render)
+
+| Servicio | URL desplegada | Swagger |
+|----------|----------------|---------|
+| Donaciones | https://donaciones-lfmk.onrender.com | https://donaciones-lfmk.onrender.com/swagger-ui/index.html |
+
+> Nota: en el plan gratuito de Render el servicio se duerme tras 15 min sin tráfico. La primera request tras dormir puede tardar ~30 segundos (cold start).
+
+---
+
 ## 📧 Configuración de Email (Resend)
 
 El servicio de notificaciones envía emails reales usando [Resend](https://resend.com).
