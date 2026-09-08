@@ -1,10 +1,10 @@
 package com.tp.donatrack.domain.donacion;
 
-import com.tp.donatrack.domain.bien.SubCategoria;
-import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.bien.Bien;
+import com.tp.donatrack.domain.bien.SubCategoria;
+import com.tp.donatrack.domain.donacion.estado.EnDeposito;
+import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,23 +41,19 @@ public class DonacionSegmentada {
         this.subCategoria = subCategoria;
         this.bienes = bienes;
         this.donanteId = donanteId;
-        this.estado = EstadoDonacionSegmentada.EN_DEPOSITO;
-        registrarEvento(null, EstadoDonacionSegmentada.EN_DEPOSITO, "Administrador",
+        this.estado = new EnDeposito();
+        registrarEvento(null, this.estado, "Administrador",
                 "Donación registrada e ingresada al depósito");
     }
 
     public void transicionar(EstadoDonacionSegmentada nuevoEstado, String actor, String descripcion) {
         EstadoDonacionSegmentada anterior = this.estado;
-        if (transicionPosible(anterior, nuevoEstado)) {
-            this.estado = nuevoEstado;
-            registrarEvento(anterior, nuevoEstado, actor, descripcion);
-        }
+        this.estado = nuevoEstado;
+        registrarEvento(anterior, nuevoEstado, actor, descripcion);
     }
 
     public void asignar(EntidadBeneficiaria entidad, String actor) {
-        entidad.implementarDonacion(this);
-        this.entidadBeneficiariaAsignadaId = entidad.getDatosDeEntidad().getId();
-        transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, actor, "Donación asignada a entidad beneficiaria");
+        this.estado.asignar(this, entidad, actor);
     }
 
     /** @deprecated Usar asignar(entidad, actor) para trazabilidad completa */
@@ -67,31 +63,27 @@ public class DonacionSegmentada {
     }
 
     public void listarParaEntrega(String actor) {
-        transicionar(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, actor, "Ruta de entrega planificada");
+        this.estado.listarParaEntrega(this, actor);
     }
 
     public void iniciarTraslado(String actor) {
-        transicionar(EstadoDonacionSegmentada.EN_TRASLADO, actor, "Camión inició el recorrido de entrega");
+        this.estado.iniciarTraslado(this, actor);
     }
 
     public void confirmarEntrega(Long entidadBeneficiariaId) {
-        transicionar(
-                EstadoDonacionSegmentada.ENTREGADA,
-                String.valueOf(entidadBeneficiariaId),
-                "Entidad beneficiaria confirmó la recepción");
+        this.estado.confirmarEntrega(this, entidadBeneficiariaId);
     }
 
     public void registrarEntregaFallida(String actor, String justificacion) {
-        transicionar(EstadoDonacionSegmentada.ENTREGA_FALLIDA, actor, justificacion);
-        // Vuelve al depósito
-        transicionar(EstadoDonacionSegmentada.EN_DEPOSITO, "Sistema",
-                "Donación devuelta al depósito tras entrega fallida");
+        this.estado.registrarEntregaFallida(this, actor, justificacion);
     }
 
     public void marcarVencida(String actor) {
-        // TODO: Verificar si una donacion puede marcarse como vencido (si contiene
-        // bienes perdecederos)
-        transicionar(EstadoDonacionSegmentada.VENCIDA, actor, "Donación marcada como vencida por administrador");
+        this.estado.marcarVencida(this, actor);
+    }
+
+    public void registrarLlegadaADestino(String actor) {
+        this.estado.registrarLlegadaADestino(this, actor);
     }
 
     public List<EventoTrazabilidad> getHistorial() {
@@ -105,31 +97,15 @@ public class DonacionSegmentada {
     }
 
     public boolean transicionPosible(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo) {
-        return switch (anterior) {
-            case EN_DEPOSITO ->
-                nuevo == EstadoDonacionSegmentada.ASIGNACION_REALIZADA
-                        || nuevo == EstadoDonacionSegmentada.VENCIDA;
-            case ASIGNACION_REALIZADA -> nuevo == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR;
-            case LISTA_PARA_ENTREGAR -> nuevo == EstadoDonacionSegmentada.EN_TRASLADO;
-            case EN_TRASLADO ->
-                nuevo == EstadoDonacionSegmentada.ENTREGADA
-                        || nuevo == EstadoDonacionSegmentada.ENTREGA_FALLIDA;
-            case ENTREGA_FALLIDA -> nuevo == EstadoDonacionSegmentada.EN_DEPOSITO;
-            case ENTREGADA, VENCIDA -> false; // Estados finales
-            default -> false;
-        };
+        return anterior != null && anterior.puedeTransicionarA(nuevo);
+    }
+
+    public void registrarEventoTrazabilidad(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor, String descripcion) {
+        registrarEvento(anterior, nuevo, actor, descripcion);
     }
 
     private void registrarEvento(EstadoDonacionSegmentada anterior, EstadoDonacionSegmentada nuevo, String actor,
             String descripcion) {
         historial.add(new EventoTrazabilidad(anterior, nuevo, actor, descripcion));
-    }
-
-    public void registrarLlegadaADestino(String actor) {
-        transicionar(
-                EstadoDonacionSegmentada.PENDIENTE_RECEPCION,
-                actor,
-                "El vehículo de logística reportó la llegada. Esperando confirmación de la entidad."
-        );
     }
 }

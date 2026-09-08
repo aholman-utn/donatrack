@@ -97,4 +97,76 @@ public class DonacionSegmentadaTest {
         assertEquals(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, donacionSegmentada.getEstado(),
             "El estado debería cambiar a ASIGNACION_REALIZADA luego de ser procesada por la entidad");
     }
+
+    @Test
+    void testFlujoCompletoHastaEntrega() {
+        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, segmento.getEstado());
+
+        segmento.asignar(unaEntidadBeneficiaria, "Admin");
+        assertEquals(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, segmento.getEstado());
+        assertTrue(segmento.getEstado().isAsignada());
+
+        segmento.listarParaEntrega("Operador");
+        assertEquals(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, segmento.getEstado());
+        assertTrue(segmento.getEstado().isListaParaEntregar());
+
+        segmento.iniciarTraslado("Chofer");
+        assertEquals(EstadoDonacionSegmentada.EN_TRASLADO, segmento.getEstado());
+        assertTrue(segmento.getEstado().isEnTraslado());
+
+        segmento.confirmarEntrega(10L);
+        assertEquals(EstadoDonacionSegmentada.ENTREGADA, segmento.getEstado());
+        assertTrue(segmento.getEstado().isFinalizada());
+    }
+
+    @Test
+    void testTransicionesInvalidasLanzanTransicionNoPermitidaException() {
+        DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        assertEquals(EstadoDonacionSegmentada.EN_DEPOSITO, segmento.getEstado());
+
+        // No se puede iniciar traslado directamente desde depósito
+        org.junit.jupiter.api.Assertions.assertThrows(
+                com.tp.donatrack.domain.donacion.exception.TransicionNoPermitidaException.class,
+                () -> segmento.iniciarTraslado("Chofer"),
+                "Debe fallar al intentar iniciar traslado desde EN_DEPOSITO"
+        );
+
+        // No se puede confirmar entrega directamente desde depósito
+        org.junit.jupiter.api.Assertions.assertThrows(
+                com.tp.donatrack.domain.donacion.exception.TransicionNoPermitidaException.class,
+                () -> segmento.confirmarEntrega(10L)
+        );
+
+        // Avanzar a ENTREGADA
+        segmento.asignar(unaEntidadBeneficiaria, "Admin");
+        segmento.listarParaEntrega("Admin");
+        segmento.iniciarTraslado("Chofer");
+        segmento.confirmarEntrega(10L);
+
+        // En estado ENTREGADA (terminal), ninguna acción debe permitirse
+        org.junit.jupiter.api.Assertions.assertThrows(
+                com.tp.donatrack.domain.donacion.exception.TransicionNoPermitidaException.class,
+                () -> segmento.asignar(unaEntidadBeneficiaria, "Admin")
+        );
+        org.junit.jupiter.api.Assertions.assertThrows(
+                com.tp.donatrack.domain.donacion.exception.TransicionNoPermitidaException.class,
+                () -> segmento.listarParaEntrega("Admin")
+        );
+    }
+
+    @Test
+    void testSerializacionYDeserializacionJackson() throws Exception {
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+        // Serialización
+        EstadoDonacionSegmentada estado = EstadoDonacionSegmentada.EN_DEPOSITO;
+        String json = mapper.writeValueAsString(estado);
+        assertEquals("\"EN_DEPOSITO\"", json);
+
+        // Deserialización
+        EstadoDonacionSegmentada deserializado = mapper.readValue("\"ASIGNACION_REALIZADA\"", EstadoDonacionSegmentada.class);
+        assertEquals(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, deserializado);
+        assertTrue(deserializado.isAsignada());
+    }
 }

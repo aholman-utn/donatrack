@@ -106,10 +106,10 @@ public class LogisticaPollingTask {
         DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(evento.getDonacionSegmentadaId());
         if (segmentada != null) {
             try {
-                if (segmentada.getEstado() == EstadoDonacionSegmentada.ASIGNACION_REALIZADA) {
+                if (EstadoDonacionSegmentada.ASIGNACION_REALIZADA.equals(segmentada.getEstado())) {
                     segmentada.listarParaEntrega("Sistema (Logística Polling)");
                 }
-                if (segmentada.getEstado() == EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR) {
+                if (EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR.equals(segmentada.getEstado())) {
                     segmentada.iniciarTraslado("Sistema (Logística Polling)");
                     logger.info("Donación segmentada ID {} transicionada a EN_TRASLADO", segmentada.getId());
 

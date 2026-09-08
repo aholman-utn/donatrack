@@ -187,18 +187,53 @@ package "Donación y Trazabilidad" {
         +confirmarEntrega(entidadBeneficiariaId: Long)
         +registrarEntregaFallida(actor, justificacion)
         +marcarVencida(actor: String)
-        +transicionPosible(anterior, nuevo): boolean
         +getUltimoEvento(): EventoTrazabilidad
     }
 
-    enum EstadoDonacionSegmentada {
-        EN_DEPOSITO
-        ASIGNACION_REALIZADA
-        LISTA_PARA_ENTREGAR
-        EN_TRASLADO
-        ENTREGADA
-        ENTREGA_FALLIDA
-        VENCIDA
+    abstract class EstadoDonacionSegmentada {
+        + {abstract} getNombre(): String
+        + isAsignada(): boolean
+        + asignar(donacion, entidad, actor)
+        + listarParaEntrega(donacion, actor)
+        + iniciarTraslado(donacion, actor)
+        + confirmarEntrega(donacion, entidadBeneficiariaId)
+        + registrarEntregaFallida(donacion, actor, justificacion)
+        + marcarVencida(donacion, actor)
+    }
+
+    class EnDeposito extends EstadoDonacionSegmentada {
+        + getNombre(): String
+        + asignar(donacion, entidad, actor)
+        + marcarVencida(donacion, actor)
+    }
+
+    class AsignacionRealizada extends EstadoDonacionSegmentada {
+        + getNombre(): String
+        + listarParaEntrega(donacion, actor)
+    }
+
+    class ListaParaEntregar extends EstadoDonacionSegmentada {
+        + getNombre(): String
+        + iniciarTraslado(donacion, actor)
+    }
+
+    class EnTraslado extends EstadoDonacionSegmentada {
+        + getNombre(): String
+        + confirmarEntrega(donacion, entidadBeneficiariaId)
+        + registrarEntregaFallida(donacion, actor, justificacion)
+    }
+
+    class Entregada extends EstadoDonacionSegmentada {
+        + getNombre(): String
+    }
+
+    class EntregaFallida extends EstadoDonacionSegmentada {
+        + getNombre(): String
+        + reingresarADeposito(donacion, actor)
+    }
+
+    class Vencida extends EstadoDonacionSegmentada {
+        + getNombre(): String
     }
 
     interface DonacionEventPublisher {
@@ -224,9 +259,9 @@ package "Donación y Trazabilidad" {
     end note
 
     note top of EstadoDonacionSegmentada
-        **State**: transicionPosible() en DonacionSegmentada
-        define, mediante un switch exhaustivo, la máquina
-        de estados finita de este enum.
+        **State (GoF)**: DonacionSegmentada delega las operaciones
+        dependientes del estado en la jerarquía polimórfica
+        de EstadoDonacionSegmentada, eliminando condicionales switch.
     end note
 }
 
@@ -236,7 +271,14 @@ Donacion "1" *-- "1..*" DonacionSegmentada : donacionesSegmentadas
 Donacion --> EstadoDonacion : deriva >
 DonacionSegmentada "1" *-- "1..*" Bien : bienes
 DonacionSegmentada "1" *-- "0..*" EventoTrazabilidad : historial
-DonacionSegmentada --> EstadoDonacionSegmentada : estado
+DonacionSegmentada "1" o--> "1" EstadoDonacionSegmentada : estado
+EstadoDonacionSegmentada <|-- EnDeposito
+EstadoDonacionSegmentada <|-- AsignacionRealizada
+EstadoDonacionSegmentada <|-- ListaParaEntregar
+EstadoDonacionSegmentada <|-- EnTraslado
+EstadoDonacionSegmentada <|-- Entregada
+EstadoDonacionSegmentada <|-- EntregaFallida
+EstadoDonacionSegmentada <|-- Vencida
 DonacionSegmentada ..> EntidadBeneficiaria : asigna >
 
 package "Necesidades y Entidad Beneficiaria" {

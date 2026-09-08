@@ -32,7 +32,7 @@ public class ServicioMatchmaking {
      * Retorna un ResultadoMatchmaking con las propuestas de cada algoritmo y las coincidencias.
      */
     public ResultadoMatchmaking ejecutar(DonacionSegmentada donacion, List<EntidadBeneficiaria> entidades) {
-        if (donacion.getEstado() != EstadoDonacionSegmentada.EN_DEPOSITO) {
+        if (donacion.getEstado() == null || !donacion.getEstado().isEnDeposito()) {
             throw new IllegalStateException("Solo se pueden asignar donaciones en estado EN_DEPOSITO");
         }
 
@@ -51,7 +51,7 @@ public class ServicioMatchmaking {
      */
     public List<ResultadoMatchmaking> ejecutarTodas(List<DonacionSegmentada> donaciones, List<EntidadBeneficiaria> entidades) {
         return donaciones.stream()
-                .filter(d -> d.getEstado() == EstadoDonacionSegmentada.EN_DEPOSITO)
+                .filter(d -> d.getEstado() != null && d.getEstado().isEnDeposito())
                 .map(d -> ejecutar(d, entidades))
                 .collect(Collectors.toList());
     }

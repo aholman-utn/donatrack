@@ -46,7 +46,7 @@ public class MatchmakingService {
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
-        if (segmentada.getEstado() != EstadoDonacionSegmentada.EN_DEPOSITO) {
+        if (segmentada.getEstado() == null || !segmentada.getEstado().isEnDeposito()) {
             throw new IllegalStateException(
                     "Solo se puede ejecutar el matchmaking para donaciones en estado EN_DEPOSITO");
         }
@@ -87,7 +87,7 @@ public class MatchmakingService {
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
-        if (segmentada.getEstado() != EstadoDonacionSegmentada.EN_DEPOSITO) {
+        if (segmentada.getEstado() == null || !segmentada.getEstado().isEnDeposito()) {
             throw new IllegalStateException("Solo se pueden asignar donaciones en estado EN_DEPOSITO");
         }
 
