@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Gestión de Donantes</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>⚙️ DonaTrack Admin</h2>
+            <nav>
+                <a href="admin-dashboard.html">📊 Dashboard</a>
+                <a href="admin-donantes.html" class="active">👥 Donantes</a>
+                <a href="admin-donaciones.html">📦 Donaciones</a>
+                <a href="admin-importar.html">📄 Importar CSV</a>
+                <a href="#">🏫 Entidades</a>
+                <a href="#">🚚 Camiones</a>
+                <a href="#">🏆 Rankings</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="header-row">
+                <h1>Gestión de Donantes</h1>
+                <button class="btn">+ Registrar Donante</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="🔍 Buscar por nombre, documento o email...">
+            </div>
+            <div class="table-section">
+                <table>
+                    <thead>
+                        <tr><th>Tipo</th><th>Nombre / Razón Social</th><th>Documento</th><th>Email</th><th>Teléfono</th><th>Donaciones</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><span class="badge badge-human">Humana</span></td><td>Ana Pérez</td><td>DNI 12345678</td><td>ana@mail.com</td><td>+54 11 5555-5555</td><td>12</td><td class="actions"><a href="#">Editar</a><a href="#">Ver</a></td></tr>
+                        <tr><td><span class="badge badge-juridica">Jurídica</span></td><td>Arcos Plateados S.A.</td><td>CUIT 30-12345678-9</td><td>contacto@empresa.com</td><td>+54 11 4444-4444</td><td>15</td><td class="actions"><a href="#">Editar</a><a href="#">Ver</a></td></tr>
+                        <tr><td><span class="badge badge-human">Humana</span></td><td>Juan García</td><td>DNI 87654321</td><td>juan@mail.com</td><td>+54 11 3333-3333</td><td>6</td><td class="actions"><a href="#">Editar</a><a href="#">Ver</a></td></tr>
+                        <tr><td><span class="badge badge-juridica">Jurídica</span></td><td>Pastas del Sur</td><td>CUIT 30-98765432-1</td><td>info@pastas.com</td><td>+54 11 2222-2222</td><td>8</td><td class="actions"><a href="#">Editar</a><a href="#">Ver</a></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

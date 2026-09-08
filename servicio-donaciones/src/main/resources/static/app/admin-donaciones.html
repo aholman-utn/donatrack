@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Registro de Donaciones</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>⚙️ DonaTrack Admin</h2>
+            <nav>
+                <a href="admin-dashboard.html">📊 Dashboard</a>
+                <a href="admin-donantes.html">👥 Donantes</a>
+                <a href="admin-donaciones.html" class="active">📦 Donaciones</a>
+                <a href="admin-importar.html">📄 Importar CSV</a>
+                <a href="#">🏫 Entidades</a>
+                <a href="#">🚚 Camiones</a>
+                <a href="#">🏆 Rankings</a>
+                <a href="index.html">🚪 Cerrar Sesión</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <h1>Registrar Donación</h1>
+
+            <div class="form-section">
+                <h3>1. Persona Donante</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Buscar donante</label>
+                        <input type="text" placeholder="Nombre, DNI o email..." value="Arcos Plateados S.A.">
+                    </div>
+                    <div class="form-group">
+                        <label>Donante seleccionado</label>
+                        <input type="text" disabled value="CUIT 30-12345678-9 | contacto@empresa.com">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>2. Descripción General</h3>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Descripción de la donación</label>
+                    <textarea rows="2" placeholder="Ej: Muebles de oficina usados por mudanza">Muebles de oficina usados por mudanza corporativa</textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>3. Bienes Donados</h3>
+                <div class="bien-item">
+                    <h4>Bien #1</h4>
+                    <div class="form-row">
+                        <div class="form-group"><label>Descripción</label><input value="Silla de oficina"></div>
+                        <div class="form-group"><label>Categoría</label><select><option selected>Mobiliario</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Subcategoría</label><select><option selected>Sillas</option></select></div>
+                        <div class="form-group"><label>Cantidad</label><input type="number" value="6"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Estado</label><select><option>Nuevo</option><option selected>Usado</option></select></div>
+                        <div class="form-group"><label>Foto (opcional)</label><input type="file"></div>
+                    </div>
+                </div>
+                <div class="bien-item">
+                    <h4>Bien #2</h4>
+                    <div class="form-row">
+                        <div class="form-group"><label>Descripción</label><input value="Mesa rectangular"></div>
+                        <div class="form-group"><label>Categoría</label><select><option selected>Mobiliario</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Subcategoría</label><select><option selected>Mesas</option></select></div>
+                        <div class="form-group"><label>Cantidad</label><input type="number" value="1"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Estado</label><select><option>Nuevo</option><option selected>Usado</option></select></div>
+                        <div class="form-group"><label>Foto (opcional)</label><input type="file"></div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary">+ Agregar otro bien</button>
+            </div>
+
+            <button class="btn btn-primary" style="margin-bottom:1.5rem;">Registrar Donación</button>
+
+            <!-- Resultado de segmentación -->
+            <div class="segmentation">
+                <h3>✓ Segmentación Automática</h3>
+                <p style="color:#666;margin-bottom:1rem;">El sistema generó las siguientes donaciones independientes:</p>
+                <div class="seg-item"><span><strong>Donación #1:</strong> Sillas (6 u.) - Mobiliario/Sillas - Usado</span><span>Pendiente</span></div>
+                <div class="seg-item"><span><strong>Donación #2:</strong> Mesa rectangular (1 u.) - Mobiliario/Mesas - Usado</span><span>Pendiente</span></div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -361,6 +361,15 @@ Una vez levantado el servicio, abrí en el navegador:
 |----------|----------------|---------|
 | Donaciones | https://donaciones-lfmk.onrender.com | https://donaciones-lfmk.onrender.com/swagger-ui/index.html |
 
+### Landing / App web
+
+La interfaz web (landing y bocetos) se sirve desde el servicio de donaciones:
+
+| Recurso | URL |
+|---------|-----|
+| Landing (raíz, redirige) | https://donaciones-lfmk.onrender.com/ |
+| Landing (directo) | https://donaciones-lfmk.onrender.com/app/index.html |
+
 > Nota: en el plan gratuito de Render el servicio se duerme tras 15 min sin tráfico. La primera request tras dormir puede tardar ~30 segundos (cold start).
 
 ---

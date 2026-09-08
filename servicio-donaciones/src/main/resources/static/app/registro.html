@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Registro</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { padding: 2rem; }
+        .register-container { background: var(--card); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--border); max-width: 650px; margin: 0 auto; }
+        .register-container h1 { color: var(--primary); margin-bottom: 0.25rem; font-size: 1.6rem; }
+        .register-container .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+        .back-link { display: block; text-align: center; margin-top: 1.25rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .back-link:hover { color: var(--primary); }
+        .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>💚 Registro en DonaTrack</h1>
+        <p class="subtitle">Completá tus datos para crear tu cuenta</p>
+
+        <!-- Selección de rol -->
+        <div class="role-select">
+            <div class="role-option active">
+                <h4>🙋 Persona Donante</h4>
+                <p>Quiero realizar donaciones</p>
+            </div>
+            <div class="role-option">
+                <h4>🏫 Entidad Beneficiaria</h4>
+                <p>Necesito recibir donaciones</p>
+            </div>
+        </div>
+
+        <!-- Tabs tipo persona -->
+        <div class="tabs">
+            <div class="tab active">Persona Humana</div>
+            <div class="tab">Persona Jurídica</div>
+        </div>
+
+        <!-- Formulario Persona Humana -->
+        <form>
+            <p class="section-title">👤 Datos Personales</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" placeholder="Ana">
+                </div>
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" placeholder="Pérez">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo de Documento</label>
+                    <select>
+                        <option>DNI</option>
+                        <option>CUIT</option>
+                        <option>Pasaporte</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Número de Documento</label>
+                    <input type="text" placeholder="12345678">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Edad</label>
+                    <input type="number" placeholder="30">
+                </div>
+                <div class="form-group">
+                    <label>Género</label>
+                    <select>
+                        <option>Femenino</option>
+                        <option>Masculino</option>
+                        <option>No binario</option>
+                        <option>Prefiero no decir</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="section-title">📍 Dirección</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Calle y número</label>
+                    <input type="text" placeholder="Av. Medrano 951">
+                </div>
+                <div class="form-group">
+                    <label>Ciudad</label>
+                    <input type="text" placeholder="CABA">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Provincia</label>
+                    <input type="text" placeholder="Buenos Aires">
+                </div>
+                <div class="form-group">
+                    <label>Código Postal</label>
+                    <input type="text" placeholder="1179">
+                </div>
+            </div>
+
+            <p class="section-title">📧 Medios de Contacto</p>
+            <div class="form-group">
+                <label>Correo electrónico <span style="color:var(--danger);font-size:0.8rem;">(obligatorio)</span></label>
+                <input type="email" placeholder="ana@mail.com">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teléfono <span style="color:var(--text-muted);font-size:0.8rem;">(opcional)</span></label>
+                    <input type="tel" placeholder="+54 11 5555-5555">
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp <span style="color:var(--text-muted);font-size:0.8rem;">(opcional)</span></label>
+                    <input type="tel" placeholder="+54 11 5555-5555">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Medio predeterminado para notificaciones</label>
+                <select>
+                    <option>Correo electrónico</option>
+                    <option>Teléfono</option>
+                    <option>WhatsApp</option>
+                </select>
+            </div>
+
+            <p class="section-title">🔐 Credenciales de Acceso</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar contraseña</label>
+                    <input type="password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.85rem;font-size:1rem;">Crear mi cuenta</button>
+        </form>
+
+        <a href="login.html" class="back-link">¿Ya tenés cuenta? Iniciá sesión</a>
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+    </div>
+</body>
+</html>

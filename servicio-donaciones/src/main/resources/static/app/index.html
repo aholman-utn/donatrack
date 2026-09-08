@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonaTrack - Sistema de Gestión de Donaciones</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .hero-landing { background: var(--gradient-hero); color: white; padding: 6rem 2rem 5rem; text-align: center; position: relative; overflow: hidden; }
+        .hero-landing::before { content: ''; position: absolute; top: -100px; right: -100px; width: 600px; height: 600px; background: rgba(207,231,221,0.07); border-radius: 50%; }
+        .hero-landing::after { content: ''; position: absolute; bottom: -150px; left: -80px; width: 500px; height: 500px; background: rgba(123,174,155,0.05); border-radius: 50%; }
+        .hero-landing h2 { font-size: 3rem; margin-bottom: 1.25rem; font-weight: 800; position: relative; z-index: 1; line-height: 1.2; }
+        .hero-landing p { font-size: 1.2rem; max-width: 650px; margin: 0 auto 2.5rem; opacity: 0.9; position: relative; z-index: 1; line-height: 1.6; }
+        .hero-landing .hero-buttons { position: relative; z-index: 1; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .hero-landing .hero-buttons .btn { padding: 0.85rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 10px; }
+        .hero-landing .btn-white { background: white; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .hero-landing .btn-white:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+        .features { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .features h3 { text-align: center; font-size: 2rem; margin-bottom: 0.75rem; }
+        .features .features-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 1.05rem; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        .feature-card { text-align: center; padding: 2rem 1.5rem; border-radius: 16px; border: 1px solid var(--border); background: var(--card); transition: all 0.3s; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(31,58,54,0.08); }
+        .feature-card .feature-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .feature-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .feature-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+
+        .donations-section { background: var(--accent); padding: 5rem 2rem; }
+        .donations-section .inner { max-width: 1100px; margin: 0 auto; }
+        .donations-section h3 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .donations-section .section-subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+        .donation-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .donation-item { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); transition: all 0.2s; }
+        .donation-item:hover { box-shadow: 0 6px 20px rgba(31,58,54,0.08); }
+        .donation-item .category { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+        .donation-item h4 { margin-bottom: 0.5rem; font-size: 1rem; }
+        .donation-item .route { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .donation-item .status { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; }
+        .donation-item .status .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-green { background: var(--success); }
+        .dot-yellow { background: var(--warning); }
+
+        .map-section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .map-section h3 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .map-section .section-subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+        .map-container { background: var(--accent); height: 400px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--sidebar); font-size: 1.2rem; font-weight: 500; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .map-container::before { content: '📍'; position: absolute; top: 30%; left: 25%; font-size: 2rem; opacity: 0.5; }
+        .map-container::after { content: '📍'; position: absolute; top: 50%; right: 30%; font-size: 1.5rem; opacity: 0.4; }
+
+        .cta-section { background: var(--gradient-hero); padding: 5rem 2rem; text-align: center; color: white; }
+        .cta-section h3 { font-size: 2rem; margin-bottom: 1rem; }
+        .cta-section p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .cta-section .btn { padding: 0.85rem 2.5rem; font-size: 1rem; font-weight: 600; border-radius: 10px; }
+
+        .stats-bar { display: flex; justify-content: center; gap: 4rem; padding: 3rem 2rem; background: var(--card); border-bottom: 1px solid var(--border); }
+        .stats-bar .stat { text-align: center; }
+        .stats-bar .stat .num { font-size: 2.2rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stats-bar .stat .lbl { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+        /* Bocetos index */
+        .bocetos-index { padding: 3rem 2rem; max-width: 900px; margin: 0 auto; }
+        .bocetos-index details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+        .bocetos-index summary { cursor: pointer; font-weight: 600; color: var(--text-primary); font-size: 1rem; }
+        .bocetos-index ul { list-style: none; margin-top: 1rem; }
+        .bocetos-index li { padding: 0.35rem 0; }
+        .bocetos-index li strong { display: block; margin-top: 0.75rem; color: var(--text-primary); }
+        .bocetos-index a { color: var(--primary); text-decoration: none; }
+        .bocetos-index a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .hero-landing h2 { font-size: 2rem; }
+            .features-grid, .donation-grid { grid-template-columns: 1fr; }
+            .stats-bar { flex-direction: column; gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAV -->
+    <nav class="nav">
+        <h1>💚 DonaTrack</h1>
+        <div class="nav-links">
+            <a href="#features">Cómo funciona</a>
+            <a href="#donaciones">Donaciones</a>
+            <a href="#mapa">Mapa</a>
+            <a href="login.html">Iniciar Sesión</a>
+            <a href="registro.html" class="btn btn-primary" style="padding:0.5rem 1.25rem;">Registrarse</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-landing">
+        <h2>Cada donación cuenta.<br>Cada entrega se rastrea.</h2>
+        <p>DonaTrack conecta personas donantes con entidades beneficiarias, garantizando transparencia y trazabilidad en todo el proceso.</p>
+        <div class="hero-buttons">
+            <a href="registro.html" class="btn btn-white">Quiero Donar</a>
+            <a href="registro.html" class="btn btn-secondary" style="padding:0.85rem 2rem;font-size:1rem;">Soy Entidad Beneficiaria</a>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat"><div class="num">245</div><div class="lbl">Donantes activos</div></div>
+        <div class="stat"><div class="num">1.200+</div><div class="lbl">Donaciones realizadas</div></div>
+        <div class="stat"><div class="num">12</div><div class="lbl">Entidades beneficiarias</div></div>
+        <div class="stat"><div class="num">98%</div><div class="lbl">Entregas exitosas</div></div>
+    </div>
+
+    <!-- ÍNDICE DE BOCETOS -->
+    <div class="bocetos-index" style="max-width:1100px;padding-top:4rem;padding-bottom:2rem;">
+        <h3 style="text-align:center;margin-bottom:0.5rem;font-size:1.8rem;">📋 Navegación de Bocetos</h3>
+        <p style="text-align:center;color:var(--text-secondary);margin-bottom:2.5rem;">Explorá todas las pantallas del sistema por rol de usuario</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;">
+            <!-- Acceso Público -->
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all 0.2s;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">🌐</div>
+                <h4 style="margin-bottom:0.75rem;font-size:1rem;color:var(--text-primary);">Acceso Público</h4>
+                <ul style="list-style:none;">
+                    <li style="padding:0.4rem 0;"><a href="index.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Landing Page</a></li>
+                    <li style="padding:0.4rem 0;"><a href="login.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Inicio de Sesión</a></li>
+                    <li style="padding:0.4rem 0;"><a href="registro.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Registro</a></li>
+                </ul>
+            </div>
+            <!-- Persona Donante -->
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all 0.2s;">
+                <div style="width:48px;height:48px;background:var(--success-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">🙋</div>
+                <h4 style="margin-bottom:0.75rem;font-size:1rem;color:var(--text-primary);">Persona Donante</h4>
+                <ul style="list-style:none;">
+                    <li style="padding:0.4rem 0;"><a href="donante-dashboard.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Dashboard</a></li>
+                    <li style="padding:0.4rem 0;"><a href="donante-donaciones.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Mis Donaciones</a></li>
+                    <li style="padding:0.4rem 0;"><a href="donante-entidades.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Entidades Beneficiarias</a></li>
+                </ul>
+            </div>
+            <!-- Entidad Beneficiaria -->
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all 0.2s;">
+                <div style="width:48px;height:48px;background:var(--info-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">🏫</div>
+                <h4 style="margin-bottom:0.75rem;font-size:1rem;color:var(--text-primary);">Entidad Beneficiaria</h4>
+                <ul style="list-style:none;">
+                    <li style="padding:0.4rem 0;"><a href="entidad-dashboard.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Dashboard</a></li>
+                    <li style="padding:0.4rem 0;"><a href="entidad-necesidades.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Gestión de Necesidades</a></li>
+                    <li style="padding:0.4rem 0;"><a href="entidad-donaciones.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Donaciones Asignadas</a></li>
+                </ul>
+            </div>
+            <!-- Administrador -->
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all 0.2s;">
+                <div style="width:48px;height:48px;background:var(--warning-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">⚙️</div>
+                <h4 style="margin-bottom:0.75rem;font-size:1rem;color:var(--text-primary);">Administrador</h4>
+                <ul style="list-style:none;">
+                    <li style="padding:0.4rem 0;"><a href="admin-dashboard.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Dashboard</a></li>
+                    <li style="padding:0.4rem 0;"><a href="admin-donantes.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Gestión de Donantes</a></li>
+                    <li style="padding:0.4rem 0;"><a href="admin-donaciones.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Registro de Donaciones</a></li>
+                    <li style="padding:0.4rem 0;"><a href="admin-importar.html" style="color:var(--primary);text-decoration:none;font-size:0.9rem;">Importación CSV</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <h3>¿Cómo funciona DonaTrack?</h3>
+        <p class="features-subtitle">Un proceso simple y transparente de principio a fin</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📦</span>
+                <h4>Registrá tu donación</h4>
+                <p>Acercate al depósito con tus bienes. Un administrador registra la donación y el sistema la segmenta automáticamente.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎯</span>
+                <h4>Asignación inteligente</h4>
+                <p>El sistema vincula cada donación con la entidad beneficiaria que más la necesita según sus necesidades registradas.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🚚</span>
+                <h4>Seguimiento en tiempo real</h4>
+                <p>Seguí el recorrido de tu donación en el mapa hasta que llegue a destino. Transparencia total.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🏫</span>
+                <h4>Entidades verificadas</h4>
+                <p>Comedores, escuelas y hogares registran sus necesidades concretas para recibir lo que realmente necesitan.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔔</span>
+                <h4>Notificaciones</h4>
+                <p>Recibí alertas por email, teléfono o WhatsApp cuando tu donación es asignada, enviada o entregada.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🏆</span>
+                <h4>Incentivos y misiones</h4>
+                <p>Completá misiones, ganá insignias y subí de categoría. Donar tiene recompensas simbólicas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DONACIONES DESTACADAS -->
+    <section class="donations-section" id="donaciones">
+        <div class="inner">
+            <h3>Donaciones del último mes</h3>
+            <p class="section-subtitle">Ejemplos reales de donaciones gestionadas por DonaTrack</p>
+            <div class="donation-grid">
+                <div class="donation-item">
+                    <div class="category">🪑 Mobiliario</div>
+                    <h4>6 sillas + 1 mesa de oficina</h4>
+                    <p class="route">Arcos Plateados S.A. → Escuela Rural N°10</p>
+                    <div class="status"><span class="dot dot-green"></span> Entregado el 10/05/2026</div>
+                </div>
+                <div class="donation-item">
+                    <div class="category">🍝 Alimentos</div>
+                    <h4>100 paquetes de fideos secos</h4>
+                    <p class="route">Pastas del Sur → Comedor Escobar Sonrisas</p>
+                    <div class="status"><span class="dot dot-green"></span> Entregado el 08/05/2026</div>
+                </div>
+                <div class="donation-item">
+                    <div class="category">🧥 Vestimenta</div>
+                    <h4>50 camperas de abrigo</h4>
+                    <p class="route">Ana Pérez → Hogar de Niños San Martín</p>
+                    <div class="status"><span class="dot dot-yellow"></span> En tránsito</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAPA -->
+    <section class="map-section" id="mapa">
+        <h3>Mapa de entregas realizadas</h3>
+        <p class="section-subtitle">Hacé clic en cada marcador para ver los detalles de la donación entregada</p>
+        <div class="map-container">
+            🗺️ Mapa interactivo con marcadores de entregas
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h3>¿Listo para hacer la diferencia?</h3>
+        <p>Unite a DonaTrack y ayudá a que cada donación llegue a quien más la necesita.</p>
+        <a href="registro.html" class="btn btn-primary" style="padding:0.85rem 2.5rem;font-size:1rem;font-weight:600;border-radius:10px;">Crear mi cuenta</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p style="margin-bottom:0.5rem;">DonaTrack © 2026 - UTN Solidaria</p>
+        <p><a href="#">Información Legal</a> · <a href="#">Política de Privacidad</a> · <a href="#">Contacto</a></p>
+    </footer>
+</body>
+</html>
