@@ -369,10 +369,10 @@ Una vez levantado el servicio, abrí en el navegador:
 
 ## ☁️ Servicios desplegados (Render)
 
-| Servicio | URL desplegada | Swagger |
-|----------|----------------|---------|
-| Donaciones | https://donaciones-lfmk.onrender.com | https://donaciones-lfmk.onrender.com/swagger-ui/index.html |
-
+| Servicio    | URL desplegada | Swagger |
+|-------------|----------------|---------|
+| Donaciones  | https://donaciones-lfmk.onrender.com | https://donaciones-lfmk.onrender.com/swagger-ui/index.html |
+| Logística   | https://servicio-logistica-latest.onrender.com | [Ver Swagger](https://servicio-logistica-latest.onrender.com/swagger-ui/index.html) |
 ### Landing / App web
 
 La interfaz web (landing y bocetos) se sirve desde el servicio de donaciones:
