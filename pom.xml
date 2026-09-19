@@ -23,6 +23,7 @@
 		<module>servicio-notificaciones</module>
         <module>commons</module>
 		<module>servicio-logistica</module>
+        <module>api-gateway</module>
     </modules>
 
 	<properties>

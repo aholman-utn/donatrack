@@ -51,6 +51,7 @@ start_service() {
     sleep 2
 }
 
+start_service "api-gateway"
 start_service "servicio-donaciones"
 start_service "servicio-incentivos"
 start_service "servicio-notificaciones"

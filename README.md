@@ -280,6 +280,18 @@ Ejemplos:
 - `TipoNotificador`: enum para seleccionar el canal.
 - `NotificacionService`: resuelve el notificador por tipo y envia la notificacion.
 
+## API Gateway
+
+### Estrategia de Ruteo y Fallback (Render vs Local)
+
+El servicio de Logística cuenta con un entorno principal en la nube y una instancia local de respaldo. El Gateway utiliza **Resilience4j** para implementar un patrón de **Circuit Breaker** que decide dinámicamente hacia dónde enviar el tráfico, garantizando que el servicio no se interrumpa:
+
+1. **Intento Principal (Nube):** Por defecto, toda petición hacia `/api/logistica/**` es enrutada a la instancia alojada en la nube ([https://servicio-logistica-latest.onrender.com](https://servicio-logistica-latest.onrender.com)).
+2. **Detección de Fallos:** Si la instancia en Render se cae, agota el tiempo de espera (timeout de 35s), o es suspendida (devolviendo un error `403` o `500+`), el Circuit Breaker detecta la anomalía y "abre" el circuito para proteger el sistema.
+3. **Preservación de la Ruta:** En el momento exacto en que la petición falla, un filtro global personalizado (`OriginalPathFilter`) captura la URL original solicitada por el cliente y la resguarda inyectándola en el header `X-Original-Path`.
+4. **Desvío Automático (Localhost):** La petición es desviada internamente hacia el `FallbackController`. Este controlador lee el header original y redirige el tráfico de manera transparente hacia la instancia local de Logística (`http://localhost:8083`), manteniendo intactos los parámetros, cabeceras y el cuerpo de la petición.
+
+> **Alta Disponibilidad:** Gracias a este mecanismo de *failover*, si el proveedor en la nube sufre una interrupción o suspende la cuenta, el Gateway conmuta automáticamente el tráfico al entorno local, haciendo que la caída sea completamente imperceptible para el usuario final.
 ## Estructura del proyecto
 
 ```text
