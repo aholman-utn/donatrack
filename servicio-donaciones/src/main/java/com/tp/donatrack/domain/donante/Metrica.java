@@ -13,12 +13,19 @@ public class Metrica {
     private Integer totalDonacionesExitosas;
     private List<CategoriaBien> categoriasAyudadas;
     private List<EntidadAyudada> entidadesAyudadas;
-    private List<Long> misionesCompletadas;
+    private Integer totalMisionesCompletadas;
 
     public Metrica() {
         this.totalDonacionesExitosas = 0;
         this.categoriasAyudadas = new ArrayList<>();
         this.entidadesAyudadas = new ArrayList<>();
-        this.misionesCompletadas = new ArrayList<>();
+        this.totalMisionesCompletadas = 0;
+    }
+
+    public void incrementarMisionesCompletadas() {
+        if (this.totalMisionesCompletadas == null) {
+            this.totalMisionesCompletadas = 0;
+        }
+        this.totalMisionesCompletadas++;
     }
 }

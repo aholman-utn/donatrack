@@ -338,7 +338,7 @@ if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody()
     // 2. Registrar misión completada en las métricas del perfil
     if (response.isMisionCumplida()) {
         Metrica metricaDonante = donante.getPerfil().getMetricasPerfil();
-        metricaDonante.getMisionesCompletadas().add(donante.getPerfil().getMisionActualId());
+        metricaDonante.incrementarMisionesCompletadas();
     }
 
     // 3. Si ascendió de categoría, actualizar su nivel

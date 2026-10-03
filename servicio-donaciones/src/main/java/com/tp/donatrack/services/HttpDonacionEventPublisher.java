@@ -77,7 +77,7 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
                 if (response.isMisionCumplida()) {
                     Metrica metricaDonante = donante.getPerfil().getMetricasPerfil();
                     logger.info("Donante ganó mision: {}", event.dto().getUltimaMisionId());
-                    metricaDonante.getMisionesCompletadas().add(donante.getPerfil().getMisionActualId());
+                    metricaDonante.incrementarMisionesCompletadas();
                 }
 
                 if (response.isSubioDeCategoria() && response.getNuevoNivel() != null) {

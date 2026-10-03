@@ -296,8 +296,8 @@ public class DonanteService {
                 .collect(Collectors.toList());
 
         int misionesCompletadas = perfil.getMetricasPerfil() != null
-                && perfil.getMetricasPerfil().getMisionesCompletadas() != null
-                        ? perfil.getMetricasPerfil().getMisionesCompletadas().size()
+                && perfil.getMetricasPerfil().getTotalMisionesCompletadas() != null
+                        ? perfil.getMetricasPerfil().getTotalMisionesCompletadas()
                         : 0;
 
         return MetricasActividadDTO.builder()
@@ -320,16 +320,18 @@ public class DonanteService {
             throw new RuntimeException("Donante no encontrado");
         PerfilDonante perfil = donante.getPerfil();
 
+        int misionesCompletadas = perfil.getMetricasPerfil() != null
+                && perfil.getMetricasPerfil().getTotalMisionesCompletadas() != null
+                        ? perfil.getMetricasPerfil().getTotalMisionesCompletadas()
+                        : 0;
+
         return PerfilDonanteDTO.builder()
                 .visibilidadInsignia(perfil.isVisibilidadInsignia())
                 .categoriaDonante(perfil.getNivelDonante())
                 .misionActualId(perfil.getMisionActualId())
                 .progreso(perfil.getProgreso())
                 .insigniasGanadas(perfil.getInsigniasGanadas())
-                .misionesCompletadasIds(perfil.getMetricasPerfil() != null
-                        && perfil.getMetricasPerfil().getMisionesCompletadas() != null
-                                ? perfil.getMetricasPerfil().getMisionesCompletadas()
-                                : new ArrayList<>())
+                .totalMisionesCompletadas(misionesCompletadas)
                 .build();
     }
 

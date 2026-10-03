@@ -281,7 +281,8 @@ package "Personas y Donantes" {
     class Metrica {
         -totalDonacionesExitosas: Integer
         -categoriasAyudadas: List<CategoriaBien>
-        -misionesCompletadas: List<Long>
+        -totalMisionesCompletadas: Integer
+        +incrementarMisionesCompletadas(): void
     }
 
     class ItemHistoralDonaciones {

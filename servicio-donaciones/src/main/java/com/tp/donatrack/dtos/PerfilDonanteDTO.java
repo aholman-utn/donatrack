@@ -16,5 +16,5 @@ public class PerfilDonanteDTO {
     private Long misionActualId;
     private Double progreso;
     private List<String> insigniasGanadas;
-    private List<Long> misionesCompletadasIds;
+    private int totalMisionesCompletadas;
 }
