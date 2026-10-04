@@ -23,7 +23,7 @@ public class ComprobanteController {
 
     @GetMapping("/{id}")
     public String verComprobante(@PathVariable String id, Model model) {
-        ComprobanteRecepcionDonacion comprobante = comprobanteRepository.findById(id);
+        ComprobanteRecepcionDonacion comprobante = comprobanteRepository.findById(id).orElse(null);
 
         if (comprobante == null) {
             return "error/404";

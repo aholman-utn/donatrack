@@ -1,6 +1,14 @@
 package com.tp.donatrack.domain.bien;
 
 import com.tp.commons.domain.donaciones.Unidad;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +16,29 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "subcategorias")
 public class SubCategoria {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_subcategoria")
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria_bien")
     private CategoriaBien categoria;
+
+    @Column(name = "descripcion")
     private String descripcion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "unidad")
     private Unidad unidad;
+
+    // Requerido por JPA.
+    protected SubCategoria() {
+    }
 
     public SubCategoria(
         CategoriaBien categoria, 
