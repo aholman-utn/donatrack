@@ -61,7 +61,7 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
                 logger.info("Respuesta exitosa de Incentivos. Progreso: {}, Misión Cumplida: {}",
                         response.getNuevoProgreso(), response.isMisionCumplida());
 
-                Donante donante = donanteRepository.findById(event.dto().getDonanteId());
+                Donante donante = donanteRepository.findByIdOrNull(event.dto().getDonanteId());
 
                 if (donante == null) {
                     logger.error("Error: Donante con ID {} no encontrado en memoria.", event.dto().getDonanteId());
