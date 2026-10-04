@@ -71,7 +71,7 @@ public class DonacionRepository {
     public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Long donanteId) {
         return findByDonanteId(donanteId).stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
-                .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.EN_DEPOSITO)
+                .filter(ds -> com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.EN_DEPOSITO.equals(ds.getEstado()))
                 .collect(Collectors.toList());
     }
 

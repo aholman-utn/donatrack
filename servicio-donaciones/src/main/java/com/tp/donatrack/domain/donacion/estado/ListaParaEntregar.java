@@ -21,12 +21,12 @@ public class ListaParaEntregar extends EstadoDonacionSegmentada {
     }
 
     @Override
-    public boolean puedeTransicionarA(EstadoDonacionSegmentada nuevo) {
-        return nuevo != null && "EN_TRASLADO".equals(nuevo.getNombre());
+    public void solicitarPlanificacion(DonacionSegmentada donacion, String actor) {
+        donacion.transicionar(new EnPlanificacion(),actor,"Lote enviado a logística para planificación");
     }
 
     @Override
-    public void iniciarTraslado(DonacionSegmentada donacion, String actor) {
-        donacion.transicionar(new EnTraslado(), actor, "Camión inició el recorrido de entrega");
+    public boolean puedeTransicionarA(EstadoDonacionSegmentada nuevo) {
+        return nuevo != null && "EN_PLANIFICACION".equals(nuevo.getNombre());
     }
 }

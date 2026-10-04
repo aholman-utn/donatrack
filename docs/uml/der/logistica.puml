@@ -1,0 +1,188 @@
+@startuml logistica
+!include ../_style.puml
+' El DER se lee mejor con líneas rectas que ortogonales
+skinparam linetype polyline
+
+title DER — Servicio de Logística\n(entidades efectivamente persistidas, commit main 5545136)
+
+' =====================================================================
+' NOTA DE ALCANCE
+' Hoy NO existe base de datos: no hay JPA, ni @Entity, ni datasource.
+' Toda la "persistencia" son colecciones en memoria (se pierde al
+' reiniciar el proceso). Este DER modela la estructura de datos REAL
+' que hoy vive en memoria, expresada como modelo relacional para que
+' sea directamente implementable en la Entrega de Persistencia.
+'
+' Leyenda de estereotipos de almacenamiento:
+'   <<service map>> = ConcurrentHashMap dentro de LogisticaService
+'   <<repository>>  = clase @Repository dedicada
+'   <<embebida>>    = no tiene almacén propio: vive dentro de Ruta
+'   <<derivada>>    = no existe en el código; sería necesaria en BD
+' =====================================================================
+
+entity "CAMION" as CAMION <<service map>> {
+  * **id** : Long  <<PK>>
+  --
+  * patente : String
+  * marca : String
+  * modelo : String
+  * capacidadCarga : double  «kg»
+  * volumen : double  «m³»
+  * altura : double  «m»
+}
+
+entity "CHOFER" as CHOFER <<service map>> {
+  * **id** : Long  <<PK>>
+  --
+  * nombre : String
+  * apellido : String
+  * dni : String
+}
+
+entity "RUTA" as RUTA <<repository>> {
+  * **id** : Long  <<PK>>
+  --
+  * iniciada : Boolean
+  --
+  * camion_id : Long  <<FK → CAMION>>
+  * chofer_id : Long  <<FK → CHOFER>>
+}
+
+entity "PARADA" as PARADA <<embebida>> {
+  * **ruta_id** : Long  <<PK, FK → RUTA>>
+  * **orden** : Integer  <<PK>>
+  --
+  * direccion : String
+}
+
+entity "PARADA_ENVIO" as PARADA_ENVIO <<derivada>> {
+  * **ruta_id** : Long  <<PK, FK → PARADA>>
+  * **orden** : Integer  <<PK, FK → PARADA>>
+  * **envio_id** : Long  <<PK, FK → ENVIO (?)>>
+}
+
+entity "ENVIO" as ENVIO <<service map>> {
+  * **id** : Long  <<PK>>
+  --
+  * estado : EstadoEnvio
+  --
+  ' Identificadores de otro bounded context (servicio-donaciones).
+  ' NO son claves foráneas: no hay integridad referencial entre servicios.
+  * donacionSegmentadaId : Long  <<ref. externa>>
+  * entidadBeneficiariaId : Long  <<ref. externa>>
+}
+
+entity "EVENTO_LOGISTICA" as EVENTO <<repository>> {
+  * **id** : Long  <<PK derivada — hoy NO existe>>
+  --
+  * tipoEvento : String  «INICIO_RUTA | ENTREGA_EXITOSA | ENTREGA_FALLIDA»
+  * timestamp : LocalDateTime
+  detalles : String
+  --
+  * donacionSegmentadaId : Long  <<ref. externa>>
+  * entidadBeneficiariaId : Long  <<ref. externa>>
+}
+
+' ===================== Relaciones =====================
+CAMION ||--o{ RUTA : "es asignado a"
+CHOFER ||--o{ RUTA : "conduce"
+RUTA   ||--o{ PARADA : "se compone de\n(identifying)"
+
+PARADA       ||--o{ PARADA_ENVIO : "agrupa"
+PARADA_ENVIO }o--|| ENVIO : "descarga"
+
+' Relación sólo lógica: el evento se construye a partir de un Envio,
+' pero persiste el ID externo de la donación, no el envio_id.
+ENVIO ..o{ EVENTO : "origina\n(sin FK: se copia donacionSegmentadaId)"
+
+' ===================== Notas =====================
+
+note right of CAMION
+  **Almacenamiento**: `ConcurrentHashMap<Long, Camion>`
+  como campo de `LogisticaService`, con secuencia
+  propia `camionIdSeq` (AtomicLong).
+  No tiene clase @Repository — a diferencia de RUTA
+  y EVENTO_LOGISTICA.
+end note
+
+note bottom of PARADA
+  **Entidad débil (composición)**: `Parada` no tiene `id`
+  propio; vive como `List<Parada>` dentro de `Ruta`.
+  Su identidad depende de la ruta contenedora, por eso
+  la PK es compuesta (ruta_id + orden).
+  Si se borra la Ruta, desaparecen sus Paradas.
+end note
+
+note bottom of PARADA_ENVIO
+  **Tabla asociativa derivada**: en el código la N:M está
+  materializada como `List<Long> enviosIds` dentro de
+  `Parada`. Al normalizar a un modelo relacional hace
+  falta esta tabla intermedia.
+  ⚠ Ver nota de ambigüedad sobre el contenido real de
+  esos IDs.
+end note
+
+note bottom of EVENTO
+  **Log append-only**: `CopyOnWriteArrayList<EventoLogistica>`;
+  sólo se agrega (`registrar`) y se lee todo (`obtenerTodos`).
+  No hay borrado, ni actualización, ni identificador:
+  **la PK `id` es una propuesta de diseño, hoy no existe
+  en la clase**. Es el endpoint que consume Donaciones
+  por polling cada 10 s.
+end note
+
+note as N_AMBIG #FFE0E0
+  ⚠ **Ambigüedad real detectada en `Parada.enviosIds`**
+  El mismo campo se escribe y se lee con semánticas distintas:
+  • **Escritura** (flujo automático) — `CapacidadFisica:90-92`
+    guarda `donacion.donacionSegmentadaId()`, es decir un
+    **ID externo de servicio-donaciones**.
+  • **Lectura** (`LogisticaService.registrarRuta:107` e
+    `iniciarRuta:139`) hace `envios.get(envioId)`, es decir
+    espera un **ID local de ENVIO**.
+  Por eso la FK `PARADA_ENVIO.envio_id` queda marcada con "(?)":
+  antes de llevar esto a una BD hay que definir a qué entidad
+  apunta realmente.
+end note
+
+note as N_ENVIO #FFF4E0
+  ⚠ **ENVIO no se puebla en el flujo automático.**
+  El cron de Donaciones sólo envía el DTO a `/planificar`, y
+  `planificarLote` **no crea Envios**: sólo arma Rutas y Paradas.
+  Los `Envio` únicamente nacen por el endpoint manual
+  `POST /api/logistica/envios`.
+  Consecuencia combinada con la ambigüedad de arriba: al
+  iniciar una ruta generada automáticamente, `envios.get(...)`
+  devuelve null, **no se transiciona ningún envío y no se emite
+  el evento INICIO_RUTA**.
+end note
+
+note as N_PERSIST #E8F0FE
+  **Sin motor de base de datos (verificado en todo el repo)**
+  • `servicio-logistica/pom.xml`: sin `spring-boot-starter-data-jpa`.
+  • `application.properties`: sólo `server.port=8083`; sin
+    `spring.datasource.*` en ningún módulo.
+  • Cero `@Entity` / `@Id` / `jakarta.persistence`.
+  ⇒ Las 6 entidades son **volátiles**: se pierden al reiniciar.
+  ⇒ Las secuencias de ID son `AtomicLong` en memoria
+    (`RutaRepository.ID_GENERATOR` es además `static`).
+end note
+
+N_AMBIG .. PARADA_ENVIO
+N_ENVIO .. ENVIO
+
+legend right
+  |= Símbolo |= Significado |
+  | barra doble | exactamente uno (1) |
+  | círculo + pata de gallo | cero o muchos (0..N) |
+  | línea punteada | relación lógica, sin FK en el código |
+  | <<PK>> | clave primaria |
+  | <<FK>> | clave foránea (dentro del servicio) |
+  | <<ref. externa>> | ID de otro servicio, **sin** integridad referencial |
+  | <<service map>> | hoy: ConcurrentHashMap en LogisticaService |
+  | <<repository>> | hoy: clase @Repository dedicada |
+  | <<embebida>> | hoy: colección anidada dentro de otra entidad |
+  | <<derivada>> | no existe hoy; requerida al normalizar |
+endlegend
+
+@enduml

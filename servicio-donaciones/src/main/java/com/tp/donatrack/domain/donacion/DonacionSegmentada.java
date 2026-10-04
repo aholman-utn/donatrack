@@ -66,6 +66,11 @@ public class DonacionSegmentada {
         this.estado.listarParaEntrega(this, actor);
     }
 
+
+    public void solicitarPlanificacion(String actor) {
+        this.estado.solicitarPlanificacion(this, actor);
+    }
+
     public void iniciarTraslado(String actor) {
         this.estado.iniciarTraslado(this, actor);
     }

@@ -125,6 +125,18 @@ public class TrazabilidadService {
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
+    public TrazaSegmentoDTO transicionSolicitarPlanificacion(
+            Integer idDonacion,
+            Integer idSegmento,
+            String actor) {
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_PLANIFICACION)) {
+            throw new IllegalArgumentException("No es posible realizar esta transicion");
+        }
+        segmentada.solicitarPlanificacion(actor);
+        return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
+    }
+
     public TrazaSegmentoDTO transicionEnTraslado(
             Integer idDonacion,
             Integer idSegmento,

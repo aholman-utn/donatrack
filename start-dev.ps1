@@ -1,6 +1,8 @@
 # ====================================================================
 # DonaTrack - Script de Inicio del Entorno de Desarrollo Completo
 # ====================================================================
+Set-Location -LiteralPath $PSScriptRoot
+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
@@ -13,17 +15,18 @@ Write-Host "`n[1/3] Verificando e iniciando contenedores Docker (RabbitMQ, n8n).
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     try {
         docker compose -f herramientas/docker-compose.yml up -d
+        if ($LASTEXITCODE -ne 0) { throw "Docker Compose fallo." }
         Write-Host "  ✅ Contenedores Docker iniciados correctamente." -ForegroundColor Green
     } catch {
-        Write-Host "  ⚠️ No se pudo iniciar Docker Compose. Asegurate de que Docker Desktop esté abierto." -ForegroundColor DarkYellow
+        throw "No se pudo iniciar Docker Compose. Verifica Docker Desktop."
     }
 } else {
-    Write-Host "  ⚠️ Docker no está instalado o no se encuentra en el PATH." -ForegroundColor DarkYellow
+    throw "Docker no esta instalado o no se encuentra en PATH."
 }
 
 # 2. Compilar e instalar dependencias (principalmente 'commons')
 Write-Host "`n[2/3] Compilando e instalando dependencias (mvn clean install)..." -ForegroundColor Yellow
-$mvnResult = & .\mvnw.cmd clean install -DskipTests
+& .\mvnw.cmd clean install -DskipTests
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Error fatal: Falló la compilación de Maven. Abortando inicio." -ForegroundColor Red
     exit 1
@@ -40,7 +43,7 @@ $servicios = @(
     @{ Nombre = "servicio-logistica"; Puerto = "8083"; Color = "Yellow" }
 )
 
-$currentDir = Get-Location
+$currentDir = $PSScriptRoot.Replace("'", "''")
 
 foreach ($s in $servicios) {
     $nombre = $s.Nombre
@@ -53,9 +56,9 @@ foreach ($s in $servicios) {
 }
 
 Write-Host "`n========================================================" -ForegroundColor Green
-Write-Host "  ✅ Todos los microservicios fueron lanzados con éxito!" -ForegroundColor Green
+Write-Host "  Procesos lanzados; espera el arranque de cada servicio." -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
-Write-Host "Puertos activos:" -ForegroundColor White
+Write-Host "Puertos configurados:" -ForegroundColor White
 Write-Host "  - Servicio Donaciones:     http://localhost:8080" -ForegroundColor White
 Write-Host "  - Servicio Incentivos:     http://localhost:8081" -ForegroundColor White
 Write-Host "  - Servicio Notificaciones: http://localhost:8082" -ForegroundColor White
