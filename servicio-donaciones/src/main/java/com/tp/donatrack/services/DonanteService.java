@@ -81,7 +81,7 @@ public class DonanteService {
     }
 
     public Donante buscarDonantePorId(Long id) {
-        return this.donanteRepository.findById(id);
+        return this.donanteRepository.findByIdOrNull(id);
     }
 
     public ImportacionResponseDTO importarDonantes(MultipartFile archivo) {
@@ -166,7 +166,7 @@ public class DonanteService {
 
     public void notificarEntrega(Long donanteId) {
         try {
-            Donante donante = donanteRepository.findById(donanteId);
+            Donante donante = donanteRepository.findByIdOrNull(donanteId);
 
             if (donante == null || donante.getPersona() == null) {
                 logger.warn("No se encontró el donante o la persona para el ID: {}", donanteId);
@@ -218,7 +218,7 @@ public class DonanteService {
 
     public IndicadoresDonanteDTO calcularIndicadores(Long donanteId, DonacionSegmentada segmentada,
             List<String> indicadores) {
-        Donante donante = donanteRepository.findById(donanteId);
+        Donante donante = donanteRepository.findByIdOrNull(donanteId);
 
         if (donante == null) {
             throw new RuntimeException("Donante no encontrado");

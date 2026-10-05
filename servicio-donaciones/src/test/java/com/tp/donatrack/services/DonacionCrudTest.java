@@ -16,7 +16,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Prueba de integración del CRUD de donaciones de extremo a extremo, ejecutada
+ * sobre una base de datos en memoria mediante el perfil de pruebas.
+ */
 @SpringBootTest
+@org.springframework.test.context.ActiveProfiles("test")
+@org.springframework.transaction.annotation.Transactional
 class DonacionCrudTest {
 
     @Autowired

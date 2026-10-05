@@ -38,11 +38,20 @@ class LogisticaStateIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        repository = new DonacionRepository();
+        repository = mock(DonacionRepository.class);
+        when(repository.save(any(Donacion.class))).thenAnswer(invocation -> invocation.getArgument(0));
         var sub = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
         var bien = new BienDuradero("Silla", "Prueba", null, sub, EstadoBien.NUEVO);
-        donacion = repository.save(new Donacion(null, "Prueba", new Date(), List.of(bien)));
+        donacion = new Donacion(null, "Prueba", new Date(), List.of(bien));
+        donacion.setId(1L);
+        donacion.getDonacionesSegmentadas().getFirst().setId(1L);
+        donacion = repository.save(donacion);
         segmento = donacion.getDonacionesSegmentadas().getFirst();
+        when(repository.findAll()).thenReturn(List.of(donacion));
+        // findSegmentadaById / findDonacionByDonacionesSegmentadaId son métodos
+        // default de la interfaz; Mockito no los ejecuta, por lo que se stubean.
+        when(repository.findSegmentadaById(segmento.getId())).thenReturn(segmento);
+        when(repository.findDonacionByDonacionesSegmentadaId(segmento.getId())).thenReturn(donacion);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Test", "Asignada");
         segmento.listarParaEntrega("Test");
         segmento.setEntidadBeneficiariaAsignadaId(10L);
@@ -138,7 +147,7 @@ class LogisticaStateIntegrationTest {
         assertEquals(EstadoDonacionSegmentada.EN_TRASLADO, segmento.getEstado());
         var entrega = evento(TipoEventoLogistica.ENTREGA_EXITOSA);
         listener.recibirEventoLogistica(entrega);
-        verify(trazabilidad).recepcionarEntrega(donacion.getId(), Math.toIntExact(segmento.getId()),
+        verify(trazabilidad).recepcionarEntrega(donacion.getId(), segmento.getId(),
                 entrega.getTimestamp(), "Prueba");
     }
 

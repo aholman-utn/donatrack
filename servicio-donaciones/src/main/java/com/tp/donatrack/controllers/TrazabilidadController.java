@@ -28,7 +28,7 @@ public class TrazabilidadController {
      * Obtiene la trazabilidad completa de una donación, incluyendo todos sus segmentos.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> trazabilizarDonacion(@PathVariable Integer id) {
+    public ResponseEntity<?> trazabilizarDonacion(@PathVariable Long id) {
         try {
             TrazaDonacionDTO traza = trazabilidadService.trazabilizarDonacion(id);
             return ResponseEntity.ok(traza);
@@ -42,8 +42,8 @@ public class TrazabilidadController {
      */
     @GetMapping("/{idDonacion}/{idSegmento}")
     public ResponseEntity<?> trazabilizarDonacionSegmentada(
-            @PathVariable Integer idDonacion,
-            @PathVariable Integer idSegmento
+            @PathVariable Long idDonacion,
+            @PathVariable Long idSegmento
     ) {
         try {
             TrazaSegmentoDTO traza = trazabilidadService.trazabilizarDonacionSegmentada(idDonacion, idSegmento);
@@ -58,8 +58,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar")
     public ResponseEntity<?> transicionarDonacion(
-        @PathVariable Integer idDonacion,
-        @PathVariable Integer idSegmento,
+        @PathVariable Long idDonacion,
+        @PathVariable Long idSegmento,
         @RequestBody CrearEventoRequest request
     ) {
         try {
@@ -75,8 +75,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/lista_entregar")
     public ResponseEntity<?> transicionarListaEntregar(
-        @PathVariable Integer idDonacion,
-        @PathVariable Integer idSegmento,
+        @PathVariable Long idDonacion,
+        @PathVariable Long idSegmento,
         @RequestParam String actor
     ) {
         try {
@@ -93,8 +93,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/planificacion")
     public ResponseEntity<?> transicionarPlanificacion(
-        @PathVariable Integer idDonacion,
-        @PathVariable Integer idSegmento,
+        @PathVariable Long idDonacion,
+        @PathVariable Long idSegmento,
         @RequestParam String actor
     ) {
         try {
@@ -110,8 +110,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/en_traslado")
     public ResponseEntity<?> transicionarEnTraslado(
-        @PathVariable Integer idDonacion,
-        @PathVariable Integer idSegmento,
+        @PathVariable Long idDonacion,
+        @PathVariable Long idSegmento,
         @RequestParam String actor
     ) {
         try {
@@ -127,8 +127,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/entrega_fallida")
     public ResponseEntity<?> transicionarEntregaFallida(
-        @PathVariable Integer idDonacion,
-        @PathVariable Integer idSegmento,
+        @PathVariable Long idDonacion,
+        @PathVariable Long idSegmento,
         @RequestParam String actor,
         @RequestParam String justificacion
     ) {
@@ -145,8 +145,8 @@ public class TrazabilidadController {
      */
     @PostMapping("/{idDonacion}/{idSegmento}/transicionar/marcar_vencida")
     public ResponseEntity<?> transicionarMarcarVencida(
-            @PathVariable Integer idDonacion,
-            @PathVariable Integer idSegmento,
+            @PathVariable Long idDonacion,
+            @PathVariable Long idSegmento,
             @RequestParam String actor
     ) {
         try {
@@ -163,8 +163,8 @@ public class TrazabilidadController {
      */
     @PatchMapping("/{idDonacion}/{idSegmento}/recepcionar")
     public ResponseEntity<?> recepcionarEntrega(
-            @PathVariable Integer idDonacion,
-            @PathVariable Integer idSegmento
+            @PathVariable Long idDonacion,
+            @PathVariable Long idSegmento
     ) {
         try {
             TrazaSegmentoDTO traza = trazabilidadService.recepcionarEntrega(

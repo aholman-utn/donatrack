@@ -90,7 +90,7 @@ public class LogisticaEventListener {
                 if (donacionPadre != null) {
                     trazabilidadService.recepcionarEntrega(
                             donacionPadre.getId(),
-                            Math.toIntExact(segmentada.getId()),
+                            segmentada.getId(),
                             evento.getTimestamp(),
                             evento.getDetalles()
                     );

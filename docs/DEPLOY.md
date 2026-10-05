@@ -58,7 +58,8 @@ Configurar en el dashboard de Render si es necesario:
 |----------|-------------|
 | `PORT` | Puerto (Render lo asigna automáticamente) |
 | `SPRING_PROFILES_ACTIVE` | `prod` para producción |
-| `DB_URL` | URL de base de datos (cuando se agregue persistencia) |
+
+> **Persistencia:** la base de datos de producción todavía no está definida. Cuando se elija un proveedor de MySQL, se externalizará la conexión de `donatrack-donaciones` y `donatrack-notificaciones` por variables de entorno. (Render no ofrece MySQL gestionado; solo PostgreSQL.)
 
 ## Limitaciones del plan gratuito
 

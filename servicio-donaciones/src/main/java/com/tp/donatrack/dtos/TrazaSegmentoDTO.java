@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TrazaSegmentoDTO {
-    private Integer id;
+    private Long id;
     private List<EventoTrazabilidad> eventos;
 }

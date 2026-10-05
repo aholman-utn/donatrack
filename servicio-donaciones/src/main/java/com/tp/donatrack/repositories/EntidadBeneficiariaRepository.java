@@ -1,52 +1,25 @@
 package com.tp.donatrack.repositories;
 
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
-import com.tp.donatrack.domain.persona.Persona;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
+/**
+ * Repositorio de {@link EntidadBeneficiaria}.
+ */
 @Repository
-public class EntidadBeneficiariaRepository {
-    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
-    private final List<EntidadBeneficiaria> entidades;
-    public EntidadBeneficiariaRepository() {
-        this.entidades = new ArrayList<>();
+public interface EntidadBeneficiariaRepository extends JpaRepository<EntidadBeneficiaria, Long> {
+
+    /** Persiste la entidad beneficiaria. */
+    default EntidadBeneficiaria create(EntidadBeneficiaria entidad) {
+        return save(entidad);
     }
 
-    public EntidadBeneficiaria create(EntidadBeneficiaria entidadBeneficiaria){
-        if (entidadBeneficiaria.getDatosDeEntidad() != null && entidadBeneficiaria.getDatosDeEntidad().getId() == null) {
-            entidadBeneficiaria.getDatosDeEntidad().setId(Persona.nextId());
-            //entidadBeneficiaria.setEntidadBeneficiariaId(ID_GENERATOR.getAndIncrement());
+    /** Busca una entidad beneficiaria por su identificador, devolviendo {@code null} si no existe. */
+    default EntidadBeneficiaria find(Long id) {
+        if (id == null) {
+            return null;
         }
-        this.entidades.add(entidadBeneficiaria);
-        return entidadBeneficiaria;
+        return findById(id).orElse(null);
     }
-
-    public List<EntidadBeneficiaria> findAll() {return this.entidades;}
-
-    public EntidadBeneficiaria find(Long id) {
-        return this.entidades.stream()
-                .filter(entidad -> entidad.getDatosDeEntidad() != null && entidad.getDatosDeEntidad().getId() != null && entidad.getDatosDeEntidad().getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void delete(EntidadBeneficiaria entidad) {entidades.remove(entidad);}
-
-    public List<EntidadBeneficiaria> findAllById(Collection<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return this.entidades.stream()
-                .filter(entidad -> entidad.getDatosDeEntidad() != null
-                        && entidad.getDatosDeEntidad().getId() != null
-                        && ids.contains(entidad.getDatosDeEntidad().getId()))
-                .toList();
-    }
-
 }

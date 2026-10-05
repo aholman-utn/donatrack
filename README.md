@@ -333,6 +333,18 @@ Configuracion actual:
 - Maximo tamano de archivo multipart: `10MB`
 - Maximo tamano de request multipart: `10MB`
 
+### Base de datos (desarrollo local)
+
+Los servicios con persistencia JPA (`servicio-donaciones` y `servicio-notificaciones`) se conectan a una base MySQL local. La configuración está en el `application.properties` de cada servicio (host `localhost:3306`).
+
+Para levantar un MySQL local con Docker:
+
+```bash
+docker compose -f herramientas/docker-compose.yml up mysql -d
+```
+
+> La base de datos de producción todavía no está definida. Cuando se elija un proveedor, la conexión se externalizará por configuración.
+
 ---
 
 ## 📡 API REST - Swagger UI

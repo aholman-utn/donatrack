@@ -4,6 +4,17 @@ import java.util.List;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.necesidad.NecesidadMaterial;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +24,25 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "entidades_beneficiarias")
 public class EntidadBeneficiaria {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_entidad_beneficiaria")
+    private Long idEntidadBeneficiaria;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_persona_juridica")
     private PersonaJuridica datosDeEntidad;
+
+    /**
+     * Necesidades de la entidad. Se mantienen en memoria para la lógica de dominio;
+     * su persistencia se gestiona por separado mediante {@code NecesidadRepository}
+     * (vinculadas por {@code entidadBeneficiariaId}).
+     */
+    @Transient
     private List<NecesidadMaterial> nececidades = new ArrayList<>();
 
     private List<NecesidadMaterial> necesidadesActivas() {
