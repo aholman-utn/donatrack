@@ -42,15 +42,16 @@ class EventoTrazabilidadTest {
     }
 
     @Test
-    @DisplayName("Flujo completo: EN_DEPOSITO → ASIGNACION_REALIZADA → LISTA_PARA_ENTREGAR → EN_TRASLADO → ENTREGADA")
+    @DisplayName("Flujo completo: EN_DEPOSITO → ASIGNACION_REALIZADA → LISTA_PARA_ENTREGAR → EN_PLANIFICACION → EN_TRASLADO → ENTREGADA")
     void flujoCompletoExitoso() {
         donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada por algoritmo");
         donacion.listarParaEntrega("Logística");
+        donacion.solicitarPlanificacion("Sistema (Cron)");
         donacion.iniciarTraslado("Chofer Pérez");
         donacion.confirmarEntrega(123L);
 
         assertEquals(EstadoDonacionSegmentada.ENTREGADA, donacion.getEstado());
-        assertEquals(5, donacion.getHistorial().size());
+        assertEquals(6, donacion.getHistorial().size());
     }
 
     @Test
@@ -58,6 +59,7 @@ class EventoTrazabilidadTest {
     void entregaFallidaConJustificacion() {
         donacion.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         donacion.listarParaEntrega("Logística");
+        donacion.solicitarPlanificacion("Sistema (Cron)");
         donacion.iniciarTraslado("Chofer");
 
         donacion.registrarEntregaFallida("Chofer", "Tocamos timbre pero nadie respondió");

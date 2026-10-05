@@ -266,7 +266,7 @@ public class DonanteService {
                 .collect(Collectors.toList());
 
         List<Long> entidadesIds = segmentadas.stream()
-                .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA)
+                .filter(ds -> com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.ENTREGADA.equals(ds.getEstado()))
                 .map(DonacionSegmentada::getEntidadBeneficiariaAsignadaId)
                 .filter(Objects::nonNull)
                 .distinct()

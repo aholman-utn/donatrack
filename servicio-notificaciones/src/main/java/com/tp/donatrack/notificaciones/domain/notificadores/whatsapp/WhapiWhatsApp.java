@@ -58,8 +58,10 @@ public class WhapiWhatsApp implements iWhatsAppProvider {
 
         } catch (RestClientResponseException e) {
             logger.error("❌ Error de API Whapi al mandar texto (Código {}): {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            throw new RuntimeException("Falló la API de Whapi: " + e.getStatusCode().value());
         } catch (Exception e) {
             logger.error("❌ Explotó el envío del mensaje a {}: {}", numero, e.getMessage(), e);
+            throw new RuntimeException("Error inesperado enviando WhatsApp", e);
         }
     }
 }

@@ -15,11 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Implementación real del proveedor de email usando la API de Resend.
- * Envía emails transaccionales vía HTTP POST a la API de Resend.
- * Documentación: https://resend.com/docs/api-reference/emails/send-email
- */
 @Component
 @ConditionalOnProperty(name = "resend.api.key", matchIfMissing = false)
 public class Resend implements iEmailProvider {
@@ -33,13 +28,16 @@ public class Resend implements iEmailProvider {
     private String fromEmail;
 
     private static final String API_URL = "https://api.resend.com/emails";
+    private final RestTemplate restTemplate;
+
+    public Resend(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public void enviarEmail(String destinatario, String mensaje, String asunto) {
         logger.info("--- ENVIANDO EMAIL REAL A {} ---", destinatario);
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", "Bearer " + apiKey);
@@ -62,6 +60,7 @@ public class Resend implements iEmailProvider {
 
         } catch (Exception e) {
             logger.error("Error al enviar email a {}: {}", destinatario, e.getMessage(), e);
+            throw new RuntimeException("Error inesperado enviando email", e);
         }
     }
 }

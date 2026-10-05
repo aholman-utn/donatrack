@@ -23,16 +23,31 @@ public class NotificacionService {
     }
 
     public void notificar(NotificacionRequestDTO body) {
-        iNotificador notificador = this.seleccionarNotificador(body.getMedio())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un notificador"));
+        Notificacion notificacion = new Notificacion();
+        notificacion.setIdPersona(body.getIdPersona());
+        notificacion.setAsunto(body.getAsunto());
+        notificacion.setMensaje(body.getMensaje());
+        notificacion.setDestinatario(body.getDestinatario());
+        notificacion.setFecha(LocalDateTime.now());
+        notificacion.setEnviado(false);
 
-        notificador.enviarNotificacion(body.getDestinatario(), body.getMensaje(), body.getAsunto());
+        try {
+            iNotificador notificador = this.seleccionarNotificador(body.getMedio())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró un notificador"));
 
-        this.crearNotificacion(body.getIdPersona(), body.getAsunto(), body.getMensaje(), body.getDestinatario());
+            notificacion.setMedio(notificador.getMedio());
+            notificador.enviarNotificacion(body.getDestinatario(), body.getMensaje(), body.getAsunto());
+
+            notificacion.setEnviado(true);
+
+        } catch (Exception e) {
+            System.err.println("Error al enviar notificación: " + e.getMessage());
+        }
+        this.guardarEnBaseDeDatos(notificacion);
     }
 
-    public List<Notificacion> buscar(Long id_persona) {
-        return this.notificacionRepository.findByIdPersona(id_persona);
+    public List<Notificacion> buscar(Long idPersona) {
+        return this.notificacionRepository.findByIdPersona(idPersona);
     }
 
     public List<Notificacion> buscarTodas() {
@@ -45,14 +60,7 @@ public class NotificacionService {
                 .findFirst();
     }
 
-    private Notificacion crearNotificacion(Long idPersona, String asunto, String mensaje, String destinatario) {
-        Notificacion nueva = new Notificacion();
-        nueva.setId_persona(idPersona);
-        nueva.setAsunto(asunto);
-        nueva.setMensaje(mensaje);
-        nueva.setDestinatario(destinatario);
-        nueva.setFecha(LocalDateTime.now());
-
-        return this.notificacionRepository.save(nueva);
+    private Notificacion guardarEnBaseDeDatos(Notificacion notificacion) {
+        return this.notificacionRepository.save(notificacion);
     }
 }

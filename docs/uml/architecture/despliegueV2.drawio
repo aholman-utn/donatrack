@@ -1,0 +1,116 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Despliegue DonaTrack" id="deploy-v2">
+    <mxGraphModel dx="1348" dy="913" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="usuario" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;" value="Persona usuaria&#xa;(Donante / Entidad / Admin)" vertex="1">
+          <mxGeometry height="60" width="40" x="700" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="render" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;" value="Render.com (nube)" vertex="1">
+          <mxGeometry height="300" width="900" x="200" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="node-don" parent="1" style="shape=mxgraph.sysml.package;tabWidth=200;tabHeight=30;align=center;overflow=hidden;" value="«Docker»&#xa;Servicio de Donaciones&#xa;(Spring Boot)" vertex="1">
+          <mxGeometry height="80" width="220" x="230" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="jar-don" parent="1" style="shape=component;align=center;spacingLeft=10;" value="servicio-donaciones.jar" vertex="1">
+          <mxGeometry height="35" width="180" x="250" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="node-not" parent="1" style="shape=mxgraph.sysml.package;tabWidth=200;tabHeight=30;align=center;overflow=hidden;" value="«Docker»&#xa;Servicio de Notificaciones&#xa;(Spring Boot)" vertex="1">
+          <mxGeometry height="80" width="220" x="500" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="jar-not" parent="1" style="shape=component;align=center;spacingLeft=10;" value="servicio-notificaciones.jar" vertex="1">
+          <mxGeometry height="35" width="180" x="520" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="node-inc" parent="1" style="shape=mxgraph.sysml.package;tabWidth=200;tabHeight=30;align=center;overflow=hidden;" value="«Docker»&#xa;Servicio de Incentivos&#xa;(Spring Boot)" vertex="1">
+          <mxGeometry height="80" width="220" x="770" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="jar-inc" parent="1" style="shape=component;align=center;spacingLeft=10;" value="servicio-incentivos.jar" vertex="1">
+          <mxGeometry height="35" width="180" x="790" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="local" parent="1" style="rounded=1;whiteSpace=wrap;dashed=1;fillColor=none;" value="Entorno local / desarrollo" vertex="1">
+          <mxGeometry height="280" width="900" x="200" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="node-log" parent="1" style="shape=mxgraph.sysml.package;tabWidth=200;tabHeight=30;align=center;overflow=hidden;" value="«Proceso Java»&#xa;Servicio de Logística&#xa;(Spring Boot :8083)" vertex="1">
+          <mxGeometry height="80" width="220" x="230" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="jar-log" parent="1" style="shape=component;align=center;spacingLeft=10;" value="servicio-logistica.jar" vertex="1">
+          <mxGeometry height="35" width="180" x="250" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="node-n8n" parent="1" style="shape=mxgraph.sysml.package;tabWidth=150;tabHeight=30;align=center;overflow=hidden;" value="«Docker»&#xa;N8N&#xa;(automatización :5678)" vertex="1">
+          <mxGeometry height="80" width="200" x="530" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-ins" parent="1" style="shape=component;align=center;spacingLeft=10;" value="Flujo: Insignias" vertex="1">
+          <mxGeometry height="30" width="130" x="545" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-rank" parent="1" style="shape=component;align=center;spacingLeft=10;" value="Flujo: Ranking" vertex="1">
+          <mxGeometry height="30" width="130" x="545" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="node-browser" parent="1" style="shape=mxgraph.sysml.package;tabWidth=150;tabHeight=30;align=center;overflow=hidden;" value="«Docker»&#xa;Browserless/Chrome&#xa;(:3000)" vertex="1">
+          <mxGeometry height="80" width="200" x="800" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="linkedin" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;" value="LinkedIn API" vertex="1">
+          <mxGeometry height="60" width="120" x="1150" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="gsheets" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;" value="Google Sheets API" vertex="1">
+          <mxGeometry height="60" width="120" x="1150" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" edge="1" parent="1" source="usuario" style="endArrow=open;" target="node-don" value="HTTPS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" edge="1" parent="1" source="usuario" style="endArrow=open;" target="node-not" value="HTTPS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" edge="1" parent="1" source="usuario" style="endArrow=open;" target="node-inc" value="HTTPS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-not" value="HTTP&#xa;POST /notificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-inc" value="HTTP&#xa;POST /entrega">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f6" edge="1" parent="1" source="node-inc" style="endArrow=open;dashed=1;" target="node-don" value="HTTP&#xa;GET /indicadores">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f7" edge="1" parent="1" source="node-inc" style="endArrow=open;" target="node-not" value="HTTP&#xa;POST /notificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f8" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-log" value="HTTP&#xa;POST /planificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f9" edge="1" parent="1" source="node-don" style="endArrow=open;dashed=1;" target="node-log" value="HTTP&#xa;GET /eventos&#xa;(polling 10s)">
+          <mxGeometry relative="1" x="-0.3793" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f10" edge="1" parent="1" source="node-inc" style="endArrow=open;" target="node-n8n" value="HTTP&#xa;webhook">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f11" edge="1" parent="1" source="node-n8n" style="endArrow=open;" target="node-browser" value="HTTP&#xa;/screenshot">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f12" edge="1" parent="1" source="node-n8n" style="endArrow=open;" target="linkedin" value="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f13" edge="1" parent="1" source="node-n8n" style="endArrow=open;" target="gsheets" value="HTTPS">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nota-log" parent="1" style="shape=note;size=15;align=left;spacingLeft=5;" value="Logística no tiene Dockerfile ni entrada&#xa;en render.yaml. Corre como proceso local." vertex="1">
+          <mxGeometry height="45" width="280" x="230" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="nota-persist" parent="1" style="shape=note;size=15;align=left;spacingLeft=5;" value="Sin base de datos: los 4 servicios&#xa;persisten en memoria (List/Map).&#xa;Persistencia real → Entrega 5." vertex="1">
+          <mxGeometry height="55" width="260" x="460" y="440" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

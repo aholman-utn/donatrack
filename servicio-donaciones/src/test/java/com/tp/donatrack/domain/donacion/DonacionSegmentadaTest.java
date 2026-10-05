@@ -111,6 +111,7 @@ public class DonacionSegmentadaTest {
         assertEquals(EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR, segmento.getEstado());
         assertTrue(segmento.getEstado().isListaParaEntregar());
 
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
         assertEquals(EstadoDonacionSegmentada.EN_TRASLADO, segmento.getEstado());
         assertTrue(segmento.getEstado().isEnTraslado());
@@ -141,6 +142,7 @@ public class DonacionSegmentadaTest {
         // Avanzar a ENTREGADA
         segmento.asignar(unaEntidadBeneficiaria, "Admin");
         segmento.listarParaEntrega("Admin");
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
         segmento.confirmarEntrega(10L);
 

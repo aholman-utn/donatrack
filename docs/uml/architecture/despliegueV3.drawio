@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Despliegue DonaTrack" id="deploy-v3">
+    <mxGraphModel dx="1348" dy="913" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nube" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;fontSize=14;fontStyle=1;" value="" vertex="1">
+          <mxGeometry height="350" width="700" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="node-don" parent="1" style="shape=mxgraph.sysml.package;tabWidth=180;tabHeight=25;align=center;" value="&#xa;Servicio de Donaciones" vertex="1">
+          <mxGeometry height="60" width="200" x="80" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="node-not" parent="1" style="shape=mxgraph.sysml.package;tabWidth=180;tabHeight=25;align=center;" value="&#xa;Servicio de Notificaciones" vertex="1">
+          <mxGeometry height="60" width="200" x="270" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="node-inc" parent="1" style="shape=mxgraph.sysml.package;tabWidth=180;tabHeight=25;align=center;" value="&#xa;Servicio de Incentivos" vertex="1">
+          <mxGeometry height="60" width="200" x="460" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="node-log" parent="1" style="shape=mxgraph.sysml.package;tabWidth=180;tabHeight=25;align=center;" value="&#xa;Servicio de Logística" vertex="1">
+          <mxGeometry height="60" width="200" x="80" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="n8n" parent="1" style="shape=mxgraph.sysml.package;tabWidth=160;tabHeight=25;align=center;dashed=1;" value="&#xa;N8N (automatización)" vertex="1">
+          <mxGeometry height="60" width="200" x="860" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="browser" parent="1" style="shape=mxgraph.sysml.package;tabWidth=160;tabHeight=25;align=center;dashed=1;" value="&#xa;Browserless/Chrome" vertex="1">
+          <mxGeometry height="60" width="200" x="860" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="linkedin" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;" value="LinkedIn API" vertex="1">
+          <mxGeometry height="50" width="120" x="1160" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gsheets" parent="1" style="shape=mxgraph.cisco.cloud;sketch=0;fillColor=none;" value="Google Sheets API" vertex="1">
+          <mxGeometry height="50" width="120" x="1160" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-not" value="notificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-inc" value="evento entrega">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" edge="1" parent="1" source="node-inc" style="endArrow=open;dashed=1;" target="node-don" value="consultar indicadores">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" edge="1" parent="1" source="node-inc" style="endArrow=open;" target="node-not" value="notificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" edge="1" parent="1" source="node-don" style="endArrow=open;" target="node-log" value="enviar donaciones&#xa;a planificar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f6" edge="1" parent="1" source="node-log" style="endArrow=open;dashed=1;" target="node-don" value="polling eventos">
+          <mxGeometry relative="1" x="-0.4286" y="-20" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f7" edge="1" parent="1" source="node-inc" style="endArrow=open;" target="n8n" value="webhook insignia">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f8" edge="1" parent="1" source="n8n" style="endArrow=open;" target="browser" value="generar imagen">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f9" edge="1" parent="1" source="n8n" style="endArrow=open;" target="linkedin" value="publicar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f10" edge="1" parent="1" source="n8n" style="endArrow=open;" target="gsheets" value="ranking mensual">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="nota" parent="1" style="shape=note;size=15;align=left;spacingLeft=5;" value="Logística es pasivo:&#xa;no invoca otros servicios.&#xa;Donaciones consulta por polling." vertex="1">
+          <mxGeometry height="55" width="230" x="480" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="nota2" parent="1" style="shape=note;size=15;align=left;spacingLeft=5;" value="Comunicación entre servicios:&#xa;HTTP REST (JSON) síncrono.&#xa;Sin base de datos (memoria)." vertex="1">
+          <mxGeometry height="55" width="230" x="490" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="M_0ttPedj2CoboQy_Vim-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 14px; font-weight: 700; white-space: nowrap;&quot;&gt;Nube (Render)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="70" y="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

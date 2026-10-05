@@ -99,6 +99,7 @@ class TrazabilidadServiceNotificacionesTest {
     @DisplayName("notificarInicioDeRuta envía notificación al donante y a la entidad beneficiaria")
     void notificaInicioDeRuta() {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Sistema (Logística Polling)");
 
         trazabilidadService.notificarInicioDeRuta(segmento);
@@ -127,6 +128,7 @@ class TrazabilidadServiceNotificacionesTest {
         Long idDonacion = donacion.getId();
         Long idSegmento = segmento.getId();
 
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
         segmento.registrarLlegadaADestino("Chofer");
 
@@ -153,6 +155,7 @@ class TrazabilidadServiceNotificacionesTest {
     @DisplayName("notificarEntregaNoSatisfactoria envía notificación con justificación al donante y a la entidad")
     void notificaEntregaNoSatisfactoria() {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
 
         String justificacion = "Tocamos timbre pero nadie respondió";
@@ -181,6 +184,7 @@ class TrazabilidadServiceNotificacionesTest {
     @DisplayName("Si falla el envío de notificación, no se lanza excepción (fire-and-forget)")
     void falloEnNotificacionNoLanzaExcepcion() {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
 
         when(notificacionQueueClient.notificar(any(), any(), any(), any(), any()))
@@ -202,6 +206,7 @@ class TrazabilidadServiceNotificacionesTest {
         DonacionSegmentada segmento = donacionSinDonante.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.listarParaEntrega("Logística");
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
 
         trazabilidadService.notificarInicioDeRuta(segmento);
@@ -225,6 +230,7 @@ class TrazabilidadServiceNotificacionesTest {
         DonacionSegmentada segmento = donacionNueva.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.listarParaEntrega("Logística");
+        segmento.solicitarPlanificacion("Sistema (Cron)");
         segmento.iniciarTraslado("Chofer");
 
         trazabilidadService.notificarInicioDeRuta(segmento);

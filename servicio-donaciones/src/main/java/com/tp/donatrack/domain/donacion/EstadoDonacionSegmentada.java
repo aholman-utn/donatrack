@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.tp.donatrack.domain.donacion.estado.AsignacionRealizada;
 import com.tp.donatrack.domain.donacion.estado.EnDeposito;
+import com.tp.donatrack.domain.donacion.estado.EnPlanificacion;
 import com.tp.donatrack.domain.donacion.estado.EnTraslado;
 import com.tp.donatrack.domain.donacion.estado.EntregaFallida;
 import com.tp.donatrack.domain.donacion.estado.Entregada;
@@ -19,10 +20,12 @@ public abstract class EstadoDonacionSegmentada {
     public static final EstadoDonacionSegmentada EN_DEPOSITO = new EnDeposito();
     public static final EstadoDonacionSegmentada ASIGNACION_REALIZADA = new AsignacionRealizada();
     public static final EstadoDonacionSegmentada LISTA_PARA_ENTREGAR = new ListaParaEntregar();
+    public static final EstadoDonacionSegmentada EN_PLANIFICACION = new EnPlanificacion();
     public static final EstadoDonacionSegmentada EN_TRASLADO = new EnTraslado();
     public static final EstadoDonacionSegmentada ENTREGADA = new Entregada();
     public static final EstadoDonacionSegmentada ENTREGA_FALLIDA = new EntregaFallida();
     public static final EstadoDonacionSegmentada VENCIDA = new Vencida();
+
 
     @JsonValue
     public abstract String getNombre();
@@ -36,6 +39,7 @@ public abstract class EstadoDonacionSegmentada {
             case "EN_DEPOSITO" -> EN_DEPOSITO;
             case "ASIGNACION_REALIZADA" -> ASIGNACION_REALIZADA;
             case "LISTA_PARA_ENTREGAR" -> LISTA_PARA_ENTREGAR;
+            case "EN_PLANIFICACION" -> EN_PLANIFICACION;
             case "EN_TRASLADO", "PENDIENTE_RECEPCION" -> EN_TRASLADO;
             case "ENTREGADA" -> ENTREGADA;
             case "ENTREGA_FALLIDA" -> ENTREGA_FALLIDA;
@@ -75,7 +79,9 @@ public abstract class EstadoDonacionSegmentada {
     public void listarParaEntrega(DonacionSegmentada donacion, String actor) {
         throw new TransicionNoPermitidaException(getNombre(), "listarParaEntrega");
     }
-
+    public void solicitarPlanificacion(DonacionSegmentada donacion, String actor) {
+        throw new TransicionNoPermitidaException(getNombre(), "solicitarPlanificacion");
+    }
     public void iniciarTraslado(DonacionSegmentada donacion, String actor) {
         throw new TransicionNoPermitidaException(getNombre(), "iniciarTraslado");
     }

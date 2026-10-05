@@ -1,0 +1,145 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Componentes DonaTrack" id="comp-v2">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ==================== SERVICIO DE DONACIONES (centro-izquierda) ==================== -->
+        <mxCell id="pkg-don" value="Servicio de Donaciones" style="shape=folder;tabWidth=200;tabHeight=25;tabPosition=left;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="250" width="380" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="gd" value="Gestión Donantes" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="gdon" value="Gestión Donaciones" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="350" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="geb" value="Gestión Entidades Beneficiarias" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="400" width="200" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="match" value="Matchmaking (Asignación)" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="450" width="190" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="traz" value="Trazabilidad" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="polling" value="Polling Logística" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="300" width="140" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="cron-log" value="Cron Envío a Logística" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="350" width="155" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="cron-inact" value="Cron Donantes Inactivos" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="400" width="155" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="csv" value="Importador CSV" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="450" width="140" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SERVICIO DE LOGÍSTICA (arriba-derecha) ==================== -->
+        <mxCell id="pkg-log" value="Servicio de Logística" style="shape=folder;tabWidth=180;tabHeight=25;tabPosition=left;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="50" width="350" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="plan" value="Planificador de Rutas" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="100" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="gcam" value="Gestión Camiones" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="150" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="evlog" value="Eventos Logística" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="100" width="120" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SERVICIO DE NOTIFICACIONES (abajo-centro) ==================== -->
+        <mxCell id="pkg-not" value="Servicio de Notificaciones" style="shape=folder;tabWidth=200;tabHeight=25;tabPosition=left;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="650" width="380" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="notif" value="Notificador" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="email" value="Email" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="690" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sms" value="SMS" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="730" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wa" value="WhatsApp" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="770" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SERVICIO DE INCENTIVOS (derecha) ==================== -->
+        <mxCell id="pkg-inc" value="Servicio de Incentivos" style="shape=folder;tabWidth=180;tabHeight=25;tabPosition=left;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="350" width="350" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="mis" value="Misiones" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="400" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="rank" value="Ranking" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="450" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="eval" value="Evaluador Progreso" style="shape=component;align=center;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="740" y="400" width="140" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== N8N (abajo-derecha) ==================== -->
+        <mxCell id="n8n" value="N8N&#xa;(automatización)" style="shape=component;align=center;spacingLeft=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="620" width="140" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== FLECHAS ==================== -->
+
+        <!-- Donaciones → Logística -->
+        <mxCell id="e1" value="enviar donaciones&#xa;a planificar (máx 100)" style="endArrow=open;" edge="1" source="cron-log" target="plan" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="polling eventos&#xa;(cada 10s)" style="endArrow=open;dashed=1;" edge="1" source="polling" target="evlog" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Donaciones → Notificaciones -->
+        <mxCell id="e3" value="notificar&#xa;(inicio ruta, entrega,&#xa;inactivos)" style="endArrow=open;" edge="1" source="traz" target="notif" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3b" style="endArrow=open;" edge="1" source="cron-inact" target="notif" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Donaciones → Incentivos -->
+        <mxCell id="e4" value="evento donación&#xa;entregada" style="endArrow=open;" edge="1" source="traz" target="eval" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Incentivos → Donaciones -->
+        <mxCell id="e5" value="consultar&#xa;indicadores donante" style="endArrow=open;dashed=1;" edge="1" source="eval" target="gdon" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Incentivos → N8N -->
+        <mxCell id="e6" value="webhook&#xa;nueva insignia" style="endArrow=open;" edge="1" source="rank" target="n8n" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Notificador → Providers -->
+        <mxCell id="e7" style="endArrow=open;" edge="1" source="notif" target="email" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="endArrow=open;" edge="1" source="notif" target="sms" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="endArrow=open;" edge="1" source="notif" target="wa" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== NOTAS ==================== -->
+        <mxCell id="nota-log" value="Servicio pasivo: no invoca&#xa;otros servicios. Solo expone&#xa;eventos para polling." style="shape=note;size=15;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="920" y="100" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="nota-poll" value="Polling detecta INICIO_RUTA&#xa;y ENTREGA_FALLIDA.&#xa;Transiciona estados y notifica." style="shape=note;size=15;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="240" height="55" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
