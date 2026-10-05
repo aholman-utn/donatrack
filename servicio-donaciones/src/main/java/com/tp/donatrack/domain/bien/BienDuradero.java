@@ -20,7 +20,6 @@ public class BienDuradero extends Bien {
     @Column(name = "estado_bien")
     private EstadoBien estado;
 
-    // Requerido por JPA.
     protected BienDuradero() {
         super();
     }

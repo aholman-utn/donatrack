@@ -67,7 +67,6 @@ public class DonacionSegmentada {
     @JoinColumn(name = "id_comprobante")
     private ComprobanteRecepcionDonacion comprobanteRecepcionDonacion;
 
-    // Requerido por JPA.
     protected DonacionSegmentada() {
     }
 

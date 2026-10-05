@@ -17,9 +17,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Prueba la capa de persistencia JPA del agregado Necesidad usando una base H2
- * en memoria. Verifica el guardado, la recuperación, el método derivado y el
- * mapeo de herencia (SINGLE_TABLE con columna discriminadora).
+ * Pruebas de persistencia del agregado {@link NecesidadMaterial}: guardado,
+ * recuperación, método de búsqueda derivado, borrado y mapeo de herencia JOINED
+ * de sus subtipos.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

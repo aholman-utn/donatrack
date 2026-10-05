@@ -41,7 +41,6 @@ public class EventoTrazabilidad {
     @Column(name = "descripcion")
     private String descripcion;
 
-    // Requerido por JPA.
     protected EventoTrazabilidad() {
     }
 

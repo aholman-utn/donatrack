@@ -24,7 +24,6 @@ public class NecesidadRecurrente extends NecesidadMaterial {
     @Column(name = "dias")
     private int dias;
 
-    // Requerido por JPA.
     protected NecesidadRecurrente() {
         super();
     }

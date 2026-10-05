@@ -16,8 +16,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Reactivado tras la migración JPA (Fase 3): corre contra H2 (perfil test) con
-// el flujo real de persistencia de Donacion/Donante.
+/**
+ * Prueba de integración del CRUD de donaciones de extremo a extremo, ejecutada
+ * sobre una base de datos en memoria mediante el perfil de pruebas.
+ */
 @SpringBootTest
 @org.springframework.test.context.ActiveProfiles("test")
 @org.springframework.transaction.annotation.Transactional

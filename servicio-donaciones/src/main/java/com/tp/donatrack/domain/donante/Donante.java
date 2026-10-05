@@ -32,8 +32,7 @@ public class Donante {
     @Column(name = "password_hash")
     private String password;
 
-    // PerfilDonante pertenece al agregado de incentivos; se mapea en una fase
-    // posterior. Por ahora se mantiene fuera de la persistencia JPA.
+    /** Perfil de incentivos del donante; no forma parte de la persistencia de este servicio. */
     @Transient
     @Builder.Default
     private PerfilDonante perfil = new PerfilDonante();

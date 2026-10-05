@@ -36,7 +36,6 @@ public class SubCategoria {
     @Column(name = "unidad")
     private Unidad unidad;
 
-    // Requerido por JPA.
     protected SubCategoria() {
     }
 

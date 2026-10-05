@@ -31,9 +31,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.lenient;
 
 /**
- * Test de notificaciones de trazabilidad reescrito tras la migración JPA
- * (Fase 3). Los repositorios son mocks (ya son interfaces JpaRepository) y el
- * escenario se arma seteando ids manualmente, dado que los mocks no persisten.
+ * Pruebas de las notificaciones emitidas por {@link TrazabilidadService} ante
+ * los eventos de trazabilidad (inicio de ruta, entrega exitosa y entrega
+ * fallida). Los repositorios se simulan con mocks.
  */
 @ExtendWith(MockitoExtension.class)
 class TrazabilidadServiceNotificacionesTest {
@@ -89,7 +89,6 @@ class TrazabilidadServiceNotificacionesTest {
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
 
-        // La búsqueda de la donación padre y de la entidad se resuelve vía mocks.
         lenient().when(donacionRepository.findAll()).thenReturn(List.of(donacion));
         lenient().when(donacionRepository.findById(50L)).thenReturn(java.util.Optional.of(donacion));
         lenient().when(entidadBeneficiariaRepository.find(2L)).thenReturn(entidad);

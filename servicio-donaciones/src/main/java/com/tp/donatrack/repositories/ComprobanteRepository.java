@@ -4,8 +4,10 @@ import com.tp.donatrack.domain.donacion.ComprobanteRecepcionDonacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repositorio de {@link ComprobanteRecepcionDonacion}, identificado por una
+ * clave de tipo {@code String}.
+ */
 @Repository
 public interface ComprobanteRepository extends JpaRepository<ComprobanteRecepcionDonacion, String> {
-    // save(...), findById(String) y findAll() provienen de JpaRepository y
-    // conservan las firmas que ya usaban los servicios.
 }

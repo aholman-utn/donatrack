@@ -4,10 +4,9 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 /**
- * Persiste el patrón State {@link EstadoDonacionSegmentada} como el nombre del
- * estado (String) en una única columna, y lo reconstruye al leer. Mantiene el
- * esquema fiel al DER (una columna de estado) sin romper el patrón State ni el
- * contrato JSON con otros servicios (se reutiliza fromString/getNombre).
+ * Convierte {@link EstadoDonacionSegmentada} a su nombre ({@code String}) para
+ * almacenarlo en una única columna y lo reconstruye al leer mediante
+ * {@link EstadoDonacionSegmentada#fromString(String)}.
  */
 @Converter(autoApply = false)
 public class EstadoDonacionSegmentadaConverter

@@ -21,9 +21,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifica la migración JPA de la Fase 3: Donacion con id Long y segmentadas en
- * cascada, estado persistido vía AttributeConverter (B2, preservando el patrón
- * State) e historial de trazabilidad persistido como tabla.
+ * Pruebas de persistencia de {@link Donacion}: id de tipo {@code Long},
+ * segmentadas persistidas en cascada, estado almacenado mediante
+ * {@code AttributeConverter} e historial de trazabilidad persistido como tabla.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -59,7 +59,6 @@ class DonacionRepositoryTest {
         assertThat(recuperada).isPresent();
 
         DonacionSegmentada segmentada = recuperada.get().getDonacionesSegmentadas().get(0);
-        // El estado inicial es EN_DEPOSITO y se reconstruye como el mismo singleton del patrón State.
         assertThat(segmentada.getEstado()).isEqualTo(EstadoDonacionSegmentada.EN_DEPOSITO);
         assertThat(segmentada.getEstado().isEnDeposito()).isTrue();
     }
@@ -72,7 +71,6 @@ class DonacionRepositoryTest {
         assertThat(recuperada).isPresent();
 
         DonacionSegmentada segmentada = recuperada.get().getDonacionesSegmentadas().get(0);
-        // El constructor registra el evento inicial de ingreso al depósito.
         assertThat(segmentada.getHistorial()).isNotEmpty();
         assertThat(segmentada.getHistorial().get(0).getEstadoNuevo())
                 .isEqualTo(EstadoDonacionSegmentada.EN_DEPOSITO);

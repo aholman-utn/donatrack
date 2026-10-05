@@ -15,9 +15,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifica la migración JPA de la Fase 2: Donante/Persona con herencia JOINED,
- * id generado por la base (sin nextId()), y MedioDeContacto persistido como
- * tabla, incluyendo la búsqueda por valor de contacto.
+ * Pruebas de persistencia de {@link Donante} y {@link com.tp.donatrack.domain.persona.Persona}:
+ * herencia JOINED, generación de id por la base, persistencia de los medios de
+ * contacto en su tabla y búsqueda por valor de contacto.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -42,7 +42,6 @@ class DonanteRepositoryTest {
 
         assertThat(guardado.getId()).isNotNull();
         assertThat(guardado.getPersona().getId()).isNotNull();
-        // Donante comparte PK con Persona (MapsId).
         assertThat(guardado.getId()).isEqualTo(guardado.getPersona().getId());
     }
 

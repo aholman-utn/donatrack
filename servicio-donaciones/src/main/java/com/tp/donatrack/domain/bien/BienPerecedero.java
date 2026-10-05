@@ -21,7 +21,6 @@ public class BienPerecedero extends Bien {
     @Column(name = "fecha_vencimiento")
     private Date fechaVencimiento;
 
-    // Requerido por JPA.
     protected BienPerecedero() {
         super();
     }

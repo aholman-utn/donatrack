@@ -77,8 +77,8 @@ public class ImportadorCargaMasiva {
             persona = pj;
         }
 
-        persona.agregarMedioDeContacto("email", registro.getEmail());
-        persona.agregarMedioDeContacto("telefono", registro.getTelefono());
+        persona.agregarMedioDeContacto("EMAIL", registro.getEmail());
+        persona.agregarMedioDeContacto("SMS", registro.getTelefono());
         donante.setPersona(persona);
 
         return donante;
@@ -90,7 +90,10 @@ public class ImportadorCargaMasiva {
         boolean cambioTipoPersona = !tipoActual.equalsIgnoreCase(dto.getTipoPersona());
 
         if (cambioTipoPersona) {
-            // Si cambió el tipo de persona, se reemplaza la persona entera
+            // Al cambiar el tipo de persona (humana <-> jurídica) cambia la subclase
+            // persistida. Con herencia JOINED no es posible mutar el tipo de una fila
+            // existente, por lo que se elimina el donante actual y se recrea con una
+            // nueva identidad asignada por la base.
             Persona nuevaPersona;
 
             if (dto.getTipoPersona().equalsIgnoreCase(TipoPersona.HUMANA.name())) {
@@ -108,17 +111,21 @@ public class ImportadorCargaMasiva {
                 nuevaPersona = pj;
             }
 
-            // Preservar el ID y datos que no vienen del CSV
-            nuevaPersona.setId(personaActual.getId());
             nuevaPersona.setDireccion(personaActual.getDireccion());
             nuevaPersona.setMedioPredeterminado(personaActual.getMedioPredeterminado());
             nuevaPersona.setFechaUltimaInteraccion(personaActual.getFechaUltimaInteraccion());
 
-            // Setear los medios de contacto del CSV
-            nuevaPersona.agregarMedioDeContacto("email", dto.getEmail());
-            nuevaPersona.agregarMedioDeContacto("telefono", dto.getTelefono());
+            nuevaPersona.agregarMedioDeContacto("EMAIL", dto.getEmail());
+            nuevaPersona.agregarMedioDeContacto("SMS", dto.getTelefono());
 
-            donante.setPersona(nuevaPersona);
+            donanteRepository.delete(donante);
+            donanteRepository.flush();
+
+            Donante nuevoDonante = new Donante();
+            nuevoDonante.setPersona(nuevaPersona);
+            nuevoDonante.setPassword(donante.getPassword());
+            donanteRepository.save(nuevoDonante);
+            return;
         } else {
             // Mismo tipo de persona: actualizar campos individuales
             if (personaActual instanceof PersonaHumana ph) {
@@ -131,10 +138,10 @@ public class ImportadorCargaMasiva {
                 pj.setTipo(detectarTipo(dto.getNombre()));
             }
 
-            // Actualizar teléfono: reemplazar la lista existente
-            personaActual.getMedioDeContacto().put("telefono", List.of(dto.getTelefono()));
+            personaActual.reemplazarMedioDeContacto("SMS", dto.getTelefono());
         }
 
+        donanteRepository.update(donante);
         System.out.println("El donante " + dto.getEmail() + " ya se encontraba registrado. Actualizado correctamente.");
     }
 

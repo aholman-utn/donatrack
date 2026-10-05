@@ -29,7 +29,6 @@ public class Provincia {
     @JoinColumn(name = "id_pais")
     private Pais pais;
 
-    // Requerido por JPA.
     protected Provincia() {
     }
 

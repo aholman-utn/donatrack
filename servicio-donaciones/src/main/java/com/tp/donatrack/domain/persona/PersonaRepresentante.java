@@ -29,7 +29,6 @@ public class PersonaRepresentante {
     @Column(name = "nro_documento")
     private int nroDocumento;
 
-    // Requerido por JPA.
     public PersonaRepresentante() {
     }
 

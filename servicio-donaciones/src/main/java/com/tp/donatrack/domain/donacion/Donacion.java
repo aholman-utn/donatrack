@@ -60,7 +60,6 @@ public class Donacion {
     @JoinColumn(name = "id_donacion")
     private List<DonacionSegmentada> donacionesSegmentadas = new ArrayList<>();
 
-    // Requerido por JPA.
     protected Donacion() {
     }
 

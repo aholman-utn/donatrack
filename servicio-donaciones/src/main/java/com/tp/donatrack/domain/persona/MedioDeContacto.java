@@ -37,7 +37,6 @@ public class MedioDeContacto {
     @Column(name = "es_predeterminado")
     private boolean esPredeterminado;
 
-    // Requerido por JPA.
     public MedioDeContacto() {
     }
 

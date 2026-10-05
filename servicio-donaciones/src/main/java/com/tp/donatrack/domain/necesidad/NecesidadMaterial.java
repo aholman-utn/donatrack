@@ -39,7 +39,7 @@ public abstract class NecesidadMaterial {
     @Column(name = "entidad_beneficiaria_id")
     private Long entidadBeneficiariaId;
 
-    // Agregado DonacionSegmentada aún no persistido vía JPA: se mantiene en memoria.
+    /** Donaciones recibidas asociadas a la necesidad, usadas por la lógica de dominio en memoria. */
     @Transient
     private List<DonacionSegmentada> donaciones = new ArrayList<>();
 
@@ -61,7 +61,6 @@ public abstract class NecesidadMaterial {
     @Column(name = "estado")
     private EstadoNecesidad estado;
 
-    // Requerido por JPA.
     protected NecesidadMaterial() {
     }
 

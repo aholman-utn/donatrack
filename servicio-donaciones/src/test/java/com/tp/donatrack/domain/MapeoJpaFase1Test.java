@@ -21,9 +21,9 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifica el mapeo JPA de la Fase 1 (fiel al DER): cadena de ubicación con FKs
- * encadenadas, SubCategoria como entidad propia, y jerarquía Bien con herencia
- * JOINED (tabla hija con FK al id del padre).
+ * Pruebas de mapeo JPA del dominio material: cadena de ubicación con claves
+ * foráneas encadenadas, {@link SubCategoria} como entidad propia y la jerarquía
+ * {@code Bien} con herencia JOINED.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -44,7 +44,6 @@ class MapeoJpaFase1Test {
         direccion.setAltura(1234);
         direccion.setCiudad(ciudad);
 
-        // Cascada ALL: persistir la dirección arrastra ciudad, provincia y país.
         Direccion guardada = em.persistFlushFind(direccion);
 
         assertThat(guardada.getId()).isNotNull();

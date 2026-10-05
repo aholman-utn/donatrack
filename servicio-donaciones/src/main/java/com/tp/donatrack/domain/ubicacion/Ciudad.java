@@ -30,7 +30,6 @@ public class Ciudad {
     @JoinColumn(name = "id_provincia")
     private Provincia provincia;
 
-    // Requerido por JPA.
     protected Ciudad() {
     }
 

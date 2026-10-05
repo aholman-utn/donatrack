@@ -37,9 +37,11 @@ public class EntidadBeneficiaria {
     @JoinColumn(name = "id_persona_juridica")
     private PersonaJuridica datosDeEntidad;
 
-    // Las necesidades se vinculan por entidad_beneficiaria_id (ya presente en
-    // NecesidadMaterial). Se mantiene la colección en memoria para la lógica de
-    // dominio existente; la fuente de verdad persistida es NecesidadRepository.
+    /**
+     * Necesidades de la entidad. Se mantienen en memoria para la lógica de dominio;
+     * su persistencia se gestiona por separado mediante {@code NecesidadRepository}
+     * (vinculadas por {@code entidadBeneficiariaId}).
+     */
     @Transient
     private List<NecesidadMaterial> nececidades = new ArrayList<>();
 

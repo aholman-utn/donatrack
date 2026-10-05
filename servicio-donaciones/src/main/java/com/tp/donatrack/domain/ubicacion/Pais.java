@@ -23,7 +23,6 @@ public class Pais {
     @Column(name = "nombre")
     private String nombre;
 
-    // Requerido por JPA.
     protected Pais() {
     }
 

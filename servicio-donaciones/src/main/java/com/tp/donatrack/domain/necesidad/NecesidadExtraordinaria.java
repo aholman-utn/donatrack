@@ -21,7 +21,6 @@ public class NecesidadExtraordinaria extends NecesidadMaterial {
     @Column(name = "causa")
     private String causa;
 
-    // Requerido por JPA.
     protected NecesidadExtraordinaria() {
         super();
     }

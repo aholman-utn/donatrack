@@ -45,9 +45,9 @@ public abstract class Persona {
     private Direccion direccion;
 
     /**
-     * Medios de contacto persistidos como tabla (fiel al DER). La API pública
-     * basada en Map se conserva vía métodos de conveniencia para no romper los
-     * consumidores existentes (services, controllers, DTOs).
+     * Medios de contacto de la persona, persistidos en su propia tabla. La clase
+     * expone además una vista en forma de {@link Map} mediante métodos de
+     * conveniencia para los consumidores que trabajan con esa representación.
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_persona")
@@ -60,21 +60,8 @@ public abstract class Persona {
     @Enumerated(EnumType.STRING)
     private TipoNotificador tipoNotificador;
 
-    public static Long nextId() {
-        // Conservado por compatibilidad: con JPA el id lo asigna la base.
-        // Devuelve null para que el @GeneratedValue tome el control.
-        return null;
-    }
-
-    public static void resetIdGenerator() {
-        // No-op: la generación de IDs ahora la maneja JPA.
-    }
-
-    // ----- API de conveniencia basada en Map (respaldada por la lista) -----
-
     /**
-     * Devuelve los medios de contacto como Map tipoNotificador -> lista de
-     * valores, para preservar la API que consumían services/controllers.
+     * Devuelve los medios de contacto agrupados como {@code tipoNotificador -> valores}.
      */
     @Transient
     public Map<String, List<String>> getMedioDeContacto() {
@@ -112,8 +99,8 @@ public abstract class Persona {
     }
 
     /**
-     * Devuelve el medio predeterminado con el formato Map {"medio","valor"} que
-     * esperan los consumidores actuales, derivado de la fila marcada como tal.
+     * Devuelve el medio de contacto predeterminado como {@code Map} con las claves
+     * {@code "medio"} y {@code "valor"}, o {@code null} si no hay uno marcado como tal.
      */
     @Transient
     public Map<String, String> getMedioPredeterminado() {
@@ -157,6 +144,19 @@ public abstract class Persona {
             this.mediosDeContacto.add(new MedioDeContacto(tn, value, false));
         }
         return getMedioDeContacto();
+    }
+
+    /**
+     * Reemplaza todos los medios de contacto no predeterminados de un tipo dado
+     * por un único valor. Opera sobre la colección persistente.
+     */
+    public void reemplazarMedioDeContacto(String key, String value) {
+        TipoNotificador tn = parseTipo(key);
+        if (tn == null) {
+            return;
+        }
+        this.mediosDeContacto.removeIf(m -> !m.isEsPredeterminado() && tn.equals(m.getTipoNotificador()));
+        this.mediosDeContacto.add(new MedioDeContacto(tn, value, false));
     }
 
     private static TipoNotificador parseTipo(String clave) {
