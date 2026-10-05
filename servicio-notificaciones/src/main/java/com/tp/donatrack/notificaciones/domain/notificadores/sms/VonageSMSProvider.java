@@ -41,18 +41,27 @@ public class VonageSMSProvider implements iSMSProvider {
     @Override
     public void enviarSMS(String numero, String mensaje) {
         logger.info(">>> Enviando SMS via Vonage a: {} desde: {}", numero, fromNumber);
-        TextMessage textMessage = new TextMessage(fromNumber, numero, mensaje);
 
-        SmsSubmissionResponse response = vonageClient.getSmsClient().submitMessage(textMessage);
+        try {
+            TextMessage textMessage = new TextMessage(fromNumber, numero, mensaje);
+            SmsSubmissionResponse response = vonageClient.getSmsClient().submitMessage(textMessage);
 
-        MessageStatus status = response.getMessages().get(0).getStatus();
-        String errorText = response.getMessages().get(0).getErrorText();
-        logger.info(">>> Respuesta Vonage - Status: {}, Error: {}", status, errorText);
+            MessageStatus status = response.getMessages().get(0).getStatus();
+            String errorText = response.getMessages().get(0).getErrorText();
+            logger.info(">>> Respuesta Vonage - Status: {}, Error: {}", status, errorText);
 
-        if (status != MessageStatus.OK) {
-            throw new RuntimeException("Error al enviar SMS via Vonage: " + errorText);
+            if (status != MessageStatus.OK) {
+                throw new RuntimeException("Error al enviar SMS via Vonage: " + errorText);
+            }
+
+            logger.info(">>> SMS enviado exitosamente a {}", numero);
+
+        } catch (RuntimeException e) {
+            logger.error("RuntimeException - Explotó el envío del SMS a {}: {}", numero, e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            logger.error("Exception - Explotó el envío del SMS a {}: {}", numero, e.getMessage(), e);
+            throw new RuntimeException("Error inesperado enviando SMS por Vonage", e);
         }
-
-        logger.info(">>> SMS enviado exitosamente a {}", numero);
     }
 }
