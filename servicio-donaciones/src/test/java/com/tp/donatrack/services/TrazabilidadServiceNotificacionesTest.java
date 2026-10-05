@@ -17,7 +17,6 @@ import com.tp.donatrack.repositories.DonanteRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +28,13 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.lenient;
 
-// TODO(JPA Fase 2/3): este test de integración instancia los repositorios en
-// memoria (new DonacionRepository(), etc.) y depende del comportamiento en
-// memoria de Donante/Donacion/Persona, que todavía no fueron migrados a JPA.
-// Se reactiva y reescribe (con repos JPA / mocks) cuando se migren esos
-// agregados en las fases 2 y 3.
-@Disabled("Pendiente de reescritura tras la migración JPA de Donante/Donacion/Persona (Fase 2/3)")
+/**
+ * Test de notificaciones de trazabilidad reescrito tras la migración JPA
+ * (Fase 3). Los repositorios son mocks (ya son interfaces JpaRepository) y el
+ * escenario se arma seteando ids manualmente, dado que los mocks no persisten.
+ */
 @ExtendWith(MockitoExtension.class)
 class TrazabilidadServiceNotificacionesTest {
 
@@ -67,27 +66,33 @@ class TrazabilidadServiceNotificacionesTest {
         );
 
         PersonaHumana personaDonante = new PersonaHumana();
+        personaDonante.setId(1L);
         personaDonante.setNombre("Juan");
         personaDonante.setApellido("Pérez");
         personaDonante.setMedioPredeterminado(Map.of("medio", "EMAIL", "valor", "juan@mail.com"));
         donante = new Donante(personaDonante);
-        donanteRepository.create(donante);
 
         PersonaJuridica personaEntidad = new PersonaJuridica();
+        personaEntidad.setId(2L);
         personaEntidad.setRazonSocial("Comedor Los Pibes");
         personaEntidad.setMedioPredeterminado(Map.of("medio", "EMAIL", "valor", "comedor@mail.com"));
         entidad = new EntidadBeneficiaria(personaEntidad);
-        entidadBeneficiariaRepository.create(entidad);
 
         SubCategoria subCategoria = new SubCategoria(CategoriaBien.ALIMENTOS, "Fideos", Unidad.KG);
         BienPerecedero bien = new BienPerecedero("Fideos", "Fideos secos 500g", null, subCategoria, new Date());
         List<Bien> bienes = List.of(bien);
         donacion = new Donacion(donante, "Donación de fideos", new Date(), bienes);
-        donacionRepository.save(donacion);
+        donacion.setId(50L);
 
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().get(0);
+        segmento.setId(100L);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
+
+        // La búsqueda de la donación padre y de la entidad se resuelve vía mocks.
+        lenient().when(donacionRepository.findAll()).thenReturn(List.of(donacion));
+        lenient().when(donacionRepository.findById(50L)).thenReturn(java.util.Optional.of(donacion));
+        lenient().when(entidadBeneficiariaRepository.find(2L)).thenReturn(entidad);
         segmento.listarParaEntrega("Logística");
     }
 
@@ -120,8 +125,8 @@ class TrazabilidadServiceNotificacionesTest {
     @DisplayName("recepcionarEntrega notifica al donante y a la entidad beneficiaria con comprobante")
     void notificaEntregaExitosa() {
         DonacionSegmentada segmento = donacion.getDonacionesSegmentadas().getFirst();
-        Integer idDonacion = donacion.getId();
-        Integer idSegmento = Math.toIntExact(segmento.getId());
+        Long idDonacion = donacion.getId();
+        Long idSegmento = segmento.getId();
 
         segmento.iniciarTraslado("Chofer");
         segmento.registrarLlegadaADestino("Chofer");
@@ -193,7 +198,7 @@ class TrazabilidadServiceNotificacionesTest {
         SubCategoria sub = new SubCategoria(CategoriaBien.ALIMENTOS, "Arroz", Unidad.KG);
         BienPerecedero bien = new BienPerecedero("Arroz", "Arroz 1kg", null, sub, new Date());
         Donacion donacionSinDonante = new Donacion(null, "Donación anónima", new Date(), List.of(bien));
-        donacionRepository.save(donacionSinDonante);
+        lenient().when(donacionRepository.findAll()).thenReturn(List.of(donacionSinDonante));
 
         DonacionSegmentada segmento = donacionSinDonante.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
@@ -212,12 +217,11 @@ class TrazabilidadServiceNotificacionesTest {
         personaSinContacto.setNombre("María");
         personaSinContacto.setApellido("López");
         Donante donanteSinContacto = new Donante(personaSinContacto);
-        donanteRepository.create(donanteSinContacto);
 
         SubCategoria sub = new SubCategoria(CategoriaBien.VESTIMENTA, "Camperas", Unidad.UNIDADES);
         BienDuradero bien = new BienDuradero("Campera", "Campera de abrigo", null, sub, EstadoBien.NUEVO);
         Donacion donacionNueva = new Donacion(donanteSinContacto, "Camperas", new Date(), List.of(bien));
-        donacionRepository.save(donacionNueva);
+        lenient().when(donacionRepository.findAll()).thenReturn(List.of(donacionNueva));
 
         DonacionSegmentada segmento = donacionNueva.getDonacionesSegmentadas().get(0);
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");

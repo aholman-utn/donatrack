@@ -29,7 +29,7 @@ public class DonacionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Integer id) {
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
         try {
             DonacionHistorialDTO donacion = donacionService.obtenerPorId(id);
             return ResponseEntity.ok(donacion);
@@ -40,7 +40,7 @@ public class DonacionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarDonacion(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @RequestBody com.tp.donatrack.dtos.ActualizarDonacionRequest request) {
         try {
             DonacionHistorialDTO actualizada = donacionService.actualizarDonacion(id, request);
@@ -53,7 +53,7 @@ public class DonacionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarDonacion(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarDonacion(@PathVariable Long id) {
         try {
             donacionService.eliminarDonacion(id);
             return ResponseEntity.ok("Donación eliminada exitosamente.");

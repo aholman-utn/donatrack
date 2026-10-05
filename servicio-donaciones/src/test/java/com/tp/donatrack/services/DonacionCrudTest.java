@@ -16,12 +16,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO(JPA Fase 3): depende del comportamiento en memoria de DonacionRepository
-// (clear(), segmentación, id Integer) y de la cadena Donante/Persona aún no
-// migrada. Se reactiva al completar la migración JPA de Donacion (Fase 3).
-@org.junit.jupiter.api.Disabled("Pendiente de reescritura tras la migración JPA de Donacion/Donante (Fase 3)")
+// Reactivado tras la migración JPA (Fase 3): corre contra H2 (perfil test) con
+// el flujo real de persistencia de Donacion/Donante.
 @SpringBootTest
 @org.springframework.test.context.ActiveProfiles("test")
+@org.springframework.transaction.annotation.Transactional
 class DonacionCrudTest {
 
     @Autowired

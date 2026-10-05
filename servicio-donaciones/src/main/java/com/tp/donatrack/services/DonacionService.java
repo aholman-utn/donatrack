@@ -100,8 +100,8 @@ public class DonacionService {
                 .collect(Collectors.toList());
     }
 
-    public DonacionHistorialDTO obtenerPorId(Integer id) {
-        Donacion donacion = donacionRepository.findById(id);
+    public DonacionHistorialDTO obtenerPorId(Long id) {
+        Donacion donacion = donacionRepository.findById(id).orElse(null);
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }
@@ -113,9 +113,9 @@ public class DonacionService {
         this.entidadBeneficiariaService.notificarEntrega(donacionSegmentada.getEntidadBeneficiariaAsignadaId());
     }
 
-    public DonacionHistorialDTO actualizarDonacion(Integer id,
+    public DonacionHistorialDTO actualizarDonacion(Long id,
             com.tp.donatrack.dtos.ActualizarDonacionRequest request) {
-        Donacion donacion = donacionRepository.findById(id);
+        Donacion donacion = donacionRepository.findById(id).orElse(null);
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }
@@ -126,8 +126,8 @@ public class DonacionService {
         return mapToDTO(donacion);
     }
 
-    public void eliminarDonacion(Integer id) {
-        Donacion donacion = donacionRepository.findById(id);
+    public void eliminarDonacion(Long id) {
+        Donacion donacion = donacionRepository.findById(id).orElse(null);
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }

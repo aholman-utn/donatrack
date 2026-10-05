@@ -5,6 +5,20 @@ import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.donacion.estado.EnDeposito;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,16 +28,48 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "donaciones_segmentadas")
 public class DonacionSegmentada {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_donacion_segmentada")
     private Long id;
+
+    @Column(name = "cantidad")
     private int cantidad; //300 kg de fideos, 200lt de leche...etc
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_subcategoria")
     private SubCategoria subCategoria;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_donacion_segmentada")
     private List<Bien> bienes;
+
+    @Convert(converter = EstadoDonacionSegmentadaConverter.class)
+    @Column(name = "estado_donacion")
     private EstadoDonacionSegmentada estado;
-    private final List<EventoTrazabilidad> historial = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_donacion_segmentada")
+    @OrderColumn(name = "orden_historial")
+    private List<EventoTrazabilidad> historial = new ArrayList<>();
+
+    @Column(name = "donante_id")
     private Long donanteId;
+
+    @Column(name = "entidad_beneficiaria_asignada_id")
     private Long entidadBeneficiariaAsignadaId;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_comprobante")
     private ComprobanteRecepcionDonacion comprobanteRecepcionDonacion;
+
+    // Requerido por JPA.
+    protected DonacionSegmentada() {
+    }
 
     public DonacionSegmentada(
             int cantidad,

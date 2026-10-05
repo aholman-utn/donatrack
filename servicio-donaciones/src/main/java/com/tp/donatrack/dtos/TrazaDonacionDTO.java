@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TrazaDonacionDTO {
-    private Integer id;
+    private Long id;
     private EstadoDonacion estado;
     private List<TrazaSegmentoDTO> segmentos;
 }

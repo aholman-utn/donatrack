@@ -55,24 +55,24 @@ public class TrazabilidadService {
         this.notificacionRestClient = notificacionQueueClient;
     }
 
-    private Donacion buscarDonacionPorId(Integer id) {
-        Donacion donacion = donacionRepository.findById(id);
+    private Donacion buscarDonacionPorId(Long id) {
+        Donacion donacion = donacionRepository.findById(id).orElse(null);
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }
         return donacion;
     }
 
-    private DonacionSegmentada buscarDonacionSegmentadaPorId(Integer idDonacion, Integer idSegmentada) {
+    private DonacionSegmentada buscarDonacionSegmentadaPorId(Long idDonacion, Long idSegmentada) {
         Donacion donacion = this.buscarDonacionPorId(idDonacion);
         return donacion.getDonacionesSegmentadas().stream()
-                .filter(p -> p.getId() != null && p.getId().equals(Long.valueOf(idSegmentada)))
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmentada))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No se encontró la el segmento de la donación con ID: " + idSegmentada));
     }
 
-    public TrazaDonacionDTO trazabilizarDonacion(Integer id) {
+    public TrazaDonacionDTO trazabilizarDonacion(Long id) {
         Donacion donacion = this.buscarDonacionPorId(id);
 
         List<DonacionSegmentada> segmentos = donacion.getDonacionesSegmentadas();
@@ -80,7 +80,7 @@ public class TrazabilidadService {
         for (DonacionSegmentada segmentada : segmentos) {
             trazabilidades.add(
                     TrazaSegmentoDTO.builder()
-                            .id(Math.toIntExact(segmentada.getId()))
+                            .id(segmentada.getId())
                             .eventos(segmentada.getHistorial())
                             .build());
         }
@@ -91,14 +91,14 @@ public class TrazabilidadService {
                 .build();
     }
 
-    public TrazaSegmentoDTO trazabilizarDonacionSegmentada(Integer idDonacion, Integer idSegmento) {
+    public TrazaSegmentoDTO trazabilizarDonacionSegmentada(Long idDonacion, Long idSegmento) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
     public TrazaSegmentoDTO transicionarDonacion(
-            Integer idDonacion,
-            Integer idSegmento,
+            Long idDonacion,
+            Long idSegmento,
             CrearEventoRequest request) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), request.getNuevoEstado())) {
@@ -114,8 +114,8 @@ public class TrazabilidadService {
     }
 
     public TrazaSegmentoDTO transicionListaEntregar(
-            Integer idDonacion,
-            Integer idSegmento,
+            Long idDonacion,
+            Long idSegmento,
             String actor) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR)) {
@@ -126,8 +126,8 @@ public class TrazabilidadService {
     }
 
     public TrazaSegmentoDTO transicionEnTraslado(
-            Integer idDonacion,
-            Integer idSegmento,
+            Long idDonacion,
+            Long idSegmento,
             String actor) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_TRASLADO)) {
@@ -138,8 +138,8 @@ public class TrazabilidadService {
     }
 
     public TrazaSegmentoDTO transicionEntregaFallida(
-            Integer idDonacion,
-            Integer idSegmento,
+            Long idDonacion,
+            Long idSegmento,
             String actor,
             String justificacion) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
@@ -151,8 +151,8 @@ public class TrazabilidadService {
     }
 
     public TrazaSegmentoDTO transicionMarcarVencida(
-            Integer idDonacion,
-            Integer idSegmento,
+            Long idDonacion,
+            Long idSegmento,
             String actor) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.VENCIDA)) {
@@ -169,7 +169,7 @@ public class TrazabilidadService {
      * @param idSegmento  ID de la donación segmentada a recepcionar
      * @return traza actualizada del segmento
      */
-    public TrazaSegmentoDTO recepcionarEntrega(Integer idDonacion, Integer idSegmento, LocalDateTime fechaEntrega, String detallesLogistica) {
+    public TrazaSegmentoDTO recepcionarEntrega(Long idDonacion, Long idSegmento, LocalDateTime fechaEntrega, String detallesLogistica) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
 
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGADA)) {

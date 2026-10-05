@@ -2,81 +2,52 @@ package com.tp.donatrack.repositories;
 
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Repository
-public class DonacionRepository {
+public interface DonacionRepository extends JpaRepository<Donacion, Long> {
 
-    private final List<Donacion> donaciones = new ArrayList<>();
-    private final AtomicInteger idsDonacion = new AtomicInteger(1);
-    private final AtomicInteger idsSegmentada = new AtomicInteger(1);
+    @Query("SELECT d FROM Donacion d WHERE d.donante.id = :donanteId")
+    List<Donacion> findByDonanteId(@Param("donanteId") Long donanteId);
 
-    public Donacion save(Donacion donacion) {
-        if (donacion.getId() == null) {
-            donacion.setId(idsDonacion.getAndIncrement());
-            this.donaciones.add(donacion);
-        } else if (!this.donaciones.contains(donacion)) {
-            this.donaciones.add(donacion);
+    // ----- Métodos de compatibilidad con la API previa (en memoria) -----
+
+    default DonacionSegmentada findSegmentadaById(Long segmentadaId) {
+        if (segmentadaId == null) {
+            return null;
         }
-        for (DonacionSegmentada ds : donacion.getDonacionesSegmentadas()) {
-            if (ds.getId() == null) {
-                ds.setId((long) idsSegmentada.getAndIncrement());
-            }
-        }
-        return donacion;
-    }
-
-    public void delete(Donacion donacion) {
-        this.donaciones.remove(donacion);
-    }
-
-    public List<Donacion> findByDonanteId(Long donanteId) {
-        return this.donaciones.stream()
-                .filter(d -> d.getDonante() != null && d.getDonante().getPersona() != null && d.getDonante().getPersona().getId().equals(donanteId))
-                .collect(Collectors.toList());
-    }
-
-    public Donacion findById(Integer id) {
-        return this.donaciones.stream()
-                .filter(d -> d.getId() != null && d.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public List<Donacion> findAll() {
-        return new ArrayList<>(this.donaciones);
-    }
-
-    public DonacionSegmentada findSegmentadaById(Long segmentadaId) {
-        return this.donaciones.stream()
+        return findAll().stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
                 .filter(ds -> ds.getId() != null && ds.getId().equals(segmentadaId))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Donacion findDonacionByDonacionesSegmentadaId(Long segmentadaId) {
-        return this.donaciones.stream()
+    default Donacion findDonacionByDonacionesSegmentadaId(Long segmentadaId) {
+        if (segmentadaId == null) {
+            return null;
+        }
+        return findAll().stream()
                 .filter(d -> d.getDonacionesSegmentadas().stream()
                         .anyMatch(ds -> ds.getId() != null && ds.getId().equals(segmentadaId)))
                 .findFirst()
                 .orElse(null);
     }
 
-    public List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Long donanteId) {
+    default List<DonacionSegmentada> findSegmentadasEnDepositoByDonanteId(Long donanteId) {
         return findByDonanteId(donanteId).stream()
                 .flatMap(d -> d.getDonacionesSegmentadas().stream())
-                .filter(ds -> ds.getEstado() == com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada.EN_DEPOSITO)
-                .collect(Collectors.toList());
+                .filter(ds -> EstadoDonacionSegmentada.EN_DEPOSITO.equals(ds.getEstado()))
+                .toList();
     }
 
-    public void clear() { // creo que no se usa
-        this.donaciones.clear();
-        this.idsSegmentada.set(1);
+    default void clear() {
+        deleteAll();
     }
 }
