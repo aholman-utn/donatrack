@@ -58,14 +58,8 @@ Configurar en el dashboard de Render si es necesario:
 |----------|-------------|
 | `PORT` | Puerto (Render lo asigna automáticamente) |
 | `SPRING_PROFILES_ACTIVE` | `prod` para producción |
-| `DB_URL` | URL JDBC de la base de datos MySQL (ej: `jdbc:mysql://host:3306/donatrack`) |
-| `DB_USER` | Usuario de la base de datos |
-| `DB_PASSWORD` | Contraseña de la base de datos |
-| `DB_DDL_AUTO` | Estrategia de esquema de Hibernate. `update` en el primer despliegue (crea las tablas), `validate` una vez creado el esquema |
 
-> Aplica a `donatrack-donaciones` y `donatrack-notificaciones` (los servicios con persistencia JPA). Las variables `DB_*` están declaradas en `render.yaml` como `sync: false`: hay que cargar sus valores en el dashboard de Render, no se versionan.
->
-> **Nota:** Render no ofrece MySQL gestionado (solo PostgreSQL). Para MySQL se usa un proveedor externo (Railway, Aiven, PlanetScale, etc.) y se apunta `DB_URL` a ese host.
+> **Persistencia:** la base de datos de producción todavía no está definida. Cuando se elija un proveedor de MySQL, se externalizará la conexión de `donatrack-donaciones` y `donatrack-notificaciones` por variables de entorno. (Render no ofrece MySQL gestionado; solo PostgreSQL.)
 
 ## Limitaciones del plan gratuito
 

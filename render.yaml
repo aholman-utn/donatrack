@@ -13,16 +13,6 @@ services:
         value: 8080
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      # Conexión a la base de datos (MySQL gestionado). Cargar los valores
-      # reales en el dashboard de Render; no se versionan por seguridad.
-      - key: DB_URL
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_DDL_AUTO
-        value: validate
 
   - type: web
     name: donatrack-incentivos
@@ -47,13 +37,3 @@ services:
         value: 8082
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      # Conexión a la base de datos (MySQL gestionado). Cargar los valores
-      # reales en el dashboard de Render; no se versionan por seguridad.
-      - key: DB_URL
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_DDL_AUTO
-        value: validate

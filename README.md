@@ -333,18 +333,9 @@ Configuracion actual:
 - Maximo tamano de archivo multipart: `10MB`
 - Maximo tamano de request multipart: `10MB`
 
-### Variables de entorno de base de datos
+### Base de datos (desarrollo local)
 
-Los servicios con persistencia JPA (`servicio-donaciones` y `servicio-notificaciones`) leen la conexión a MySQL desde variables de entorno. Si no se definen, usan valores por defecto para desarrollo local.
-
-| Variable | Descripción | Default (local) |
-|----------|-------------|-----------------|
-| `DB_URL` | URL JDBC de la base MySQL | `jdbc:mysql://localhost:3306/<db>` |
-| `DB_USER` | Usuario de la base | `donatrack` (donaciones) / `root` (notificaciones) |
-| `DB_PASSWORD` | Contraseña de la base | `donatrack` (donaciones) / `123456` (notificaciones) |
-| `DB_DDL_AUTO` | Estrategia de esquema de Hibernate | `update` |
-
-> **Primer despliegue:** usar `DB_DDL_AUTO=update` para que Hibernate cree las tablas; una vez creado el esquema, cambiarlo a `validate`.
+Los servicios con persistencia JPA (`servicio-donaciones` y `servicio-notificaciones`) se conectan a una base MySQL local. La configuración está en el `application.properties` de cada servicio (host `localhost:3306`).
 
 Para levantar un MySQL local con Docker:
 
@@ -352,7 +343,7 @@ Para levantar un MySQL local con Docker:
 docker compose -f herramientas/docker-compose.yml up mysql -d
 ```
 
-En Render, estas variables se cargan en el dashboard (ver [docs/DEPLOY.md](docs/DEPLOY.md)). Render no ofrece MySQL gestionado, por lo que se usa un proveedor externo (Railway, Aiven, PlanetScale, etc.).
+> La base de datos de producción todavía no está definida. Cuando se elija un proveedor, la conexión se externalizará por configuración.
 
 ---
 
