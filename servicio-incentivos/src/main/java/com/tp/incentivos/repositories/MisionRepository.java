@@ -12,7 +12,7 @@ public class MisionRepository {
         private final Map<Nivel, List<Mision>> misionesPorNivel;
 
         public MisionRepository() {
-                this.misionesPorNivel = new EnumMap<>(Nivel.class);
+                this.misionesPorNivel = new HashMap<>();
 
                 // --- COLABORADOR ---
                 Mision colExitosas = new MisionDonacionesExitosas(

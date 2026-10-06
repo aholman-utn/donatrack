@@ -76,18 +76,11 @@ public class IncentivosService {
             boolean subioDeCategoria = false;
             Nivel nuevoNivel = nivelActual;
 
-            if (siguienteMisionId == null) {
-                // Completó todas las misiones de su nivel, sube al siguiente
-                if (nivelActual == Nivel.COLABORADOR) {
-                    nuevoNivel = Nivel.SOSTENEDOR;
-                    siguienteMisionId = obtenerMisionInicialId();
-                    subioDeCategoria = true;
-                } else if (nivelActual == Nivel.SOSTENEDOR) {
-                    nuevoNivel = Nivel.TRANSFORMADOR;
-                    siguienteMisionId = obtenerMisionInicialId();
-                    subioDeCategoria = true;
-                }
-                // Si es TRANSFORMADOR y completó todo, siguienteMisionId queda null
+            if (siguienteMisionId == null && nivelActual.tieneSiguienteNivel()) {
+                // Completó todas las misiones de su nivel actual, asciende polimórficamente al siguiente nivel
+                nuevoNivel = nivelActual.obtenerSiguienteNivel().orElse(nivelActual);
+                siguienteMisionId = obtenerMisionInicialId();
+                subioDeCategoria = true;
             }
 
             this.insigniasRestClient.notificarInsigniaObtenida(

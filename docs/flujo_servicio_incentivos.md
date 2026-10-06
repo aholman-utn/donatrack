@@ -265,17 +265,11 @@ if (cumplida) {
     boolean subioDeCategoria = false;
     Nivel nuevoNivel = nivelActual;
 
-    if (siguienteMisionId == null) {
-        // Completó todas las misiones de su nivel actual, sube al siguiente nivel
-        if (nivelActual == Nivel.COLABORADOR) {
-            nuevoNivel = Nivel.SOSTENEDOR;
-            siguienteMisionId = obtenerMisionInicialId();
-            subioDeCategoria = true;
-        } else if (nivelActual == Nivel.SOSTENEDOR) {
-            nuevoNivel = Nivel.TRANSFORMADOR;
-            siguienteMisionId = obtenerMisionInicialId();
-            subioDeCategoria = true;
-        }
+    // Patrón State: si completó todas las misiones y el nivel actual tiene sucesor, asciende polimórficamente
+    if (siguienteMisionId == null && nivelActual.tieneSiguienteNivel()) {
+        nuevoNivel = nivelActual.obtenerSiguienteNivel().orElse(nivelActual);
+        siguienteMisionId = obtenerMisionInicialId();
+        subioDeCategoria = true;
     }
 
     // Notificación externa de insignia generada (webhook n8n)

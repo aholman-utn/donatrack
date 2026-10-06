@@ -302,7 +302,7 @@ public class DonanteService {
 
         return MetricasActividadDTO.builder()
                 .donanteId(donanteId.intValue())
-                .categoriaDonante(perfil.getNivelDonante().name())
+                .categoriaDonante(perfil.getNivelDonante().getNombre())
                 .totalDonacionesExitosas(totalExitosas)
                 .entidadesAyudadasCount(entidadesIds.size())
                 .entidadesAyudadasIds(entidadesIds.stream().map(Long::intValue).collect(Collectors.toList()))

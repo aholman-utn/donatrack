@@ -585,11 +585,15 @@ Provincia "1" --> "1" Pais : pais
 Persona "1" *-- "1" Direccion : direccion
 
 package "commons (compartido entre servicios)" #F7F7F7 {
-    enum Nivel {
-        COLABORADOR
-        SOSTENEDOR
-        TRANSFORMADOR
+    interface Nivel <<State>> {
+        +getNombre(): String
+        +obtenerSiguienteNivel(): Optional<Nivel>
+        +tieneSiguienteNivel(): boolean
     }
+
+    class Colaborador implements Nivel
+    class Sostenedor implements Nivel
+    class Transformador implements Nivel
 
     enum TipoNotificador {
         EMAIL
@@ -691,10 +695,22 @@ package "commons (compartido entre servicios)" #F7F7F7 {
         -fechaObtencion: Date
     }
 
-    enum Nivel {
-        COLABORADOR
-        SOSTENEDOR
-        TRANSFORMADOR
+    interface Nivel <<State>> {
+        +getNombre(): String
+        +obtenerSiguienteNivel(): Optional<Nivel>
+        +tieneSiguienteNivel(): boolean
+    }
+
+    class Colaborador implements Nivel {
+        +obtenerSiguienteNivel(): Optional<Nivel>
+    }
+
+    class Sostenedor implements Nivel {
+        +obtenerSiguienteNivel(): Optional<Nivel>
+    }
+
+    class Transformador implements Nivel {
+        +obtenerSiguienteNivel(): Optional<Nivel>
     }
 }
 
