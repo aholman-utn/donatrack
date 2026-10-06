@@ -1,21 +1,37 @@
 package com.tp.donatrack.logistica.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "envios")
 public class Envio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parada_id")
+    @JsonIgnore
+    private Parada parada;
+
+    @Column(name = "donacion_segmentada_id")
     private Long donacionSegmentadaId;
+
+    @Column(name = "entidad_beneficiaria_id")
     private Long entidadBeneficiariaId;
+
+    @Column(name = "ruta_id")
     private Long rutaId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private EstadoEnvio estado;
 
     public void registrarEnDestino() {

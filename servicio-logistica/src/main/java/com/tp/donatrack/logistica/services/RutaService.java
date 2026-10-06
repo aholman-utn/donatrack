@@ -12,12 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class RutaService {
     private static final Logger logger = LoggerFactory.getLogger(RutaService.class);
 
@@ -36,7 +38,7 @@ public class RutaService {
             Planificacion planificacion,
             CamionService camionService,
             ChoferService choferService,
-            @Lazy EnviosService enviosService, // Lazy es para evitar espera circular.
+            @Lazy EnviosService enviosService,
             DonacionesQueueClient donacionesQueueClient
     ) {
         this.eventRepository = eventRepository;
@@ -73,6 +75,7 @@ public class RutaService {
         for (Ruta ruta : nuevasRutas) {
             if (ruta.getParadas() != null) {
                 for (Parada parada : ruta.getParadas()) {
+                    parada.setRuta(ruta);
                     List<Long> enviosRealesIds = new ArrayList<>();
 
                     if (parada.getEnviosIds() != null) {
@@ -87,9 +90,11 @@ public class RutaService {
                             Envio nuevoEnvio = new Envio();
                             nuevoEnvio.setDonacionSegmentadaId(donacionSegId);
                             nuevoEnvio.setEntidadBeneficiariaId(entidadId);
+                            nuevoEnvio.setParada(parada);
+                            nuevoEnvio.setEstado(EstadoEnvio.PENDIENTE);
 
                             Envio envioGuardado = enviosService.registrarEnvio(nuevoEnvio);
-
+                            parada.getEnvios().add(envioGuardado);
                             enviosRealesIds.add(envioGuardado.getId());
                         }
                     }
@@ -98,7 +103,7 @@ public class RutaService {
             }
         }
 
-        List<Ruta> rutasGuardadas = (List<Ruta>) rutaRepository.saveAll(nuevasRutas);
+        List<Ruta> rutasGuardadas = rutaRepository.saveAll(nuevasRutas);
 
         for (Ruta rutaGuardada : rutasGuardadas) {
             this.registrarRuta(rutaGuardada);
@@ -106,6 +111,7 @@ public class RutaService {
 
         logger.info("Planificación finalizada. Se generaron exitosamente {} rutas.", rutasGuardadas.size());
     }
+
     public Ruta registrarRuta(Ruta ruta) {
         ruta.setIniciada(false);
 
@@ -117,6 +123,7 @@ public class RutaService {
                         if (envio != null) {
                             envio.setEstado(EstadoEnvio.ASIGNACION_REALIZADA);
                             envio.setRutaId(ruta.getId());
+                            enviosService.registrarEnvio(envio);
                         }
                     }
                 }
@@ -127,7 +134,7 @@ public class RutaService {
     }
 
     public void iniciarRuta(Long rutaId) {
-        Ruta ruta = rutaRepository.findById(rutaId);
+        Ruta ruta = buscarRutaPorId(rutaId);
         if (ruta == null) {
             throw new IllegalArgumentException("No se encontró la ruta con ID: " + rutaId);
         }
@@ -149,13 +156,14 @@ public class RutaService {
                         Envio envio = enviosService.buscarEnvioPorId(envioId);
                         if (envio != null) {
                             envio.setEstado(EstadoEnvio.EN_TRASLADO);
+                            enviosService.registrarEnvio(envio);
 
                             EventoLogistica evento = EventoLogistica.builder()
                                     .tipoEvento("INICIO_RUTA")
                                     .donacionSegmentadaId(envio.getDonacionSegmentadaId())
                                     .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
                                     .timestamp(LocalDateTime.now())
-                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + ruta.getChofer().getId())
+                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + (ruta.getChofer() != null ? ruta.getChofer().getId() : "N/A"))
                                     .build();
 
                             eventRepository.registrar(evento);
@@ -177,12 +185,14 @@ public class RutaService {
         rutaRepository.save(ruta);
     }
 
+    @Transactional(readOnly = true)
     public List<Ruta> listarRutas() {
         return rutaRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Ruta buscarRutaPorId(Long id) {
         if (id == null) return null;
-        return rutaRepository.findById(id);
+        return rutaRepository.findById(id).orElse(null);
     }
 }

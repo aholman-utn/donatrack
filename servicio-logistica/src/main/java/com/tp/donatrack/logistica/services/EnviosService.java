@@ -5,56 +5,55 @@ import com.tp.donatrack.logistica.domain.Envio;
 import com.tp.donatrack.logistica.domain.EstadoEnvio;
 import com.tp.donatrack.logistica.domain.EventoLogistica;
 import com.tp.donatrack.logistica.domain.Ruta;
+import com.tp.donatrack.logistica.repository.EnvioRepository;
 import com.tp.donatrack.logistica.repository.LogisticaEventRepository;
 import com.tp.donatrack.logistica.clients.DonacionesQueueClient;
 import com.tp.commons.dtos.logistica.EventoLogisticaDTO;
 import com.tp.commons.dtos.logistica.TipoEventoLogistica;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
+@Transactional
 public class EnviosService {
     private final LogisticaEventRepository eventRepository;
-
+    private final EnvioRepository envioRepository;
     private final RutaService rutaService;
     private final CamionService camionService;
     private final DonacionesQueueClient donacionesQueueClient;
 
-    private final Map<Long, Envio> envios = new ConcurrentHashMap<>();
-    private final AtomicLong envioIdSeq = new AtomicLong(1);
-
     public EnviosService(
             LogisticaEventRepository eventRepository,
+            EnvioRepository envioRepository,
             RutaService rutaService,
             CamionService camionService,
             DonacionesQueueClient donacionesQueueClient
     ) {
         this.eventRepository = eventRepository;
+        this.envioRepository = envioRepository;
         this.rutaService = rutaService;
         this.camionService = camionService;
         this.donacionesQueueClient = donacionesQueueClient;
     }
 
     public Envio registrarEnvio(Envio envio) {
-        Long id = envioIdSeq.getAndIncrement();
-        envio.setId(id);
-        envio.setEstado(EstadoEnvio.PENDIENTE);
-        envios.put(id, envio);
-        return envio;
+        if (envio.getEstado() == null) {
+            envio.setEstado(EstadoEnvio.PENDIENTE);
+        }
+        return envioRepository.save(envio);
     }
 
     public void registrarLlegadaADestino(Long envioId) {
-        Envio envio = envios.get(envioId);
+        Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
         }
 
         envio.registrarEnDestino();
+        envioRepository.save(envio);
 
         Camion camionResponsable = buscarCamionPorEnvio(envioId);
         String infoCamion = (camionResponsable != null)
@@ -82,12 +81,13 @@ public class EnviosService {
     }
 
     public void registrarEntregaExitosa(Long envioId, String detallesExtra) {
-        Envio envio = envios.get(envioId);
+        Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
         }
 
         envio.registrarRecepcionExitosa();
+        envioRepository.save(envio);
 
         Camion camionResponsable = buscarCamionPorEnvio(envioId);
         String infoCamion = (camionResponsable != null)
@@ -117,12 +117,13 @@ public class EnviosService {
     }
 
     public void registrarEntregaFallida(Long envioId, String motivo) {
-        Envio envio = envios.get(envioId);
+        Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
         }
 
         envio.registrarRecepcionFallida();
+        envioRepository.save(envio);
 
         EventoLogistica evento = EventoLogistica.builder()
                 .tipoEvento("ENTREGA_FALLIDA")
@@ -144,12 +145,13 @@ public class EnviosService {
         donacionesQueueClient.publicarEvento(dto);
     }
 
+    @Transactional(readOnly = true)
     public List<Envio> listarEnvios() {
-        return new ArrayList<>(envios.values());
+        return envioRepository.findAll();
     }
 
     private Camion buscarCamionPorEnvio(Long envioId) {
-        Envio envio = envios.get(envioId);
+        Envio envio = buscarEnvioPorId(envioId);
 
         if (envio != null && envio.getRutaId() != null) {
             Ruta ruta = rutaService.buscarRutaPorId(envio.getRutaId());
@@ -161,7 +163,9 @@ public class EnviosService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     public Envio buscarEnvioPorId(Long id) {
-        return envios.get(id);
+        if (id == null) return null;
+        return envioRepository.findById(id).orElse(null);
     }
 }

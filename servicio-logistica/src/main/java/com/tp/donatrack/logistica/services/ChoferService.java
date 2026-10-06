@@ -1,27 +1,35 @@
 package com.tp.donatrack.logistica.services;
 
 import com.tp.donatrack.logistica.domain.Chofer;
+import com.tp.donatrack.logistica.repository.ChoferRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@Transactional
 public class ChoferService {
-    private final Map<Long, Chofer> choferes = new ConcurrentHashMap<>();
-    private final AtomicLong choferIdSeq = new AtomicLong(1);
+    private final ChoferRepository choferRepository;
 
-    public Chofer registrarChofer(Chofer chofer) {
-        Long id = choferIdSeq.getAndIncrement();
-        chofer.setId(id);
-        choferes.put(id, chofer);
-        return chofer;
+    public ChoferService(ChoferRepository choferRepository) {
+        this.choferRepository = choferRepository;
     }
 
+    public Chofer registrarChofer(Chofer chofer) {
+        return choferRepository.save(chofer);
+    }
+
+    @Transactional(readOnly = true)
     public List<Chofer> listarChoferes() {
-        return new ArrayList<>(choferes.values());
+        return choferRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Chofer buscarChoferPorId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return choferRepository.findById(id).orElse(null);
     }
 }

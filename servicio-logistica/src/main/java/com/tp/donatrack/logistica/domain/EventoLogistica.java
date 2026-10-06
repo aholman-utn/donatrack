@@ -1,21 +1,33 @@
 package com.tp.donatrack.logistica.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "eventos_logistica")
 public class EventoLogistica {
-    //TO DO: tipoEvento tiene que ser un enum.
-    private String tipoEvento; // "INICIO_RUTA", "ENTREGA_EXITOSA", "ENTREGA_FALLIDA", "LLEGADA_A_DESTINO"
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "tipo_evento", nullable = false)
+    private String tipoEvento;
+
+    @Column(name = "donacion_segmentada_id")
     private Long donacionSegmentadaId;
+
+    @Column(name = "entidad_beneficiaria_id")
     private Long entidadBeneficiariaId;
+
     private LocalDateTime timestamp;
+
+    @Column(length = 1000)
     private String detalles;
 }

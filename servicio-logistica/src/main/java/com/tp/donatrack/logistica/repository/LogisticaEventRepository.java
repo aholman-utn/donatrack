@@ -1,21 +1,19 @@
 package com.tp.donatrack.logistica.repository;
 
 import com.tp.donatrack.logistica.domain.EventoLogistica;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
-public class LogisticaEventRepository {
-    private final List<EventoLogistica> eventos = new CopyOnWriteArrayList<>();
+public interface LogisticaEventRepository extends JpaRepository<EventoLogistica, Long> {
 
-    public void registrar(EventoLogistica e) {
-        eventos.add(e);
+    default void registrar(EventoLogistica e) {
+        save(e);
     }
 
-    public List<EventoLogistica> obtenerTodos() {
-        return new ArrayList<>(eventos);
+    default List<EventoLogistica> obtenerTodos() {
+        return findAll();
     }
 }

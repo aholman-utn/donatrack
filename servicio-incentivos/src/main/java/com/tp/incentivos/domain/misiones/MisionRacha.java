@@ -3,10 +3,19 @@ package com.tp.incentivos.domain.misiones;
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
 import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@DiscriminatorValue("RACHA")
 public class MisionRacha extends Mision {
+
     public MisionRacha(
             int objetivo,
             String titulo,
@@ -14,9 +23,9 @@ public class MisionRacha extends Mision {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
-        this.insigniaAsociada = new Insignia(
+        setInsigniaAsociada(new Insignia(
                 "Racha",
-                "Donaste durante " + objetivo + " meses seguidos");
+                "Donaste durante " + objetivo + " meses seguidos"));
     }
 
     @Override

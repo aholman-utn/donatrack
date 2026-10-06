@@ -1,34 +1,35 @@
 package com.tp.donatrack.logistica.services;
 
 import com.tp.donatrack.logistica.domain.Camion;
+import com.tp.donatrack.logistica.repository.CamionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@Transactional
 public class CamionService {
-    private final AtomicLong camionIdSeq = new AtomicLong(1);
-    private final Map<Long, Camion> camiones = new ConcurrentHashMap<>();
+    private final CamionRepository camionRepository;
+
+    public CamionService(CamionRepository camionRepository) {
+        this.camionRepository = camionRepository;
+    }
 
     public Camion registrarCamion(Camion camion) {
-        Long id = camionIdSeq.getAndIncrement();
-        camion.setId(id);
-        camiones.put(id, camion);
-        return camion;
+        return camionRepository.save(camion);
     }
 
+    @Transactional(readOnly = true)
     public List<Camion> listarCamiones() {
-        return new ArrayList<>(camiones.values());
+        return camionRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Camion buscarCamionPorId(Long id) {
         if (id == null) {
             return null;
         }
-        return camiones.get(id);
+        return camionRepository.findById(id).orElse(null);
     }
 }

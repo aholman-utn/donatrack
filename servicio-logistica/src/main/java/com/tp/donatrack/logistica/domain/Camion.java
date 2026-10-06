@@ -1,22 +1,29 @@
 package com.tp.donatrack.logistica.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "camiones")
 public class Camion {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private double volumen;
-    private double altura;
+
+    @Column(nullable = false, unique = true, length = 20)
     private String patente;
+
     private String marca;
     private String modelo;
+
+    private double volumen;
+    private double altura;
+
+    @Column(name = "capacidad_carga")
     private double capacidadCarga;
 }
