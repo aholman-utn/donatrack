@@ -73,6 +73,8 @@ public class MisionJpaPersistenceTest {
         assertTrue(buscada.get() instanceof MisionDonacionesExitosas);
         assertEquals("Donacion Exitosa", buscada.get().getTitulo());
         assertNotNull(buscada.get().getInsigniaAsociada());
+        assertEquals(buscada.get().getTitulo(), buscada.get().getInsigniaAsociada().getTitulo());
+        assertEquals(buscada.get().getDescripcion(), buscada.get().getInsigniaAsociada().getDescripcion());
 
         Optional<Mision> siguiente = misionRepository.findSiguiente(Nivel.COLABORADOR, 1L);
         assertTrue(siguiente.isPresent());

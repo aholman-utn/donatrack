@@ -34,15 +34,6 @@ public abstract class Mision {
 
     protected int orden;
 
-    @Column(name = "insignia_titulo")
-    protected String insigniaTitulo;
-
-    @Column(name = "insignia_descripcion")
-    protected String insigniaDescripcion;
-
-    @Transient
-    protected Insignia insigniaAsociada;
-
     /**
      * Retorna el identificador lógico de la misión para el donante (su orden dentro del nivel: 1, 2, 3..).
      */
@@ -59,21 +50,7 @@ public abstract class Mision {
     }
 
     public Insignia getInsigniaAsociada() {
-        if (insigniaAsociada != null) {
-            return insigniaAsociada;
-        }
-        if (insigniaTitulo != null) {
-            return new Insignia(insigniaTitulo, insigniaDescripcion);
-        }
-        return null;
-    }
-
-    public void setInsigniaAsociada(Insignia insignia) {
-        this.insigniaAsociada = insignia;
-        if (insignia != null) {
-            this.insigniaTitulo = insignia.getTitulo();
-            this.insigniaDescripcion = insignia.getDescripcion();
-        }
+        return new Insignia(this.titulo, this.descripcion);
     }
 
     public abstract double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO metricas);

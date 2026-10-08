@@ -1,7 +1,6 @@
 package com.tp.incentivos.domain.misiones;
 
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
-import com.tp.commons.domain.incentivos.Insignia;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -24,10 +23,6 @@ public class MisionHabilDonador extends Mision {
         this.objetivo = objetivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
-        setInsigniaAsociada(new Insignia(
-            "Habil Donador",
-            "Hiciste una donación de gran escala"
-        ));
     }
 
     @Override

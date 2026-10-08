@@ -1,0 +1,86 @@
+@startuml incentivos
+!include ../_style.puml
+' El DER se lee mejor con líneas rectas o polilíneas
+skinparam linetype polyline
+
+title DER — Servicio de Incentivos\n(Base de Datos local: MySQL/TiDB — Catálogo de Misiones)
+
+' =====================================================================
+' NOTA DE ALCANCE Y ARQUITECTURA DE MICROSERVICIOS
+'
+' 1. DELIMITACIÓN DE CONTEXTOS (Bounded Context):
+'    El Servicio de Incentivos es un motor de evaluación STATELESS respecto
+'    al donante. NO persiste Donantes ni Perfiles de Donante.
+'    Toda la información del donante (nivel, progreso, misión actual,
+'    insignias ganadas) pertenece al SERVICIO DE DONACIONES.
+'
+' 2. PERSISTENCIA LOCAL DE INCENTIVOS:
+'    La base de datos de este servicio persiste EXCLUSIVAMENTE el catálogo
+'    de misiones en una única tabla relacional: "MISIONES".
+'
+' 3. ESTRATEGIA DE PERSISTENCIA (JPA / Hibernate):
+'    - Herencia: @Inheritance(strategy = InheritanceType.SINGLE_TABLE).
+'      Las 4 subclases de dominio colapsan en la tabla "MISIONES".
+'    - Discriminador: tipo_mision VARCHAR(31).
+'    - Insignia: La composición Mision *-- Insignia se aplana en las
+'      columnas (insignia_titulo, insignia_descripcion); Insignia es @Transient.
+'    - Nivel: Se persiste como VARCHAR(30) vía NivelConverter (State Pattern).
+' =====================================================================
+
+entity "MISIONES" as MISIONES <<JPA Single Table>> {
+  * **id** : BIGINT  <<PK, Auto-Increment>>
+  --
+  * tipo_mision : VARCHAR(31)  <<Discriminator: RACHA | COMPLETITUD | HABIL_DONADOR | DONACIONES_EXITOSAS>>
+  * objetivo : INT  «Meta numérica a cumplir»
+  * nivel : VARCHAR(30)  <<NivelConverter: COLABORADOR | SOSTENEDOR | TRANSFORMADOR>>
+  * titulo : VARCHAR(255)  «Nombre de la misión»
+  descripcion : VARCHAR(500)  «Descripción detallada»
+  * orden : INT  «Orden de progresión dentro del nivel (1..4)»
+}
+
+' ===================== Contexto Externo =====================
+package "servicio-donaciones (contexto externo — NO en esta BD)" #FAFAFA {
+  entity "DONANTE (perfil)" as DONANTE_EXTERNO <<ref. externa>> {
+    * id_donante : BIGINT
+    --
+    nivel_donante : String
+    progreso : Double
+    mision_actual_id : Long  <<ref. lógica>>
+  }
+}
+
+DONANTE_EXTERNO ..o{ MISIONES : "consulta / referencia lógica\n(vía REST, sin FK en BD)"
+
+' ===================== Notas =====================
+note right of MISIONES
+  **Mapeo de Herencia en JPA**:
+  `@Table(name = "misiones")`
+  `@Inheritance(strategy = InheritanceType.SINGLE_TABLE)`
+  `@DiscriminatorColumn(name = "tipo_mision")`
+
+  **Subclases y sus discriminadores**:
+  • `'RACHA'`            → `MisionRacha`
+  • `'COMPLETITUD'`      → `MisionCompletitud`
+  • `'HABIL_DONADOR'`    → `MisionHabilDonador`
+  • `'DONACIONES_EXITOSAS'` → `MisionDonacionesExitosas`
+end note
+
+note bottom of MISIONES
+  **Generación de Insignia**:
+  La relación `Mision *-- Insignia` del diagrama de dominio
+  NO se persiste en la base de datos (evita duplicación DRY).
+  El objeto `Insignia` se genera dinámicamente al vuelo
+  como Value Object a partir de `titulo` y `descripcion`
+  al completarse la misión.
+end note
+
+legend right
+  |= Símbolo |= Significado |
+  | <<PK>> | Clave primaria física autoincremental |
+  | <<Discriminator>> | Columna discriminadora de jerarquía JPA |
+  | <<JPA Single Table>> | ÚNICA tabla física persistida en este microservicio |
+  | <<ref. externa>> | Entidad que vive en otra base de datos (servicio-donaciones) |
+  | línea punteada | Relación lógica por API REST (sin integridad referencial FK) |
+endlegend
+
+@enduml
