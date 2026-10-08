@@ -6,12 +6,14 @@ import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 
+import com.tp.donatrack.domain.necesidad.NecesidadMaterial;
 import com.tp.donatrack.dtos.EntidadRankingDTO;
 import com.tp.donatrack.dtos.ResultadoMatchmakingDTO;
 
 import com.tp.donatrack.repositories.DonacionRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 
+import com.tp.donatrack.repositories.NecesidadRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +30,16 @@ public class MatchmakingService {
 
     private final DonacionRepository donacionRepository;
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
+    private final NecesidadRepository necesidadRepository;
     private final ServicioMatchmaking servicioMatchmaking;
 
     public MatchmakingService(
             DonacionRepository donacionRepository,
-            EntidadBeneficiariaRepository entidadBeneficiariaRepository) {
+            EntidadBeneficiariaRepository entidadBeneficiariaRepository,
+            NecesidadRepository necesidadRepository) {
         this.donacionRepository = donacionRepository;
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
+        this.necesidadRepository = necesidadRepository;
         this.servicioMatchmaking = new ServicioMatchmaking();
     }
 
@@ -52,6 +57,10 @@ public class MatchmakingService {
         }
 
         List<EntidadBeneficiaria> todasLasEntidades = entidadBeneficiariaRepository.findAll();
+        todasLasEntidades.forEach(entidad -> {
+            List<NecesidadMaterial> necesidades = necesidadRepository.findByEntidadBeneficiariaId(entidad.getIdEntidadBeneficiaria());
+            entidad.setNececidades(necesidades);
+        });
 
         ResultadoMatchmaking resultado = servicioMatchmaking.ejecutar(segmentada, todasLasEntidades);
 
