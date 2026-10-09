@@ -1,0 +1,1341 @@
+{
+  "name": "test",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        160
+      ],
+      "id": "805f4abc-7ea4-4eb5-99de-20dfe900cb82",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "content": "## Creación de Entidades Beneficiarias\n",
+        "height": 288,
+        "width": 480,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1488,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "366ba1d1-a01c-40f3-acbb-772fe7eccb87",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Creación de Personas",
+        "height": 272,
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1504,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "238bf5a9-cfc5-4586-af8a-35e7e4b986ed",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donantes/humano",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"nombre\": \"Lucas\",\n  \"apellido\": \".p\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"12345678\",\n  \"direccion\": {\n    \"calle1\": \"una calle\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 2,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"lucas@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"lautaro.corfield@gmail.com\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1424,
+        -32
+      ],
+      "id": "1c63c607-e829-404c-827f-458168415ee8",
+      "name": "Post Lucas ID:1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donantes/humano",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"nombre\": \"German\",\n  \"apellido\": \".G\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"12345678\",\n  \"direccion\": {\n    \"calle1\": \"una calle\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 2,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"German@mail.com\"\n    },\n    {\n      \"medio\": \"WHATSAPP\",\n      \"valor\": \"+5491161230142\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"WHATSAPP\",\n    \"valor\": \"+5491161230142\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1024,
+        -32
+      ],
+      "id": "4d329afb-ad4e-46ef-afe1-f9171292712a",
+      "name": "POST German ID:3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/entidadBeneficiaria",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"razonSocial\": \"Caritas\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"Beneficiencia\",\n  \"direccion\": {\n    \"calle1\": \"Av Rivadavia\",\n    \"calle2\": \"San Martin\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Juan\",\n      \"apellido\": \"Pérez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491161230142\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"info@caritas.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"lautaro.corfield@gmail.com\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1392,
+        304
+      ],
+      "id": "d5f9ddfa-5d69-49f6-8c03-8fa8e2ca428a",
+      "name": "Post Caritas ID:1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/entidadBeneficiaria",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"razonSocial\": \"Comedor el SOL\",\n  \"tipo\": \"ONG\", \n  \"rubro\": \"COmedor\",\n  \"direccion\": {\n    \"calle1\": \"Av el SOL\",\n    \"calle2\": \"San Martin\",\n    \"altura\": 1700,\n    \"sinAltura\": false,\n    \"piso\": 1,\n    \"cuerpo\": 0,\n    \"departamento\": \"C\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"representantes\": [\n    {\n      \"nombre\": \"Martina\",\n      \"apellido\": \"Gomez\",\n      \"nroDocumento\": 30123456\n    }\n  ],\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"WHATSAPP\", \n      \"valor\": \"+5491161230142\"\n    },\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"contacto@comedorlossoles.org\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"EMAIL\",\n    \"valor\": \"lautaro.corfield@gmail.com\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1184,
+        304
+      ],
+      "id": "c9ce4610-2be5-42fd-b73e-c3f5c667a5ff",
+      "name": "Post Hogar el Sol ID:3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/api/necesidades",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Mesa\",\n  \"cantidad\": 2,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 30\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1408,
+        560
+      ],
+      "id": "9b026c86-3add-4b8c-8632-eee159be201c",
+      "name": "Necsidad Mesa"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/api/necesidades",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Arroz\",\n  \"cantidad\": 10,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 30\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1168,
+        560
+      ],
+      "id": "3685cb40-097f-4277-8c64-d9971cfd9db5",
+      "name": "Necsidad Arroz"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/api/necesidades",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"entidadBeneficiariaId\": 1,\n  \"subCategoriaNombre\": \"Silla\",\n  \"cantidad\": 4,\n  \"fechaLimite\": \"2026-12-31\",\n  \"tipoNecesidad\": \"RECURRENTE\",\n  \"diasRecurrencia\": 30\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1408,
+        800
+      ],
+      "id": "0b3f32f1-0935-4f29-acb3-d761103aeed0",
+      "name": "Necsidad Silla"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -432,
+        512
+      ],
+      "id": "a5f2ed17-a1c0-40c2-b09a-6db44b4f61d7",
+      "name": "Lucas dona Arroz"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 1,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -432,
+        96
+      ],
+      "id": "aba4b34c-bee3-46ce-b842-f863964019dc",
+      "name": "German dona Arroz y Fideos"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de muebles en buen estado\",\n  \"bienes\": [\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Silla\",\n      \"descripcion\": \"Silla\",\n      \"foto\": \"silla.jpg\",\n      \"estadoBien\": \"USADO\",\n      \"subCategoria\": {\n        \"categoria\": \"MOBILIARIO\",\n        \"descripcion\": \"Silla\",\n        \"unidad\": \"UNIDADES\"\n      }\n    },\n    {\n      \"tipo\": \"DURADERO\",\n      \"nombre\": \"Mesa\",\n      \"descripcion\": \"Mesa\",\n      \"foto\": \"Mesa.jpg\",\n      \"estadoBien\": \"USADO\",\n      \"subCategoria\": {\n        \"categoria\": \"MOBILIARIO\",\n        \"descripcion\": \"Mesa\",\n        \"unidad\": \"UNIDADES\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -432,
+        304
+      ],
+      "id": "3c8fb1e5-629a-4a9f-8c7d-786c12d5b83c",
+      "name": "Mati dona silla, mesa y arroz"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donantes/humano",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"nombre\": \"Matii\",\n  \"apellido\": \".S\",\n  \"genero\": \"MASCULINO\",\n  \"fechaNacimiento\": \"1990-01-15T00:00:00.000+00:00\",\n  \"edad\": 34,\n  \"nroDocumento\": \"12345678\",\n  \"direccion\": {\n    \"calle1\": \"una calle\",\n    \"calle2\": \"Piso 2\",\n    \"altura\": 742,\n    \"sinAltura\": false,\n    \"piso\": 2,\n    \"cuerpo\": 0,\n    \"departamento\": \"A\",\n    \"ciudadNombre\": \"CABA\",\n    \"provinciaNombre\": \"Buenos Aires\",\n    \"paisNombre\": \"Argentina\"\n  },\n  \"mediosDeContacto\": [\n    {\n      \"medio\": \"EMAIL\",\n      \"valor\": \"mati@mail.com\"\n    }\n  ],\n  \"medioPredeterminado\": {\n    \"medio\": \"WHATSAPP\",\n    \"valor\": \"+5491161230142\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1216,
+        -32
+      ],
+      "id": "623857d0-2b05-4894-9529-9ed06e61d0b8",
+      "name": "POST Matii ID:2"
+    },
+    {
+      "parameters": {
+        "content": "## Creación de Donaciones",
+        "height": 672,
+        "width": 336,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -544,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "917d4bf6-b031-48f8-bde2-816163dde868",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## Creación de Necesidades\n",
+        "height": 464,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1488,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "a3ec735a-3a75-4bfc-8b51-b6b6b99c801a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "\nsegmentada id:1 Arroz\nsegmentada id:2 Fideos\n\n\n\n\n\n\n\n\n\nsegmentada id:3 Silla\n\nsegmentada id:4 Mesa\n\nsegmentada id:5 Arroz\n\n\n\n\n\n\n\n\n\n\n\n\nsegmentada id:6 Arroz\n ",
+        "height": 672,
+        "width": 192,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "875b7a63-6fe1-474e-9932-2d157d8c55cf",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 5,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "bdf180a3-3d15-43e6-afe5-4589d8893bea",
+      "name": "Algoritmo de Asignacion"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=3",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        208
+      ],
+      "id": "fe9a10e9-3002-4501-ac39-61fea74cdb43",
+      "name": "Algoritmo de Asignacion2"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=4",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        336
+      ],
+      "id": "46705e5b-5de8-485e-9304-727c26847020",
+      "name": "Algoritmo de Asignacion3"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=5",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        464
+      ],
+      "id": "293a6a1b-26b0-4c14-873a-979d3d5ac37f",
+      "name": "Algoritmo de Asignacion4"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=6",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        576
+      ],
+      "id": "c54e5d5b-12b9-4bac-a51f-8a3140a458f2",
+      "name": "Algoritmo de Asignacion5"
+    },
+    {
+      "parameters": {
+        "content": "## Selecciono a que Entidad Beneficiaria voy a donar a traves del algoritmo (segun id de Donacion Segmentada)",
+        "height": 880,
+        "width": 448,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -32,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "0b5b1be1-a9fa-46c5-93fd-c25fca524687",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        0
+      ],
+      "id": "6efabe42-d4a3-4b1d-bd37-fcf13d9e5d36",
+      "name": "Asignacion"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        112
+      ],
+      "id": "4352f9c7-8b55-4391-ad14-6cddaf4548ef",
+      "name": "Asignacion1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        224
+      ],
+      "id": "b3f90854-711b-48fc-b4da-ef6b766abd65",
+      "name": "Asignacion2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        336
+      ],
+      "id": "08ea5e6a-67a3-402f-986b-4963ca09128b",
+      "name": "Asignacion3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        448
+      ],
+      "id": "924adda9-c8b9-41d5-9402-0823f0374955",
+      "name": "Asignacion4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/matchmaking/asignar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $json.donacionSegmentadaId }} ,\n  \"entidadBeneficiariaId\": {{ $json.entidadesPropuestas[0].id }} \n} ",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        704,
+        560
+      ],
+      "id": "c7a97db6-dc1c-4ab2-a6e9-b0d10d04c172",
+      "name": "Asignacion5"
+    },
+    {
+      "parameters": {
+        "content": "## Asigno la donación a la entidad",
+        "height": 880,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "bcebafa1-15c2-4af7-9f85-0b6828dee29d",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        0
+      ],
+      "id": "b9b097dc-0153-47e1-9372-9ba99124b200",
+      "name": "Entregar"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion1').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        112
+      ],
+      "id": "98e5a88c-0f15-49ab-8520-08afd212cb41",
+      "name": "Entregar1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion2').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        224
+      ],
+      "id": "39e0dabf-9c22-464e-a558-5eae0172f8e2",
+      "name": "Entregar2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion4').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        448
+      ],
+      "id": "6c122f65-2910-4079-81e9-804f8667a6ba",
+      "name": "Entregar4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion5').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        560
+      ],
+      "id": "85b514cf-5da4-4680-ae0b-dc435a25d3db",
+      "name": "Entregar5"
+    },
+    {
+      "parameters": {
+        "content": "## Finalmente se entrega la donacion",
+        "height": 880,
+        "color": "#F7BFE8"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "000154ea-7584-462e-b38d-c2b19206108f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -800,
+        560
+      ],
+      "id": "69bdec72-e160-4dba-b471-b5f38241d5e5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "21687f66-3a0c-4bb9-bc8a-9a1978c0cf7c",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        16
+      ],
+      "id": "bf42d80c-eb0d-44e4-bcfa-94bd735b9cb9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "620fb93c-c0b2-4a81-8049-12dcb2e9a140",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        128
+      ],
+      "id": "0fc7e8f2-12a9-407b-b3b1-7cde27785260",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "620fb93c-c0b2-4a81-8049-12dcb2e9a140",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        240
+      ],
+      "id": "f5c8e715-ab66-465d-9b04-937f830a2696",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "620fb93c-c0b2-4a81-8049-12dcb2e9a140",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        352
+      ],
+      "id": "0cf38213-66a7-416e-9988-953349cec0b7",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "620fb93c-c0b2-4a81-8049-12dcb2e9a140",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        464
+      ],
+      "id": "d49e03e2-b7e4-4f2e-81d3-076f15a17caa",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "620fb93c-c0b2-4a81-8049-12dcb2e9a140",
+              "leftValue": "={{ $json.entidadesPropuestas[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        576
+      ],
+      "id": "7d89214c-20c6-4bcc-b360-cf036edb3a1b",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/matchmaking/ranking?donacionSegmentadaId=2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"donanteId\": 3,\n  \"descripcion\": \"Donación de alimentos\",\n  \"bienes\": [\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Arroz\",\n      \"descripcion\": \"paquete de arroz doble carolina\",\n      \"foto\": \"arroz.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Arroz\",\n        \"unidad\": \"KG\"\n      }\n    },\n    {\n      \"tipo\": \"PERECEDERO\",\n      \"nombre\": \"Fideos\",\n      \"descripcion\": \"paquete de fideos mostachol\",\n      \"foto\": \"fideos.jpg\",\n      \"fechaVencimiento\": \"2026-12-31T23:59:59.000Z\",\n      \"subCategoria\": {\n        \"categoria\": \"ALIMENTOS\",\n        \"descripcion\": \"Fideos\",\n        \"unidad\": \"KG\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        80
+      ],
+      "id": "a80c8ea2-c284-4efe-85d9-e90fa9eb7bad",
+      "name": "Algoritmo de Asignacion1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/donaciones/entregar",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"donacionSegmentadaId\": {{ $('Algoritmo de Asignacion3').item.json.donacionSegmentadaId }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        944,
+        336
+      ],
+      "id": "cf1d1403-aeb4-4b5a-9e69-d4e8308d4b4a",
+      "name": "Entregar3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Post Lucas ID:1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Caritas ID:1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Lucas ID:1": {
+      "main": [
+        [
+          {
+            "node": "POST Matii ID:2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Caritas ID:1": {
+      "main": [
+        [
+          {
+            "node": "Post Hogar el Sol ID:3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Necsidad Mesa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Hogar el Sol ID:3": {
+      "main": [
+        [
+          {
+            "node": "Necsidad Arroz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Necsidad Mesa": {
+      "main": [
+        [
+          {
+            "node": "Necsidad Silla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Necsidad Silla": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "POST German ID:3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Matii ID:2": {
+      "main": [
+        [
+          {
+            "node": "POST German ID:3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "German dona Arroz y Fideos": {
+      "main": [
+        [
+          {
+            "node": "Mati dona silla, mesa y arroz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mati dona silla, mesa y arroz": {
+      "main": [
+        [
+          {
+            "node": "Lucas dona Arroz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lucas dona Arroz": {
+      "main": [
+        [
+          {
+            "node": "Algoritmo de Asignacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Necsidad Arroz": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Algoritmo de Asignacion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Algoritmo de Asignacion3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion3": {
+      "main": [
+        [
+          {
+            "node": "Algoritmo de Asignacion4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion4": {
+      "main": [
+        [
+          {
+            "node": "Algoritmo de Asignacion5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion5": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion": {
+      "main": [
+        [
+          {
+            "node": "Entregar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion1": {
+      "main": [
+        [
+          {
+            "node": "Entregar1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion2": {
+      "main": [
+        [
+          {
+            "node": "Entregar2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion3": {
+      "main": [
+        [
+          {
+            "node": "Entregar3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion4": {
+      "main": [
+        [
+          {
+            "node": "Entregar4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignacion5": {
+      "main": [
+        [
+          {
+            "node": "Entregar5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "German dona Arroz y Fideos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Asignacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Asignacion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Asignacion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Asignacion3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Asignacion4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Asignacion5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Algoritmo de Asignacion1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Algoritmo de Asignacion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3ab376ed-36a4-4292-ab04-2a71c42d3705",
+  "meta": {
+    "instanceId": "1094bd80f7d40b5cb105a2d2f594aa89adea99681daf43a944d8d2ed09e2827a"
+  },
+  "nodeGroups": [],
+  "id": "OPqrZnVsomgRzsny",
+  "tags": []
+}

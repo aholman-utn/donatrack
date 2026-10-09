@@ -12,6 +12,7 @@ import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.persona.PersonaJuridica;
 import com.tp.donatrack.domain.ubicacion.Direccion;
 import com.tp.donatrack.repositories.DonacionRepository;
+import com.tp.donatrack.repositories.DonacionSegmentadaRepository;
 import com.tp.donatrack.tasks.DonacionesListasParaEntregarCron;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.*;
  * Transport and notifications are mocked: no external messages are sent. */
 class LogisticaStateIntegrationTest {
     private DonacionRepository repository;
+    private DonacionSegmentadaRepository segmentadaRepository;
     private Donacion donacion;
     private DonacionSegmentada segmento;
     private PersonaJuridica persona;
@@ -38,8 +41,14 @@ class LogisticaStateIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // Mocks iniciales
         repository = mock(DonacionRepository.class);
+        segmentadaRepository = mock(DonacionSegmentadaRepository.class); // <-- Mockeamos el nuevo Repositorio
+
         when(repository.save(any(Donacion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(segmentadaRepository.save(any(DonacionSegmentada.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Setup de la Donación
         var sub = new SubCategoria(CategoriaBien.MOBILIARIO, "Sillas", Unidad.UNIDADES);
         var bien = new BienDuradero("Silla", "Prueba", null, sub, EstadoBien.NUEVO);
         donacion = new Donacion(null, "Prueba", new Date(), List.of(bien));
@@ -47,14 +56,16 @@ class LogisticaStateIntegrationTest {
         donacion.getDonacionesSegmentadas().getFirst().setId(1L);
         donacion = repository.save(donacion);
         segmento = donacion.getDonacionesSegmentadas().getFirst();
+
         when(repository.findAll()).thenReturn(List.of(donacion));
-        // findSegmentadaById / findDonacionByDonacionesSegmentadaId son métodos
-        // default de la interfaz; Mockito no los ejecuta, por lo que se stubean.
-        when(repository.findSegmentadaById(segmento.getId())).thenReturn(segmento);
         when(repository.findDonacionByDonacionesSegmentadaId(segmento.getId())).thenReturn(donacion);
+
+        when(segmentadaRepository.findById(segmento.getId())).thenReturn(Optional.of(segmento));
+
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Test", "Asignada");
         segmento.listarParaEntrega("Test");
         segmento.setEntidadBeneficiariaAsignadaId(10L);
+
         persona = new PersonaJuridica();
         persona.setId(10L);
         var direccion = new Direccion();
@@ -65,10 +76,13 @@ class LogisticaStateIntegrationTest {
         when(entidades.listarPorIds(any())).thenReturn(List.of(new EntidadBeneficiaria(persona)));
         queue = mock(LogisticaQueueClient.class);
         trazabilidad = mock(TrazabilidadService.class);
+
         var service = new DonacionService(repository, mock(DonanteService.class), entidades,
                 mock(DonacionEventPublisher.class));
+
         cron = new DonacionesListasParaEntregarCron(service, entidades, queue);
-        listener = new LogisticaEventListener(repository, trazabilidad);
+
+        listener = new LogisticaEventListener(repository, segmentadaRepository, trazabilidad);
     }
 
     @Test

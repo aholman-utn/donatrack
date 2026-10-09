@@ -36,4 +36,13 @@ public class EnDeposito extends EstadoDonacionSegmentada {
     public void marcarVencida(DonacionSegmentada donacion, String actor) {
         donacion.transicionar(new Vencida(), actor, "Donación marcada como vencida por administrador");
     }
+
+    @Override
+    public void iniciarTraslado(DonacionSegmentada donacion, String actor) {
+        donacion.transicionar(
+                new EnTraslado(),
+                actor,
+                "Camión inició el recorrido de entrega"
+        );
+    }
 }

@@ -6,20 +6,29 @@ import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.repositories.DonacionRepository;
+import com.tp.donatrack.repositories.DonacionSegmentadaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class LogisticaEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(LogisticaEventListener.class);
+
     private final DonacionRepository donacionRepository;
+    private final DonacionSegmentadaRepository donacionSegmentadaRepository;
     private final TrazabilidadService trazabilidadService;
 
-    public LogisticaEventListener(DonacionRepository donacionRepository, TrazabilidadService trazabilidadService) {
+    public LogisticaEventListener(
+            DonacionRepository donacionRepository,
+            DonacionSegmentadaRepository donacionSegmentadaRepository,
+            TrazabilidadService trazabilidadService) {
         this.donacionRepository = donacionRepository;
+        this.donacionSegmentadaRepository = donacionSegmentadaRepository;
         this.trazabilidadService = trazabilidadService;
     }
 
@@ -45,11 +54,15 @@ public class LogisticaEventListener {
     }
 
     private void procesarInicioRuta(EventoLogisticaDTO evento) {
-        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(evento.getDonacionSegmentadaId());
+        DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
         if (segmentada != null) {
-            if (EstadoDonacionSegmentada.EN_PLANIFICACION.equals(segmentada.getEstado())) {
+            if (List.of(EstadoDonacionSegmentada.EN_PLANIFICACION, EstadoDonacionSegmentada.EN_DEPOSITO)
+                    .contains(segmentada.getEstado())
+            ) {
                 segmentada.iniciarTraslado("Sistema (RabbitMQ Listener)");
                 logger.info("Donación segmentada ID {} transicionada a EN_TRASLADO", segmentada.getId());
+
+                donacionSegmentadaRepository.save(segmentada);
 
                 try {
                     trazabilidadService.notificarInicioDeRuta(segmentada);
@@ -65,12 +78,15 @@ public class LogisticaEventListener {
     }
 
     private void procesarEntregaFallida(EventoLogisticaDTO evento) {
-        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(evento.getDonacionSegmentadaId());
+        DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
         if (segmentada != null) {
             if (EstadoDonacionSegmentada.EN_TRASLADO.equals(segmentada.getEstado())) {
                 String motivo = evento.getDetalles() != null ? evento.getDetalles() : "Entrega fallida reportada por logística";
                 segmentada.registrarEntregaFallida("Sistema (RabbitMQ)", motivo);
                 logger.info("Entrega fallida registrada para donación segmentada ID {}", evento.getDonacionSegmentadaId());
+
+                donacionSegmentadaRepository.save(segmentada);
+
                 trazabilidadService.notificarEntregaNoSatisfactoria(segmentada, motivo);
             } else {
                 logger.warn("Transición rechazada. La donación ID {} está en estado {}, no se puede registrar entrega fallida.", segmentada.getId(), segmentada.getEstado());
@@ -81,7 +97,7 @@ public class LogisticaEventListener {
     }
 
     private void procesarEntregaExitosa(EventoLogisticaDTO evento) {
-        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(evento.getDonacionSegmentadaId());
+        DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
 
         if (segmentada != null) {
             if (EstadoDonacionSegmentada.EN_TRASLADO.equals(segmentada.getEstado())) {
@@ -107,10 +123,11 @@ public class LogisticaEventListener {
     }
 
     private void procesarLlegadaADestino(EventoLogisticaDTO evento) {
-        DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(evento.getDonacionSegmentadaId());
+        DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
         if (segmentada != null) {
             segmentada.registrarLlegadaADestino("Sistema (RabbitMQ Listener)");
             logger.info("Donación segmentada ID {} marcada como en destino (esperando confirmación)", segmentada.getId());
+            donacionSegmentadaRepository.save(segmentada);
         } else {
             logger.warn("Donación segmentada ID {} no encontrada localmente", evento.getDonacionSegmentadaId());
         }
