@@ -450,3 +450,112 @@ export RESEND_API_KEY=tu_api_key_aca
 **Nota sobre el sender de prueba:** con la cuenta gratuita de Resend y el sender `onboarding@resend.dev`, solo se pueden enviar emails a la dirección con la que se registró la cuenta. Para enviar a otros destinatarios, se necesita verificar un dominio propio.
 
 **Límites del plan gratuito de Resend:** 100 emails/día, 3.000 emails/mes. La API key no vence.
+
+---
+
+## 🐇 Ver mensajes en la cola (RabbitMQ / CloudAMQP)
+
+Los servicios se comunican de forma asíncrona a través de RabbitMQ (en la nube, vía CloudAMQP). Estas son las colas del sistema:
+
+| Cola | Productor | Consumidor |
+|------|-----------|------------|
+| `notificaciones.queue` | donaciones / incentivos | notificaciones |
+| `logistica.planificar.queue` | donaciones (cron de lotes) | logística |
+| `donaciones.logistica.eventos.queue` | logística (eventos de ruta/entrega) | donaciones |
+
+### Cómo inspeccionar un mensaje manualmente
+
+> **Importante:** el servicio **consumidor** de la cola debe estar **apagado**. Si está corriendo, consume el mensaje al instante (Consumers = 1) y la cola queda vacía, por lo que no vas a poder verlo. Con el consumidor apagado, el mensaje queda retenido (Messages Ready = 1) y se puede leer.
+
+1. Entrar al **RabbitMQ Manager** de CloudAMQP: desde el panel de la instancia (`cloudamqp.com` → instancia → **RabbitMQ Manager**).
+2. Ir a **Queues** y confirmar que la cola a probar tiene **Consumers = 0** (es decir, el servicio consumidor está apagado).
+3. Abrir la cola, por ejemplo `donaciones.logistica.eventos.queue`.
+4. En **Publish message**, completar:
+   - **Delivery mode:** `Persistent`
+   - **Properties:** `{ "content_type": "application/json" }` *(o dejarlo vacío)*
+   - **Payload encoding:** `String`
+   - **Payload:**
+     ```json
+     {"tipoEvento":"INICIO_RUTA","donacionSegmentadaId":1,"entidadBeneficiariaId":10,"timestamp":"2026-10-05T12:00:00","detalles":"Prueba manual"}
+     ```
+   - Clic en **Publish message**.
+5. Volver a **Queues**: la cola debería mostrar **Messages Ready = 1**.
+6. Abrir la cola → sección **Get messages**:
+   - **Mode:** `Reject and Requeue` *(lee el mensaje sin eliminarlo de la cola)*
+   - **Encoding:** `Auto string/base64`
+   - **Messages:** `1`
+   - Clic en **Get message(s)** → se muestra el payload JSON publicado.
+
+> **Nota:** el campo **Properties** espera JSON (`{ "content_type": "application/json" }`). Escribirlo como texto plano (`content_type = application/json`) produce el error *"input must be json"*.
+
+### Probar el flujo desde el código (productor real)
+
+Esta prueba levanta `servicio-donaciones` y hace que **publique un mensaje real** en `logistica.planificar.queue` (lo mismo que haría el cron en producción), en vez de publicarlo a mano. Sirve para verificar de punta a punta que el servicio se conecta a la base, encuentra las donaciones y las encola.
+
+El cron real corre a las 8:00 AM. Para no esperar, el script lo dispara **apenas arranca el servicio** mediante la propiedad `donatrack.cron.donaciones-listas.ejecutar-al-iniciar=true` (por defecto está en `false`, así que en producción no cambia nada).
+
+#### 1. Configurar credenciales locales (una sola vez)
+
+Las credenciales no se versionan. Creá el archivo **`herramientas/.env.local`** (está en `.gitignore`) con tus valores:
+
+```dotenv
+# Base de datos (TiDB Cloud / MySQL)
+DB_URL="jdbc:mysql://<HOST>:4000/donatrack?sslMode=VERIFY_IDENTITY"
+DB_USER="<USUARIO>.root"
+DB_PASSWORD="<TU_PASSWORD>"
+DB_DDL_AUTO=update
+```
+
+> Los valores de `HOST`, `USUARIO` y `PASSWORD` son los mismos que usás para conectarte a la base desde Workbench/DBeaver (pestaña *Connect* del cluster en TiDB Cloud). La conexión a CloudAMQP (RabbitMQ) ya viene configurada por defecto en `application.properties`.
+
+#### 2. Cargar datos de prueba
+
+El productor solo encola si hay al menos una donación segmentada en estado `LISTA_PARA_ENTREGAR` con una entidad beneficiaria que tenga dirección válida. El script SQL `herramientas/seed-prueba-cola.sql` deja esa fila lista (IDs fijos 9001).
+
+Con el **servicio apagado**, ejecutá el contenido de `herramientas/seed-prueba-cola.sql` en tu cliente de base (Workbench/DBeaver) conectado a `donatrack`. Si las tablas todavía no existen, levantá el servicio una vez (paso 3) para que Hibernate las cree y después corré el seed.
+
+#### 3. Dejar apagado el consumidor
+
+Para que el mensaje **quede retenido** y se pueda ver, el consumidor (`servicio-logistica`) debe estar apagado: en el RabbitMQ Manager, la cola `logistica.planificar.queue` debe tener **Consumers = 0**. Si hay una instancia desplegada (Render) o de un compañero conectada al mismo CloudAMQP, va a consumir el mensaje al instante.
+
+#### 4. Levantar el productor
+
+```bash
+./herramientas/rabbit-producer-test.sh up     # compila commons, levanta donaciones y dispara el envío al arrancar
+./herramientas/rabbit-producer-test.sh logs    # seguir el log en vivo (Ctrl+C para salir)
+```
+
+En el log vas a ver:
+
+```
+Started DonatrackApplication ...
+Ejecución inmediata al iniciar habilitada (...ejecutar-al-iniciar=true).
+Iniciando procesamiento de cron para donaciones listas para entregar...
+Se enviaron exitosamente 1 donaciones.
+```
+
+El script además deja el cron acelerado a **cada minuto** como respaldo, así que seguirá publicando un mensaje por minuto mientras el servicio esté arriba.
+
+#### 5. Ver el mensaje en CloudAMQP
+
+En el RabbitMQ Manager, abrí `logistica.planificar.queue`:
+- Si nadie la consume, **Messages Ready** crece (1 por minuto) y podés leer el payload con **Get messages** (Mode `Reject and Requeue`).
+- Si **Consumers ≥ 1**, el mensaje se consume al instante: igual podés confirmar el flujo mirando el gráfico **Message rates** (picos de *Publish*).
+
+#### 6. Apagar el productor al terminar
+
+```bash
+./herramientas/rabbit-producer-test.sh down
+```
+
+> **Limpieza de datos:** el final de `herramientas/seed-prueba-cola.sql` tiene los `DELETE` para borrar las filas de prueba (IDs 9001) cuando termines.
+
+#### Problemas comunes
+
+| Síntoma en el log | Causa | Solución |
+|-------------------|-------|----------|
+| `Access denied for user ... (using password: YES)` | Usuario/contraseña incorrectos en `.env.local` | Copiar el usuario y contraseña exactos desde la pestaña *Connect* de TiDB (los mismos del Workbench). |
+| `Access denied ... (using password: NO)` | No se cargó `DB_PASSWORD` | Verificar que `herramientas/.env.local` exista y tenga la variable. |
+| `No se encontraron donaciones listas para entregar` | No hay datos de prueba | Correr `herramientas/seed-prueba-cola.sql`. |
+| `Se descartaron N donaciones ... por no tener dirección` | La entidad no tiene dirección válida | Revisar que el seed haya insertado la dirección (`calle1` no vacío). |
+| `symbol: method getNombre() ... class Nivel` | Artefacto `commons` viejo en `~/.m2` | El script ya reinstala `commons`; si falla, correr `./mvnw -pl commons -am install -DskipTests`. |
