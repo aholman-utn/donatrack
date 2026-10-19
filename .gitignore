@@ -36,3 +36,11 @@ build/
 ### Secrets ###
 SECRETS.md
 .env
+.env.local
+**/.env.local
+
+### Archivos temporales de los scripts de prueba de RabbitMQ ###
+.rabbit-consumer-*.pid
+.rabbit-consumer-*.log
+.rabbit-producer-*.pid
+.rabbit-producer-*.log
