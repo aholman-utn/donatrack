@@ -6,6 +6,9 @@ import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.commons.dtos.logistica.DonacionSegmentadaListaParaEntregarALogisticaDTO;
 import com.tp.donatrack.services.DonacionService;
 import com.tp.donatrack.services.EntidadBeneficiariaService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -24,6 +27,14 @@ public class DonacionesListasParaEntregarCron {
     private final DonacionService donacionService;
     private final LogisticaQueueClient logisticaQueueClient;
 
+    /**
+     * Cuando es {@code true}, el procesamiento se dispara una vez apenas la
+     * aplicación termina de arrancar, sin esperar al horario del cron. Pensado
+     * para pruebas manuales; en producción debe quedar en {@code false}.
+     */
+    @Value("${donatrack.cron.donaciones-listas.ejecutar-al-iniciar:false}")
+    private boolean ejecutarAlIniciar;
+
     public DonacionesListasParaEntregarCron(
             DonacionService donacionService,
             EntidadBeneficiariaService entidadBeneficiariaService,
@@ -32,6 +43,21 @@ public class DonacionesListasParaEntregarCron {
         this.donacionService = donacionService;
         this.entidadBeneficiariaService = entidadBeneficiariaService;
         this.logisticaQueueClient = logisticaQueueClient;
+    }
+
+    /**
+     * Dispara el procesamiento una sola vez apenas la aplicación está lista,
+     * solo si {@code donatrack.cron.donaciones-listas.ejecutar-al-iniciar=true}.
+     * Permite probar la publicación en la cola sin esperar al horario del cron.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void ejecutarAlIniciarSiCorresponde() {
+        if (!ejecutarAlIniciar) {
+            return;
+        }
+        logger.info("Ejecución inmediata al iniciar habilitada "
+                + "(donatrack.cron.donaciones-listas.ejecutar-al-iniciar=true).");
+        enviarDonacionesListasParaEntregar();
     }
 
     // Se ejecuta todos los días a las 8:00 AM.
