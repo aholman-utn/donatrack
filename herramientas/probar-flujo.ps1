@@ -136,7 +136,7 @@ $entidad = Invoke-RestMethod -Method Post "$D/entidadBeneficiaria" -ContentType 
     mediosDeContacto    = @(@{ medio = "EMAIL"; valor = "comedor@mail.com" })
     medioPredeterminado = @{ medio = "EMAIL"; valor = "comedor@mail.com" }
 } | ConvertTo-Json -Depth 5)
-$entidadId  = $entidad.datosDeEntidad.id
+$entidadId  = $entidad.idEntidadBeneficiaria
 $direccion  = "Av. Rivadavia 1234"
 Write-Ok "Entidad id=$entidadId (donantes y entidades comparten el contador Persona.nextId)"
 
@@ -303,10 +303,9 @@ if ($null -eq $envio) {
     Write-Falla "Mira los logs de servicio-logistica: probablemente 'No hay camiones o choferes'."
     exit 1
 }
-# El cast explicito falla ruidosamente si esto no es un escalar,
-# en vez de armar una URL invalida y devolver un 500 opaco.
-$envioId = [int] $envio.id
-$rutaId  = [int] $envio.rutaId
+
+$envioId = [String] $envio.id
+$rutaId  = [String] $envio.rutaId
 Write-Ok "Ruta id=$rutaId, envio id=$envioId (donacion segmentada $segId), estado=$($envio.estado)"
 
 if ($EsperaDuplicadosSegundos -gt 0) {

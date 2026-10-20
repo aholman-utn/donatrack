@@ -45,6 +45,18 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    container_name: mongodb_DonaTrack
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=donatrack
+    volumes:
+      - mongodb_data:/data/db
 volumes:
   n8n_data:
   mysql_data:
+  mongodb_data:

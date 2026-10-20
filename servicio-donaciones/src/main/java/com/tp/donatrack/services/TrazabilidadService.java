@@ -21,6 +21,7 @@ import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.List;
  * y del envío de notificaciones ante eventos de logística.
  */
 @Service
+@Transactional
 public class TrazabilidadService {
 
     private static final Logger logger = LoggerFactory.getLogger(TrazabilidadService.class);
@@ -117,11 +119,17 @@ public class TrazabilidadService {
             Long idDonacion,
             Long idSegmento,
             String actor) {
-        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = donacion.getDonacionesSegmentadas().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
+
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
         segmentada.listarParaEntrega(actor);
+        donacionRepository.save(donacion); // Persistir el cambio
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
@@ -129,11 +137,17 @@ public class TrazabilidadService {
             Long idDonacion,
             Long idSegmento,
             String actor) {
-        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = donacion.getDonacionesSegmentadas().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
+
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_PLANIFICACION)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
         segmentada.solicitarPlanificacion(actor);
+        donacionRepository.save(donacion);
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
@@ -141,11 +155,16 @@ public class TrazabilidadService {
             Long idDonacion,
             Long idSegmento,
             String actor) {
-        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = donacion.getDonacionesSegmentadas().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_TRASLADO)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
         segmentada.iniciarTraslado(actor);
+        donacionRepository.save(donacion);
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
@@ -154,11 +173,16 @@ public class TrazabilidadService {
             Long idSegmento,
             String actor,
             String justificacion) {
-        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = donacion.getDonacionesSegmentadas().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGA_FALLIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
         segmentada.registrarEntregaFallida(actor, justificacion);
+        donacionRepository.save(donacion);
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
@@ -166,11 +190,16 @@ public class TrazabilidadService {
             Long idDonacion,
             Long idSegmento,
             String actor) {
-        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = donacion.getDonacionesSegmentadas().stream()
+                .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.VENCIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
         segmentada.marcarVencida(actor);
+        donacionRepository.save(donacion);
         return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
     }
 
@@ -204,6 +233,12 @@ public class TrazabilidadService {
         comprobanteRepository.save(comprobante);
 
         segmentada.setComprobanteRecepcionDonacion(comprobante);
+        // La recepción llega desde el listener de RabbitMQ, fuera del flujo HTTP.
+        // Guardar la donación raíz persiste tanto el nuevo estado/historial del
+        // segmento como la relación con el comprobante en todos los repositorios.
+        if (donacion != null) {
+            donacionRepository.save(donacion);
+        }
 
         if (donacion != null && donacion.getDonante() != null) {
             notificarEntregaExitosa(donacion, segmentada, comprobante.getId());

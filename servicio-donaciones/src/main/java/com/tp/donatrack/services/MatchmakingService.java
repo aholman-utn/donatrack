@@ -2,6 +2,7 @@ package com.tp.donatrack.services;
 
 import com.tp.donatrack.domain.asignacion.ResultadoMatchmaking;
 import com.tp.donatrack.domain.asignacion.ServicioMatchmaking;
+import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
@@ -106,7 +107,18 @@ public class MatchmakingService {
                     "No se encontró la entidad beneficiaria con ID: " + entidadBeneficiariaId);
         }
 
+        // Cargar las necesidades de la entidad (al estar @Transient en la entidad no se cargan solas)
+        List<NecesidadMaterial> necesidades = necesidadRepository.findByEntidadBeneficiariaId(entidad.getIdEntidadBeneficiaria());
+        entidad.setNececidades(necesidades);
+
         segmentada.asignar(entidad, "Administrador");
+
+        // Persistir el cambio de estado de la donación y de la necesidad satisfecha
+        Donacion donacion = donacionRepository.findDonacionByDonacionesSegmentadaId(donacionSegmentadaId);
+        if (donacion != null) {
+            donacionRepository.save(donacion);
+        }
+        necesidadRepository.saveAll(necesidades);
     }
 
     private ResultadoMatchmakingDTO mapearResultado(DonacionSegmentada segmentada, ResultadoMatchmaking resultado) {
