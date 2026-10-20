@@ -26,7 +26,7 @@ public class ChoferService {
     }
 
     @Transactional(readOnly = true)
-    public Chofer buscarChoferPorId(Long id) {
+    public Chofer buscarChoferPorId(String id) {
         if (id == null) {
             return null;
         }

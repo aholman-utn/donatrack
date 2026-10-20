@@ -1,37 +1,31 @@
 package com.tp.donatrack.logistica.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "envios")
+@Document(collection = "envíos")
 public class Envio {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parada_id")
     @JsonIgnore
+    @Transient
     private Parada parada;
 
-    @Column(name = "donacion_segmentada_id")
     private Long donacionSegmentadaId;
 
-    @Column(name = "entidad_beneficiaria_id")
     private Long entidadBeneficiariaId;
 
-    @Column(name = "ruta_id")
-    private Long rutaId;
+    private String rutaId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
     private EstadoEnvio estado;
 
     public void registrarEnDestino() {

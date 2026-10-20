@@ -1,21 +1,19 @@
 package com.tp.donatrack.logistica.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "camiones")
+@Document(collection = "camiones")
 public class Camion {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id = null;
 
-    @Column(nullable = false, unique = true, length = 20)
     private String patente;
 
     private String marca;
@@ -24,6 +22,5 @@ public class Camion {
     private double volumen;
     private double altura;
 
-    @Column(name = "capacidad_carga")
     private double capacidadCarga;
 }

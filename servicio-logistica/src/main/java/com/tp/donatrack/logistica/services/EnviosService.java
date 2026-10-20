@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -46,7 +47,9 @@ public class EnviosService {
         return envioRepository.save(envio);
     }
 
-    public void registrarLlegadaADestino(Long envioId) {
+
+
+    public void registrarLlegadaADestino(String envioId) {
         Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
@@ -55,7 +58,7 @@ public class EnviosService {
         envio.registrarEnDestino();
         envioRepository.save(envio);
 
-        Camion camionResponsable = buscarCamionPorEnvio(envioId);
+        Camion camionResponsable = buscarCamionPorEnvio(envio.getDonacionSegmentadaId().toString());
         String infoCamion = (camionResponsable != null)
                 ? "Patente: " + camionResponsable.getPatente()
                 : "Vehículo no identificado";
@@ -80,7 +83,8 @@ public class EnviosService {
         donacionesQueueClient.publicarEvento(dto);
     }
 
-    public void registrarEntregaExitosa(Long envioId, String detallesExtra) {
+
+    public void registrarEntregaExitosa(String envioId, String detallesExtra) {
         Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
@@ -116,7 +120,7 @@ public class EnviosService {
         donacionesQueueClient.publicarEvento(dto);
     }
 
-    public void registrarEntregaFallida(Long envioId, String motivo) {
+    public void registrarEntregaFallida(String envioId, String motivo) {
         Envio envio = buscarEnvioPorId(envioId);
         if (envio == null) {
             throw new IllegalArgumentException("No se encontró el envío con ID: " + envioId);
@@ -150,7 +154,7 @@ public class EnviosService {
         return envioRepository.findAll();
     }
 
-    private Camion buscarCamionPorEnvio(Long envioId) {
+    private Camion buscarCamionPorEnvio(String envioId) {
         Envio envio = buscarEnvioPorId(envioId);
 
         if (envio != null && envio.getRutaId() != null) {
@@ -164,8 +168,13 @@ public class EnviosService {
     }
 
     @Transactional(readOnly = true)
-    public Envio buscarEnvioPorId(Long id) {
+    public Envio buscarEnvioPorId(String id) {
         if (id == null) return null;
         return envioRepository.findById(id).orElse(null);
+    }
+
+    public Optional<Envio> buscarEnvioPorSegmentada(Long id) {
+        if (id == null) return Optional.empty();
+        return envioRepository.findByDonacionSegmentadaId(id);
     }
 }

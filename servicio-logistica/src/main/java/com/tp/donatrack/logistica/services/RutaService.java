@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -78,8 +79,8 @@ public class RutaService {
                     parada.setRuta(ruta);
                     List<Long> enviosRealesIds = new ArrayList<>();
 
-                    if (parada.getEnviosIds() != null) {
-                        for (Long donacionSegId : parada.getEnviosIds()) {
+                    if (parada.getDonacionesSegmentadasIds() != null) {
+                        for (Long donacionSegId : parada.getDonacionesSegmentadasIds()) {
 
                             Long entidadId = loteDonaciones.stream()
                                     .filter(dto -> dto.donacionSegmentadaId().equals(donacionSegId))
@@ -95,10 +96,10 @@ public class RutaService {
 
                             Envio envioGuardado = enviosService.registrarEnvio(nuevoEnvio);
                             parada.getEnvios().add(envioGuardado);
-                            enviosRealesIds.add(envioGuardado.getId());
+                            enviosRealesIds.add(envioGuardado.getDonacionSegmentadaId());
                         }
                     }
-                    parada.setEnviosIds(enviosRealesIds);
+                    parada.setDonacionesSegmentadasIds(enviosRealesIds);
                 }
             }
         }
@@ -117,13 +118,13 @@ public class RutaService {
 
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
-                if (parada.getEnviosIds() != null) {
-                    for (Long envioId : parada.getEnviosIds()) {
-                        Envio envio = enviosService.buscarEnvioPorId(envioId);
-                        if (envio != null) {
-                            envio.setEstado(EstadoEnvio.ASIGNACION_REALIZADA);
-                            envio.setRutaId(ruta.getId());
-                            enviosService.registrarEnvio(envio);
+                if (parada.getDonacionesSegmentadasIds() != null) {
+                    for (Long envioId : parada.getDonacionesSegmentadasIds()) {
+                        Optional<Envio> envio = enviosService.buscarEnvioPorSegmentada(envioId);
+                        if (envio.isPresent()) {
+                            envio.get().setEstado(EstadoEnvio.ASIGNACION_REALIZADA);
+                            envio.get().setRutaId(ruta.getId());
+                            enviosService.registrarEnvio(envio.get());
                         }
                     }
                 }
@@ -133,7 +134,7 @@ public class RutaService {
         return rutaRepository.save(ruta);
     }
 
-    public void iniciarRuta(Long rutaId) {
+    public void iniciarRuta(String rutaId) {
         Ruta ruta = buscarRutaPorId(rutaId);
         if (ruta == null) {
             throw new IllegalArgumentException("No se encontró la ruta con ID: " + rutaId);
@@ -151,17 +152,17 @@ public class RutaService {
 
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
-                if (parada.getEnviosIds() != null) {
-                    for (Long envioId : parada.getEnviosIds()) {
-                        Envio envio = enviosService.buscarEnvioPorId(envioId);
-                        if (envio != null) {
-                            envio.setEstado(EstadoEnvio.EN_TRASLADO);
-                            enviosService.registrarEnvio(envio);
+                if (parada.getDonacionesSegmentadasIds() != null) {
+                    for (Long envioId : parada.getDonacionesSegmentadasIds()) {
+                        Optional<Envio> envio = enviosService.buscarEnvioPorSegmentada(envioId);
+                        if (envio.isPresent()) {
+                            envio.get().setEstado(EstadoEnvio.EN_TRASLADO);
+                            enviosService.registrarEnvio(envio.get());
 
                             EventoLogistica evento = EventoLogistica.builder()
                                     .tipoEvento("INICIO_RUTA")
-                                    .donacionSegmentadaId(envio.getDonacionSegmentadaId())
-                                    .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                                    .donacionSegmentadaId(envio.get().getDonacionSegmentadaId())
+                                    .entidadBeneficiariaId(envio.get().getEntidadBeneficiariaId())
                                     .timestamp(LocalDateTime.now())
                                     .detalles("Patente del camión: " + patente + ", Chofer ID: " + (ruta.getChofer() != null ? ruta.getChofer().getId() : "N/A"))
                                     .build();
@@ -170,8 +171,8 @@ public class RutaService {
 
                             EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
                                     .tipoEvento(TipoEventoLogistica.INICIO_RUTA)
-                                    .donacionSegmentadaId(envio.getDonacionSegmentadaId())
-                                    .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
+                                    .donacionSegmentadaId(envio.get().getDonacionSegmentadaId())
+                                    .entidadBeneficiariaId(envio.get().getEntidadBeneficiariaId())
                                     .timestamp(evento.getTimestamp())
                                     .detalles(evento.getDetalles())
                                     .build();
@@ -191,8 +192,14 @@ public class RutaService {
     }
 
     @Transactional(readOnly = true)
-    public Ruta buscarRutaPorId(Long id) {
+    public Ruta buscarRutaPorId(String id) {
         if (id == null) return null;
         return rutaRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public Optional<Envio> buscarEnvioPorSegmentada(Long id) {
+        if (id == null) return Optional.empty();
+        return enviosService.buscarEnvioPorSegmentada(id);
     }
 }

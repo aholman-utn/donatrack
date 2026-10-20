@@ -81,26 +81,26 @@ public class LogisticaController {
     }
 
     @PostMapping("/rutas/{id}/iniciar")
-    public ResponseEntity<Void> iniciarRuta(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> iniciarRuta(@PathVariable("id") String id) {
         rutaService.iniciarRuta(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/llegada")
-    public ResponseEntity<Void> registrarLlegada(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> registrarLlegada(@PathVariable("id") String id) {
         enviosService.registrarLlegadaADestino(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/recibir")
-    public ResponseEntity<Void> recibirEnvio(@PathVariable("id") Long id, @RequestBody(required = false) Map<String, String> body) {
+    public ResponseEntity<Void> recibirEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
         String detalles = (body != null) ? body.get("detalles") : null;
         enviosService.registrarEntregaExitosa(id, detalles);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/fallar")
-    public ResponseEntity<Void> fallarEnvio(@PathVariable("id") Long id, @RequestBody(required = false) Map<String, String> body) {
+    public ResponseEntity<Void> fallarEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
         String motivo = (body != null) ? body.get("motivo") : null;
         enviosService.registrarEntregaFallida(id, motivo);
         return ResponseEntity.ok().build();

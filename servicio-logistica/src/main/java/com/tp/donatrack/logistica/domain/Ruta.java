@@ -1,7 +1,8 @@
 package com.tp.donatrack.logistica.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,29 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "rutas")
+@Document(collection = "rutas")
 public class Ruta {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id = null;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "camion_id")
     private Camion camion;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "chofer_id")
     private Chofer chofer;
 
-    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<Parada> paradas = new ArrayList<>();
 
     @Builder.Default
     private Boolean iniciada = false;
 
-    @Column(name = "fecha_creacion")
     @Builder.Default
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 

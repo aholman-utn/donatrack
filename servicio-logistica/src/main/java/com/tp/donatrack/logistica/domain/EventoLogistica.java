@@ -1,7 +1,8 @@
 package com.tp.donatrack.logistica.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
@@ -10,24 +11,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "eventos_logistica")
+@Document(collection = "eventos_logística")
 public class EventoLogistica {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id = null;
 
-    @Column(name = "tipo_evento", nullable = false)
     private String tipoEvento;
 
-    @Column(name = "donacion_segmentada_id")
     private Long donacionSegmentadaId;
 
-    @Column(name = "entidad_beneficiaria_id")
     private Long entidadBeneficiariaId;
 
     private LocalDateTime timestamp;
 
-    @Column(length = 1000)
     private String detalles;
 }

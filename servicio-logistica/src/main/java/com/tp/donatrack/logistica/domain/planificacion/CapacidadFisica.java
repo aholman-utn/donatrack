@@ -108,7 +108,7 @@ public class CapacidadFisica implements Planificacion {
             paradas.add(Parada.builder()
                     .orden(ordenActual++)
                     .direccion(entry.getKey())
-                    .enviosIds(entry.getValue())
+                    .donacionesSegmentadasIds(entry.getValue())
                     .build());
         }
 

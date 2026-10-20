@@ -26,7 +26,7 @@ public class CamionService {
     }
 
     @Transactional(readOnly = true)
-    public Camion buscarCamionPorId(Long id) {
+    public Camion buscarCamionPorId(String id) {
         if (id == null) {
             return null;
         }
