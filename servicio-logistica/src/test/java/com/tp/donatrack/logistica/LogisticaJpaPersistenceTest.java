@@ -93,8 +93,8 @@ public class LogisticaJpaPersistenceTest {
                 .build());
 
         Ruta ruta = Ruta.builder()
-                .camion(camion)
-                .chofer(chofer)
+                .camionId(camion.getId())
+                .choferId(chofer.getId())
                 .iniciada(false)
                 .fechaCreacion(LocalDateTime.now())
                 .build();

@@ -114,8 +114,8 @@ public class CapacidadFisica implements Planificacion {
 
         return Ruta.builder()
                 .paradas(paradas)
-                .camion(camion)
-                .chofer(chofer)
+                .camionId(camion.getId())
+                .choferId(chofer.getId())
                 .iniciada(false)
                 .build();
     }

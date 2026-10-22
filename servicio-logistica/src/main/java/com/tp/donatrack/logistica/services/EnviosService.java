@@ -160,8 +160,8 @@ public class EnviosService {
         if (envio != null && envio.getRutaId() != null) {
             Ruta ruta = rutaService.buscarRutaPorId(envio.getRutaId());
 
-            if (ruta != null && ruta.getCamion() != null) {
-                return camionService.buscarCamionPorId(ruta.getCamion().getId());
+            if (ruta != null && ruta.getCamionId() != null) {
+                return camionService.buscarCamionPorId(ruta.getCamionId());
             }
         }
         return null;

@@ -77,7 +77,7 @@ public class RutaService {
             if (ruta.getParadas() != null) {
                 for (Parada parada : ruta.getParadas()) {
                     parada.setRuta(ruta);
-                    List<Long> enviosRealesIds = new ArrayList<>();
+                    List<String> enviosIds = new ArrayList<>();
 
                     if (parada.getDonacionesSegmentadasIds() != null) {
                         for (Long donacionSegId : parada.getDonacionesSegmentadasIds()) {
@@ -95,11 +95,11 @@ public class RutaService {
                             nuevoEnvio.setEstado(EstadoEnvio.PENDIENTE);
 
                             Envio envioGuardado = enviosService.registrarEnvio(nuevoEnvio);
-                            parada.getEnvios().add(envioGuardado);
-                            enviosRealesIds.add(envioGuardado.getDonacionSegmentadaId());
+                            parada.agregarEnvio(envioGuardado);
+                            enviosIds.add(envioGuardado.getId());
                         }
                     }
-                    parada.setDonacionesSegmentadasIds(enviosRealesIds);
+                    parada.setEnviosIds(enviosIds);
                 }
             }
         }
@@ -114,24 +114,35 @@ public class RutaService {
     }
 
     public Ruta registrarRuta(Ruta ruta) {
+        validarReferencias(ruta);
         ruta.setIniciada(false);
 
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
-                if (parada.getDonacionesSegmentadasIds() != null) {
-                    for (Long envioId : parada.getDonacionesSegmentadasIds()) {
-                        Optional<Envio> envio = enviosService.buscarEnvioPorSegmentada(envioId);
-                        if (envio.isPresent()) {
-                            envio.get().setEstado(EstadoEnvio.ASIGNACION_REALIZADA);
-                            envio.get().setRutaId(ruta.getId());
-                            enviosService.registrarEnvio(envio.get());
+                if (parada.getEnviosIds() != null) {
+                    for (String envioId : parada.getEnviosIds()) {
+                        Envio envio = enviosService.buscarEnvioPorId(envioId);
+                        if (envio == null) {
+                            throw new IllegalArgumentException("No existe el envío indicado: " + envioId);
                         }
+                        envio.setEstado(EstadoEnvio.ASIGNACION_REALIZADA);
+                        envio.setRutaId(ruta.getId());
+                        enviosService.registrarEnvio(envio);
                     }
                 }
             }
         }
 
         return rutaRepository.save(ruta);
+    }
+
+    private void validarReferencias(Ruta ruta) {
+        if (ruta.getCamionId() == null || camionService.buscarCamionPorId(ruta.getCamionId()) == null) {
+            throw new IllegalArgumentException("El camión indicado no existe: " + ruta.getCamionId());
+        }
+        if (ruta.getChoferId() == null || choferService.buscarChoferPorId(ruta.getChoferId()) == null) {
+            throw new IllegalArgumentException("El chofer indicado no existe: " + ruta.getChoferId());
+        }
     }
 
     public void iniciarRuta(String rutaId) {
@@ -143,8 +154,8 @@ public class RutaService {
         ruta.iniciarRuta();
 
         String patente = "DESCONOCIDO";
-        if (ruta.getCamion() != null && ruta.getCamion().getId() != null) {
-            Camion camion = camionService.buscarCamionPorId(ruta.getCamion().getId());
+        if (ruta.getCamionId() != null) {
+            Camion camion = camionService.buscarCamionPorId(ruta.getCamionId());
             if (camion != null) {
                 patente = camion.getPatente();
             }
@@ -152,27 +163,27 @@ public class RutaService {
 
         if (ruta.getParadas() != null) {
             for (Parada parada : ruta.getParadas()) {
-                if (parada.getDonacionesSegmentadasIds() != null) {
-                    for (Long envioId : parada.getDonacionesSegmentadasIds()) {
-                        Optional<Envio> envio = enviosService.buscarEnvioPorSegmentada(envioId);
-                        if (envio.isPresent()) {
-                            envio.get().setEstado(EstadoEnvio.EN_TRASLADO);
-                            enviosService.registrarEnvio(envio.get());
+                if (parada.getEnviosIds() != null) {
+                    for (String envioId : parada.getEnviosIds()) {
+                        Envio envio = enviosService.buscarEnvioPorId(envioId);
+                        if (envio != null) {
+                            envio.setEstado(EstadoEnvio.EN_TRASLADO);
+                            enviosService.registrarEnvio(envio);
 
                             EventoLogistica evento = EventoLogistica.builder()
                                     .tipoEvento("INICIO_RUTA")
-                                    .donacionSegmentadaId(envio.get().getDonacionSegmentadaId())
-                                    .entidadBeneficiariaId(envio.get().getEntidadBeneficiariaId())
+                                    .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                                    .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
                                     .timestamp(LocalDateTime.now())
-                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + (ruta.getChofer() != null ? ruta.getChofer().getId() : "N/A"))
+                                    .detalles("Patente del camión: " + patente + ", Chofer ID: " + (ruta.getChoferId() != null ? ruta.getChoferId() : "N/A"))
                                     .build();
 
                             eventRepository.registrar(evento);
 
                             EventoLogisticaDTO dto = EventoLogisticaDTO.builder()
                                     .tipoEvento(TipoEventoLogistica.INICIO_RUTA)
-                                    .donacionSegmentadaId(envio.get().getDonacionSegmentadaId())
-                                    .entidadBeneficiariaId(envio.get().getEntidadBeneficiariaId())
+                                    .donacionSegmentadaId(envio.getDonacionSegmentadaId())
+                                    .entidadBeneficiariaId(envio.getEntidadBeneficiariaId())
                                     .timestamp(evento.getTimestamp())
                                     .detalles(evento.getDetalles())
                                     .build();

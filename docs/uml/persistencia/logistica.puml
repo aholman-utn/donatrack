@@ -1,0 +1,113 @@
+@startuml logistica
+!include ../_style.puml
+' El DER se lee mejor con líneas rectas que ortogonales
+skinparam linetype polyline
+
+title Persistencia — Servicio de Logística\n
+
+note as LogísticaBD
+  **$oid**: Identificador único (ObjectId) generado por MongoDB.
+  **$numberLong**: Valor numérico de 64 bits (Long) representado como cadena para evitar pérdida de precisión.
+  **$date**: Valor de fecha y hora (Timestamp/Date) persistido en formato estándar.
+end note
+
+package logistica-db {}
+
+package logistica-db.camiones{
+    json Camion {
+        "_id": {"$oid": "String"},
+        "patente": "String",
+        "marca": "String",
+        "modelo": "String",
+        "volumen": "Double",
+        "altura": "Double",
+        "capacidadCarga": "Double",
+        "_class": "String"
+    }
+}
+
+package logistica-db.choferes {
+    json Chofer {
+        "_id": {"$oid": "String"},
+        "nombre": "String",
+        "apellido": "String",
+        "dni": "String",
+        "_class": "String"
+    }
+}
+
+package logistica-db.envios {
+json Envio {
+        "_id": {
+          "$oid": "String"
+        },
+        "donacionSegmentadaId": {
+          "$numberLong": "String"
+        },
+        "entidadBeneficiariaId": {
+          "$numberLong": "String"
+        },
+        "rutaId": "String",
+        "estado": "String",
+        "_class": "String"
+    }
+}
+
+note top of Envio {
+    Recordar que el estado en Dominio esta definido como un Enum
+}
+
+package logistica-db.eventos-logistica {
+    json EventoLogistica {
+        "_id": { "$oid": "String"},
+        "tipoEvento": "String",
+        "donacionSegmentadaId": {"$numberLong": "String"},
+        "entidadBeneficiariaId": {"$numberLong": "String"},
+        "timestamp": {"$date": "String"},
+        "detalles": "String",
+        "_class": "String"
+    }
+}
+
+note top of EventoLogistica {
+    Recordar que el tipoEvento en Dominio esta definido como un Enum
+}
+
+
+package logistica-db.rutas {
+json Ruta {
+  "_id": { "$oid": "String" },
+  "camionId": "String",
+  "choferId": "String",
+  "paradas": [
+    {
+      "orden": "Integer",
+      "direccion": "String",
+      "enviosIds": ["String"]
+    },
+    {
+    }
+  ],
+  "iniciada": "Boolean",
+  "fechaCreacion": {
+    "$date": "String"
+  },
+  "_class": "String"
+
+}
+
+note bottom of Ruta
+  camionId referencia al _id de un documento
+  existente en logistica-db.camiones.
+
+  choferId referencia al _id de un documento
+  existente en logistica-db.choferes.
+
+  Se persisten referencias; los datos completos
+  de Camion y Chofer no se duplican en Ruta.
+end note
+
+' ===================== Notas =====================
+
+
+@enduml

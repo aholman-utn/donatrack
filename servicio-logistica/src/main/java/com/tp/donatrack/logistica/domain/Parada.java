@@ -21,22 +21,19 @@ public class Parada {
     private String direccion;
 
     @Builder.Default
-    private List<Envio> envios = new ArrayList<>();
+    private List<String> enviosIds = new ArrayList<>();
 
+    @JsonIgnore
+    @Transient
     private List<Long> donacionesSegmentadasIds;
 
-    public List<Long> getDonacionesSegmentadasIds() {
-        if (envios != null && !envios.isEmpty()) {
-            return envios.stream().map(Envio::getDonacionSegmentadaId).toList();
-        }
-        return donacionesSegmentadasIds != null ? donacionesSegmentadasIds : new ArrayList<>();
-    }
-
     public void agregarEnvio(Envio envio) {
-        if (this.envios == null) {
-            this.envios = new ArrayList<>();
+        if (this.enviosIds == null) {
+            this.enviosIds = new ArrayList<>();
         }
-        this.envios.add(envio);
-        envio.setParada(this);
+        if (envio.getId() == null) {
+            throw new IllegalArgumentException("El envío debe estar persistido para agregarlo a una parada");
+        }
+        this.enviosIds.add(envio.getId());
     }
 }

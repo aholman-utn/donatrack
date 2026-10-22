@@ -18,9 +18,9 @@ public class Ruta {
     @Id
     private String id = null;
 
-    private Camion camion;
+    private String camionId;
 
-    private Chofer chofer;
+    private String choferId;
 
     @Builder.Default
     private List<Parada> paradas = new ArrayList<>();
