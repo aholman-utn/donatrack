@@ -1,0 +1,53 @@
+services:
+  servicio-donaciones:
+    build:
+      context: .
+      dockerfile: Dockerfile.donaciones
+    container_name: servicio-donaciones
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - donatrack_network
+
+  servicio-incentivos:
+    build:
+      context: .
+      dockerfile: Dockerfile.incentivos
+    container_name: servicio-incentivos
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    networks:
+      - donatrack_network
+
+# TODO: Revisar por qué no funciona el servicio de notificaciones.
+#  servicio-notificaciones:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.notificaciones
+#    container_name: servicio-notificaciones
+#    ports:
+#      - "8082:8082"
+#    env_file:
+#      - .env
+#    networks:
+#      - donatrack_network
+
+  servicio-logistica:
+    build:
+      context: .
+      dockerfile: Dockerfile.logistica
+    container_name: servicio-logistica
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    networks:
+      - donatrack_network
+
+networks:
+  donatrack_network:
+    driver: bridge

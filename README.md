@@ -559,3 +559,22 @@ En el RabbitMQ Manager, abrí `logistica.planificar.queue`:
 | `No se encontraron donaciones listas para entregar` | No hay datos de prueba | Correr `herramientas/seed-prueba-cola.sql`. |
 | `Se descartaron N donaciones ... por no tener dirección` | La entidad no tiene dirección válida | Revisar que el seed haya insertado la dirección (`calle1` no vacío). |
 | `symbol: method getNombre() ... class Nivel` | Artefacto `commons` viejo en `~/.m2` | El script ya reinstala `commons`; si falla, correr `./mvnw -pl commons -am install -DskipTests`. |
+
+---
+
+## 🐳 Docker Compose
+
+Para levantar todos los servicios de la aplicación de forma local usando Docker, podés usar el `docker-compose.yml` de la raíz.
+
+Para que funcione correctamente, es obligatorio tener el archivo `.env` configurado con las variables necesarias (podés usar `.env.example` como base).
+
+### Pasos para levantar el entorno:
+
+1. **Configurar el archivo `.env`**: Asegurate de completar las variables en el archivo `.env` en la raíz del proyecto.
+2. **Levantar los servicios**: Ejecutá el siguiente comando desde la raíz:
+
+```bash
+docker compose up -d
+```
+
+Esto construirá las imágenes de los servicios y los levantará en la red correspondiente, cargando las variables del `.env` automáticamente.
