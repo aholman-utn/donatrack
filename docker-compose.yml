@@ -23,18 +23,17 @@ services:
     networks:
       - donatrack_network
 
-# TODO: Revisar por qué no funciona el servicio de notificaciones.
-#  servicio-notificaciones:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.notificaciones
-#    container_name: servicio-notificaciones
-#    ports:
-#      - "8082:8082"
-#    env_file:
-#      - .env
-#    networks:
-#      - donatrack_network
+  servicio-notificaciones:
+    build:
+      context: .
+      dockerfile: Dockerfile.notificaciones
+    container_name: servicio-notificaciones
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    networks:
+      - donatrack_network
 
   servicio-logistica:
     build:
