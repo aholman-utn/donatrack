@@ -2,6 +2,7 @@ package com.tp.donatrack.repositories;
 
 import com.tp.donatrack.domain.donacion.Donacion;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
+import com.tp.donatrack.domain.donacion.EstadoDonacion;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,9 @@ public interface DonacionRepository extends JpaRepository<Donacion, Long> {
     /** Devuelve las donaciones de un donante. */
     @Query("SELECT d FROM Donacion d WHERE d.donante.id = :donanteId")
     List<Donacion> findByDonanteId(@Param("donanteId") Long donanteId);
+
+    /** Devuelve las donaciones según su estado desnormalizado (ej. PENDIENTE / ADJUDICADA). */
+    List<Donacion> findByEstado(EstadoDonacion estado);
 
     /** Busca una donación segmentada por su id, devolviendo {@code null} si no existe. */
     default DonacionSegmentada findSegmentadaById(Long segmentadaId) {

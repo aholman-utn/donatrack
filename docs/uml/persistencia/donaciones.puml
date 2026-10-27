@@ -1,0 +1,111 @@
+@startuml donaciones
+!include ../_style.puml
+skinparam linetype polyline
+
+title DER — Servicio de Donaciones\n(Base de Datos Relacional: MySQL/TiDB — Entrega 5 con Estrategias de Desnormalización)
+
+' =====================================================================
+' NOTA DE DESNORMALIZACIÓN (Entrega 5 - Punto 3)
+' =====================================================================
+note as NotaDesnormalizacion
+  **Estrategias de Desnormalización aplicadas (Entrega 5 - Punto 3):**
+  1. **DONACIONES.estado**: Estado agregado (VARCHAR) de los segmentos de la donación para listar sin agregar en memoria.
+  2. **DONACIONES_SEGMENTADAS.categoria_bien**: Categoría principal del bien copiada desde SubCategoria para filtrar donaciones por categoría sin JOINs costosos.
+  3. **DONACIONES_SEGMENTADAS.entidad_beneficiaria_nombre**: Razón social de la entidad asignada copiada al momento de asignar para renderizar historial sin JOINs.
+  4. **DONACIONES_SEGMENTADAS.donante_id**: ID del donante copiado desde la donación padre para consultas directas del perfil.
+  5. **ENTIDADES_BENEFICIARIAS.total_donaciones_recibidas**: Contador incremental de donaciones recibidas para optimizar el ordenamiento del Algoritmo de Prioridad a Sub-atendidos (O(1) lectura).
+  6. **DONANTES (Perfil Donante Embebido)**: Columnas `total_donaciones_exitosas`, `total_misiones_completadas`, `fecha_ultima_donacion`, `nivel_donante` y `mision_actual_id` aplanadas en la tabla `donantes` para consultas de ranking y perfil de alto rendimiento.
+end note
+
+entity "DONACIONES" as DONACIONES <<JPA Entity>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * donante_id : BIGINT <<FK>>
+  * estado : VARCHAR(50) <<desnormalizado: estado global>>
+  tipo : VARCHAR(50)
+  fecha_creacion : DATETIME
+}
+
+entity "DONACIONES_SEGMENTADAS" as SEGMENTADAS <<JPA Entity>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * donacion_id : BIGINT <<FK>>
+  * estado : VARCHAR(50)
+  * donante_id : BIGINT <<desnormalizado: FK lógica donante>>
+  * categoria_bien : VARCHAR(50) <<desnormalizado: CategoriaBien>>
+  entidad_beneficiaria_asignada_id : BIGINT
+  entidad_beneficiaria_nombre : VARCHAR(255) <<desnormalizado: Razón Social>>
+}
+
+entity "BIENES" as BIENES <<JPA Entity>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * donacion_id : BIGINT <<FK>>
+  * subcategoria_id : BIGINT <<FK>>
+  cantidad : INT
+  descripcion : VARCHAR(255)
+}
+
+entity "SUBCATEGORIAS" as SUBCATEGORIAS <<JPA Entity>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * categoria : VARCHAR(50) <<CategoriaBien enum>>
+  * nombre : VARCHAR(255)
+}
+
+entity "ENTIDADES_BENEFICIARIAS" as ENTIDADES <<JPA Entity>> {
+  * **id_entidad_beneficiaria** : BIGINT <<PK, Auto-Increment>>
+  --
+  * id_persona_juridica : BIGINT <<FK>>
+  * total_donaciones_recibidas : INT <<desnormalizado: contador acumulado sub-atendidos>>
+}
+
+entity "DONANTES" as DONANTES <<JPA Entity>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * id_persona : BIGINT <<FK>>
+  password : VARCHAR(255)
+  -- Perfil Donante Embebido (@Embedded) --
+  visibilidad_insignia : BOOLEAN
+  mision_actual_id : BIGINT
+  progreso_mision_actual : DOUBLE
+  nivel_donante : VARCHAR(50)
+  total_donaciones_exitosas : INT <<desnormalizado: ranking>>
+  total_misiones_completadas : INT <<desnormalizado>>
+  fecha_ultima_donacion : DATETIME <<desnormalizado>>
+}
+
+entity "PERSONAS" as PERSONAS <<JPA Single Table>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * tipo_persona : VARCHAR(31) <<Discriminator: HUMANA | JURIDICA>>
+  nombre : VARCHAR(255)
+  apellido : VARCHAR(255)
+  razon_social : VARCHAR(255)
+  cuit : VARCHAR(50)
+  nro_documento : VARCHAR(50)
+}
+
+entity "NECESIDADES" as NECESIDADES <<JPA Single Table>> {
+  * **id** : BIGINT <<PK, Auto-Increment>>
+  --
+  * entidad_beneficiaria_id : BIGINT <<FK>>
+  * tipo_necesidad : VARCHAR(31) <<Discriminator: EXTRAORDINARIA | RECURRENTE>>
+  * estado : VARCHAR(50)
+  * subcategoria_id : BIGINT <<FK>>
+  cantidad_pedida : INT
+  cantidad_faltante : INT
+}
+
+' Relaciones
+DONACIONES ||--|{ SEGMENTADAS : "1..* segmentos"
+DONACIONES ||--|{ BIENES : "1..* bienes"
+SUBCATEGORIAS ||--o{ BIENES : "define tipo"
+DONANTES ||--o{ DONACIONES : "realiza"
+PERSONAS ||--o| DONANTES : "datos de contacto/identidad"
+PERSONAS ||--o| ENTIDADES : "datos de entidad jurídica"
+ENTIDADES ||--o{ NECESIDADES : "declara"
+SEGMENTADAS }o..o| ENTIDADES : "asignada a"
+SUBCATEGORIAS ||--o{ NECESIDADES : "demanda"
+
+@enduml

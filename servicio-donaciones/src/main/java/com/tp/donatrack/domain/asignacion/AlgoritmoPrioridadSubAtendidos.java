@@ -34,8 +34,9 @@ public class AlgoritmoPrioridadSubAtendidos implements AlgoritmoAsignacion {
      * A menor cantidad, mayor prioridad (va primero en el ranking).
      */
     private int totalDonacionesRecibidas(EntidadBeneficiaria entidad) {
-        return entidad.getNececidades().stream()
+        int enMemoria = entidad.getNececidades().stream()
                 .mapToInt(n -> n.getDonaciones().size())
                 .sum();
+        return Math.max(entidad.getTotalDonacionesRecibidas(), enMemoria);
     }
 }

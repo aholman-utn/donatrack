@@ -3,13 +3,13 @@ package com.tp.donatrack.domain.donante;
 import com.tp.donatrack.domain.persona.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.*;
 
 @Getter
@@ -32,8 +32,8 @@ public class Donante {
     @Column(name = "password_hash")
     private String password;
 
-    /** Perfil de incentivos del donante; no forma parte de la persistencia de este servicio. */
-    @Transient
+    /** Perfil de incentivos del donante con métricas e indicadores desnormalizados. */
+    @Embedded
     @Builder.Default
     private PerfilDonante perfil = new PerfilDonante();
 

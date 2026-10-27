@@ -147,9 +147,12 @@ public class DonacionService {
                         .id(ds.getId())
                         .subCategoria(ds.getSubCategoria() != null ? ds.getSubCategoria().getDescripcion()
                                 : "Sin Categoría")
+                        .categoria(ds.getCategoriaBien() != null ? ds.getCategoriaBien().name()
+                                : (ds.getSubCategoria() != null && ds.getSubCategoria().getCategoria() != null ? ds.getSubCategoria().getCategoria().name() : null))
                         .cantidad(ds.getCantidad())
                         .estado(ds.getEstado())
                         .entidadBeneficiariaAsignadaId(ds.getEntidadBeneficiariaAsignadaId())
+                        .entidadBeneficiariaNombre(ds.getEntidadBeneficiariaNombre())
                         .build())
                 .collect(Collectors.toList());
 

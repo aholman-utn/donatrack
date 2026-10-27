@@ -1,5 +1,6 @@
 package com.tp.donatrack.repositories;
 
+import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,10 @@ import java.util.List;
 @Repository
 public interface DonacionSegmentadaRepository extends JpaRepository<DonacionSegmentada, Long> {
     List<DonacionSegmentada> findByDonanteIdAndEstado(Long donanteId, EstadoDonacionSegmentada estado);
+
+    List<DonacionSegmentada> findByDonanteIdAndCategoriaBien(Long donanteId, CategoriaBien categoriaBien);
+
+    List<DonacionSegmentada> findByDonanteIdAndEstadoAndCategoriaBien(Long donanteId, EstadoDonacionSegmentada estado, CategoriaBien categoriaBien);
+
+    List<DonacionSegmentada> findByCategoriaBien(CategoriaBien categoriaBien);
 }
