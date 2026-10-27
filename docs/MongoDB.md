@@ -1,15 +1,15 @@
 # MongoDB
 
-El servicio `servicio-logistica` persiste en MongoDB sus envíos, rutas, camiones, choferes y eventos. Para trabajar o probarlo, se puede usar una instancia local con Docker o una instancia en la nube con MongoDB Atlas. MongoDB Compass permite conectarse a cualquiera de ellas y explorar los datos.
+El servicio `servicio-logistica` persiste en MongoDB sus envíos, rutas, camiones, choferes y eventos. Puede conectarse a una instancia local con Docker o a MongoDB Atlas. MongoDB Compass permite explorar ambas.
 
 ## Variables de entorno
 
-La conexión se configura mediante variables de entorno que consume `servicio-logistica/src/main/resources/application.properties`:
+`servicio-logistica/src/main/resources/application.properties` construye la URI con estas variables:
 
 | Variable | Uso | Valor predeterminado |
 | --- | --- | --- |
+| `MONGODB_PROTOCOL` | Esquema de la URI (`mongodb` para una instancia normal o `mongodb+srv` para Atlas) | `mongodb` |
 | `DB_HOST` | Host o dirección de MongoDB | `localhost` |
-| `DB_PORT` | Puerto de MongoDB | `27017` |
 | `DB_NAME` | Base de datos del servicio | `logistica-db` |
 | `MONGODB_USERNAME` | Usuario de autenticación | Obligatorio |
 | `MONGODB_PASSWORD` | Contraseña de autenticación | Obligatorio |
@@ -23,7 +23,7 @@ En PowerShell, las variables se pueden definir para la terminal actual antes de 
 $env:MONGODB_USERNAME = "root"
 $env:MONGODB_PASSWORD = "donatrack"
 $env:DB_HOST = "localhost"
-$env:DB_PORT = "27017"
+$env:MONGODB_PROTOCOL = "mongodb"
 $env:DB_NAME = "logistica-db"
 $env:DB_AUTH_DB = "admin"
 ./mvnw spring-boot:run -pl servicio-logistica
@@ -79,16 +79,14 @@ Pasos generales:
 5. Configurar las variables de entorno del servicio. Por ejemplo, en PowerShell:
 
 ```powershell
+$env:MONGODB_PROTOCOL = "mongodb+srv"
 $env:DB_HOST = "cluster0.xxxxx.mongodb.net"
-$env:DB_PORT = "27017"
 $env:DB_NAME = "logistica-db"
 $env:DB_AUTH_DB = "admin"
 $env:MONGODB_USERNAME = "usuario_creado_en_atlas"
 $env:MONGODB_PASSWORD = "contraseña_del_usuario"
 ./mvnw spring-boot:run -pl servicio-logistica
 ```
-
-La aplicación construye la conexión usando host, puerto y credenciales por separado. No se debe pegar la URI completa `mongodb+srv://...` en `DB_HOST`; usar el hostname del clúster y los campos indicados arriba. Si la contraseña contiene caracteres especiales, configurarla correctamente según el mecanismo de variables de entorno usado.
 
 ## Ver los datos con MongoDB Compass
 
