@@ -37,6 +37,9 @@ public class EntidadBeneficiaria {
     @JoinColumn(name = "id_persona_juridica")
     private PersonaJuridica datosDeEntidad;
 
+    @Column(name = "total_donaciones_recibidas")
+    private int totalDonacionesRecibidas = 0;
+
     /**
      * Necesidades de la entidad. Se mantienen en memoria para la lógica de dominio;
      * su persistencia se gestiona por separado mediante {@code NecesidadRepository}
@@ -77,5 +80,10 @@ public class EntidadBeneficiaria {
         .orElseThrow(() -> new RuntimeException("La entidad no tiene una necesidad activa para la categoría: " + donacion.getSubCategoria()));
 
         necesidadCorrespondiente.recibirDonacion(donacion);
+        this.totalDonacionesRecibidas++;
+    }
+
+    public void incrementarDonacionesRecibidas() {
+        this.totalDonacionesRecibidas++;
     }
 }

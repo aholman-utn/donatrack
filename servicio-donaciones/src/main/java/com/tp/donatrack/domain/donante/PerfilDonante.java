@@ -9,31 +9,55 @@ import java.util.stream.Collectors;
 
 import com.tp.donatrack.domain.donacion.DonacionSegmentada;
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
+@Embeddable
 public class PerfilDonante {
     @Builder.Default
+    @Column(name = "visibilidad_insignia")
     private boolean visibilidadInsignia = true;
 
     @Builder.Default
+    @Column(name = "mision_actual_id")
     private Long misionActualId = 1L;
 
     @Builder.Default
+    @Transient
     private List<String> insigniasGanadas = new ArrayList<>();
 
+    @Column(name = "progreso_mision_actual")
     private Double progreso;
 
     @Builder.Default
+    @Convert(converter = NivelDonanteConverter.class)
+    @Column(name = "nivel_donante", length = 30)
     private Nivel nivelDonante = Nivel.COLABORADOR;
 
     @Builder.Default
+    @Column(name = "total_donaciones_exitosas")
+    private int totalDonacionesExitosas = 0;
+
+    @Builder.Default
+    @Column(name = "total_misiones_completadas")
+    private int totalMisionesCompletadas = 0;
+
+    @Column(name = "fecha_ultima_donacion")
+    private LocalDate fechaUltimaDonacion;
+
+    @Builder.Default
+    @Transient
     private Metrica metricasPerfil = new Metrica();
 
     @Builder.Default
+    @Transient
     private List<ItemHistoralDonaciones> historialDonaciones = new ArrayList<>();
 
     public PerfilDonante() {
@@ -41,6 +65,8 @@ public class PerfilDonante {
         this.nivelDonante = Nivel.COLABORADOR;
         this.misionActualId = 1L;
         this.progreso = (double) 0;
+        this.totalDonacionesExitosas = 0;
+        this.totalMisionesCompletadas = 0;
         this.historialDonaciones = new ArrayList<>();
         this.insigniasGanadas = new ArrayList<>();
         this.metricasPerfil = new Metrica();
@@ -58,6 +84,9 @@ public class PerfilDonante {
                 .estado(EstadoDonacionSegmentada.ENTREGADA)
                 .build();
         this.historialDonaciones.add(item);
+
+        this.totalDonacionesExitosas++;
+        this.fechaUltimaDonacion = LocalDate.now();
 
         this.metricasPerfil.setTotalDonacionesExitosas(
                 this.metricasPerfil.getTotalDonacionesExitosas() + 1);

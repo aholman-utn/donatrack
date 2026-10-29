@@ -8,6 +8,8 @@ import com.tp.donatrack.domain.bien.ClaveAgrupacion;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -50,6 +52,10 @@ public class Donacion {
     @Column(name = "fecha_ingreso")
     private Date fechaIngreso;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
+    private EstadoDonacion estado = EstadoDonacion.PENDIENTE;
+
     // Los bienes se agrupan en segmentos; en el DER el Bien referencia a la
     // donación. Se mantiene la lista para la lógica de segmentación.
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -76,8 +82,9 @@ public class Donacion {
         this.donante = donante;
         this.descripcion = descripcion;
         this.fechaIngreso = fechaIngreso;
-        this.bienes = bienes;
-        this.donacionesSegmentadas = this.segmentar(bienes);
+        this.bienes = new ArrayList<>(bienes);
+        this.donacionesSegmentadas = this.segmentar(this.bienes);
+        this.estado = this.getEstado();
     }
 
     private List<DonacionSegmentada> segmentar(List<Bien> bienes) {       
@@ -95,10 +102,19 @@ public class Donacion {
     }
 
     public EstadoDonacion getEstado() {
+        if (this.donacionesSegmentadas == null || this.donacionesSegmentadas.isEmpty()) {
+            this.estado = EstadoDonacion.PENDIENTE;
+            return this.estado;
+        }
         boolean todasAsignadas = this.donacionesSegmentadas.stream()
                 .allMatch(s -> s.getEstado() != null && s.getEstado().isAsignada()); 
         
-        return todasAsignadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
+        this.estado = todasAsignadas ? EstadoDonacion.ADJUDICADA : EstadoDonacion.PENDIENTE;
+        return this.estado;
+    }
+
+    public void actualizarEstado() {
+        this.getEstado();
     }
 
     public Optional<DonacionSegmentada> buscarPorSubcategoria(SubCategoria sub) {

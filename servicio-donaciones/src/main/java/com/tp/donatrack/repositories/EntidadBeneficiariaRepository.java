@@ -4,11 +4,16 @@ import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Repositorio de {@link EntidadBeneficiaria}.
  */
 @Repository
 public interface EntidadBeneficiariaRepository extends JpaRepository<EntidadBeneficiaria, Long> {
+
+    /** Devuelve las entidades ordenadas por total de donaciones recibidas (prioridad a sub-atendidos). */
+    List<EntidadBeneficiaria> findAllByOrderByTotalDonacionesRecibidasAsc();
 
     /** Persiste la entidad beneficiaria. */
     default EntidadBeneficiaria create(EntidadBeneficiaria entidad) {

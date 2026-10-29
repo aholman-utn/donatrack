@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,6 +21,12 @@ public interface DonanteRepository extends JpaRepository<Donante, Long> {
      */
     @Query("SELECT d FROM Donante d JOIN d.persona p JOIN p.mediosDeContacto m WHERE m.valor = :valor")
     Optional<Donante> findByMedioDeContactoValor(@Param("valor") String valor);
+
+    /**
+     * Devuelve los donantes ordenados por total de donaciones exitosas (ranking desnormalizado).
+     */
+    @Query("SELECT d FROM Donante d ORDER BY d.perfil.totalDonacionesExitosas DESC")
+    List<Donante> findTopDonantesRanking();
 
     /** Persiste el donante. */
     default Donante create(Donante donante) {

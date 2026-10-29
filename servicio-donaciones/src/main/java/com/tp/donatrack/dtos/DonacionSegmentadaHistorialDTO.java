@@ -15,7 +15,9 @@ import lombok.Setter;
 public class DonacionSegmentadaHistorialDTO {
     private Long id;
     private String subCategoria;
+    private String categoria;
     private int cantidad;
     private EstadoDonacionSegmentada estado;
     private Long entidadBeneficiariaAsignadaId;
+    private String entidadBeneficiariaNombre;
 }

@@ -1,6 +1,7 @@
 package com.tp.donatrack.domain.donacion;
 
 import com.tp.donatrack.domain.bien.Bien;
+import com.tp.donatrack.domain.bien.CategoriaBien;
 import com.tp.donatrack.domain.bien.SubCategoria;
 import com.tp.donatrack.domain.donacion.estado.EnDeposito;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
@@ -9,6 +10,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -60,8 +63,15 @@ public class DonacionSegmentada {
     @Column(name = "donante_id")
     private Long donanteId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria_bien")
+    private CategoriaBien categoriaBien;
+
     @Column(name = "entidad_beneficiaria_asignada_id")
     private Long entidadBeneficiariaAsignadaId;
+
+    @Column(name = "entidad_beneficiaria_nombre")
+    private String entidadBeneficiariaNombre;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_comprobante")
@@ -84,11 +94,19 @@ public class DonacionSegmentada {
             Long donanteId) {
         this.cantidad = cantidad;
         this.subCategoria = subCategoria;
+        this.categoriaBien = subCategoria != null ? subCategoria.getCategoria() : null;
         this.bienes = bienes;
         this.donanteId = donanteId;
         this.estado = new EnDeposito();
         registrarEvento(null, this.estado, "Administrador",
                 "Donación registrada e ingresada al depósito");
+    }
+
+    public void setSubCategoria(SubCategoria subCategoria) {
+        this.subCategoria = subCategoria;
+        if (subCategoria != null && subCategoria.getCategoria() != null) {
+            this.categoriaBien = subCategoria.getCategoria();
+        }
     }
 
     public void transicionar(EstadoDonacionSegmentada nuevoEstado, String actor, String descripcion) {

@@ -28,6 +28,7 @@ public class EnDeposito extends EstadoDonacionSegmentada {
         entidad.implementarDonacion(donacion);
         if (entidad.getDatosDeEntidad() != null) {
             donacion.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
+            donacion.setEntidadBeneficiariaNombre(entidad.getDatosDeEntidad().getRazonSocial());
         }
         donacion.transicionar(new AsignacionRealizada(), actor, "Donación asignada a entidad beneficiaria");
     }
