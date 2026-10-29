@@ -1,10 +1,8 @@
 # Estrategias de Desnormalización (Entrega 5 - Punto 3)
 
-## 1. Justificación de Diseño (Trade-off 3NF vs. Desnormalización)
+## 1. Justificación de Diseño
 
-En **DonaTrack**, el dominio presenta una **proporción de lecturas muy superior a la de escrituras**: consultas frecuentes de perfiles, rankings sobre miles de donantes importados por CSV (+10.000 filas), algoritmos de matchmaking y bandejas operativas de administración.
-
-Mantener un esquema estrictamente en **Tercera Forma Normal (3NF)** obliga a resolver estas consultas mediante múltiples `JOIN`, `GROUP BY`, `COUNT(*)` o cálculos en memoria. Aplicamos **desnormalización controlada** en el `servicio-donaciones` para transformar agregaciones y cruces costosos en lecturas directas $O(1)$ o filtrados indexados sobre una única tabla, asumiendo el costo marginal de mantener sincronizados estos campos al momento de escribir/transicionar estados.
+Mantener un esquema estrictamente en **Tercera Forma Normal** obliga a resolver consultas mediante múltiples `JOIN`, `GROUP BY`, `COUNT(*)` o cálculos en memoria. Aplicamos **desnormalización controlada** en el `servicio-donaciones` para transformar agregaciones y cruces costosos en lecturas directas o filtrados indexados sobre una única tabla, asumiendo el costo marginal de mantener sincronizados estos campos al momento de escribir/transicionar estados.
 
 ---
 
@@ -21,14 +19,14 @@ Mantener un esquema estrictamente en **Tercera Forma Normal (3NF)** obliga a res
 
 ---
 
-## 3. Ejemplos Puntuales de Implementación en Código
+## 3. Implementación en Código
 
-### Caso A: Eliminación de JOINs al filtrar por Categoría y consultar Historial (`DonacionSegmentada`)
+### En `DonacionSegmentada` eliminamos JOINs al filtrar por Categoría y consultar Historial 
 
-Se agregaron las columnas `categoria_bien` y `entidad_beneficiaria_nombre` directamente en `DonacionSegmentada`, sincronizándolas al instanciar el segmento y al asignarlo a una entidad beneficiaria.
+Agregamos las columnas `categoria_bien` y `entidad_beneficiaria_nombre` directamente en `DonacionSegmentada`, sincronizándolas al instanciar la donacion segmentada y al asignarlo a una entidad beneficiaria.
 
-**Antes (3NF):**
-Para filtrar por categoría o mostrar el nombre de la entidad en el historial, era necesario navegar relaciones (`ds.getSubCategoria().getCategoria()`) y consultar `EntidadBeneficiaria` $\to$ `PersonaJuridica`.
+**Antes (normalizado):**
+Para filtrar por categoría o mostrar el nombre de la entidad en el historial, era necesario navegar relaciones (`donacionSegmentada.getSubCategoria().getCategoria()`) y consultar `EntidadBeneficiaria` $\to$ `PersonaJuridica`.
 
 **Después (Desnormalizado):**
 ```java
@@ -51,7 +49,7 @@ public DonacionSegmentada(int cantidad, SubCategoria subCategoria, List<Bien> bi
 }
 ```
 
-Al asignar la donación en `EnDeposito.java`, se persiste el snapshot de la razón social:
+Al asignar la donación en `EnDeposito.java`, se persiste el nombre de la entidad:
 ```java
 // EnDeposito.java
 @Override
@@ -59,7 +57,8 @@ public void asignar(DonacionSegmentada donacion, EntidadBeneficiaria entidad, St
     entidad.implementarDonacion(donacion);
     if (entidad.getDatosDeEntidad() != null) {
         donacion.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
-        donacion.setEntidadBeneficiariaNombre(entidad.getDatosDeEntidad().getRazonSocial());
+       
+       donacion.setEntidadBeneficiariaNombre (entidad.getDatosDeEntidad().getRazonSocial());
     }
     donacion.transicionar(new AsignacionRealizada(), actor, "Donación asignada a entidad beneficiaria");
 }
@@ -74,7 +73,7 @@ List<DonacionSegmentada> findByDonanteIdAndEstadoAndCategoriaBien(
 
 ---
 
-### Caso B: Contador Acumulado para Matchmaking (`EntidadBeneficiaria`)
+### En `EntidadBeneficiaria` Contador Acumulado para Matchmaking 
 
 En lugar de contar todas las donaciones históricas de cada necesidad de una entidad para priorizar a las organizaciones sub-atendidas, se mantiene un contador incremental `total_donaciones_recibidas`.
 
@@ -98,7 +97,7 @@ List<EntidadBeneficiaria> findAllByOrderByTotalDonacionesRecibidasAsc();
 
 ---
 
-### Caso C: Aplanado del Perfil y Métricas en `Donante` (`@Embedded PerfilDonante`)
+### En `Donante` y `PerfilDonante` agregamos totales 
 
 `PerfilDonante` pasó de ser `@Transient` (o requerir una tabla separada y cálculos en tiempo de lectura) a embeberse con `@Embedded` en la tabla `donantes`, actualizando sus acumuladores en cada entrega confirmada:
 
