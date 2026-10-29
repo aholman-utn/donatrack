@@ -2,13 +2,13 @@ package com.tp.donatrack.logistica;
 
 import com.tp.donatrack.logistica.domain.*;
 import com.tp.donatrack.logistica.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -19,11 +19,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest
 @ActiveProfiles("test")
-@Import(LogisticaJpaPersistenceTest.TestConfig.class)
-public class LogisticaJpaPersistenceTest {
+@Import(LogisticaMongoPersistenceTest.TestConfig.class)
+public class LogisticaMongoPersistenceTest {
 
     @TestConfiguration
     static class TestConfig {
@@ -47,6 +46,15 @@ public class LogisticaJpaPersistenceTest {
 
     @Autowired
     private LogisticaEventRepository eventRepository;
+
+    @BeforeEach
+    void limpiarBase() {
+        camionRepository.deleteAll();
+        choferRepository.deleteAll();
+        rutaRepository.deleteAll();
+        envioRepository.deleteAll();
+        eventRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Persistir Camion y Chofer correctamente")
@@ -75,7 +83,7 @@ public class LogisticaJpaPersistenceTest {
     }
 
     @Test
-    @DisplayName("Persistir Ruta con Paradas y Envíos en cascada")
+    @DisplayName("Persistir Ruta con Paradas y Envíos sin cascada automática")
     public void testPersistirRutaCompleta() {
         Camion camion = camionRepository.save(Camion.builder()
                 .patente("AA999ZZ")
@@ -103,14 +111,17 @@ public class LogisticaJpaPersistenceTest {
                 .orden(1)
                 .direccion("Av. Corrientes 1234, CABA")
                 .build();
-        ruta.agregarParada(parada);
 
         Envio envio = Envio.builder()
                 .donacionSegmentadaId(101L)
                 .entidadBeneficiariaId(5L)
                 .estado(EstadoEnvio.PENDIENTE)
                 .build();
+
+        envio = envioRepository.save(envio);
+
         parada.agregarEnvio(envio);
+        ruta.agregarParada(parada);
 
         Ruta rutaGuardada = rutaRepository.save(ruta);
         assertNotNull(rutaGuardada.getId());
@@ -134,6 +145,7 @@ public class LogisticaJpaPersistenceTest {
 
         eventRepository.registrar(evento);
         List<EventoLogistica> eventos = eventRepository.obtenerTodos();
+
         assertEquals(1, eventos.size());
         assertEquals("INICIO_RUTA", eventos.get(0).getTipoEvento());
     }
