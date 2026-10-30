@@ -103,6 +103,12 @@ Luego conectarse y abrir la base `logistica-db`. MongoDB crea la base y sus cole
 
 Para Atlas, en Compass se puede pegar la URI de conexión que ofrece Atlas y completar el usuario y contraseña de **Database Access** cuando se solicite. También se puede cargar el hostname y las credenciales manualmente. La IP de la máquina debe estar permitida en **Network Access**.
 
-## Consideración sobre el perfil local
+## Persistencia de los datos entre reinicios
 
-La configuración actual activa el perfil `local`, y `MongoResetConfig` elimina la base de datos seleccionada cada vez que arranca el servicio. Por eso, con la configuración predeterminada, los datos locales se reinician al reiniciar Logística. Tener en cuenta este comportamiento antes de usar una base con datos que se quieran conservar; el volumen de Docker no evita que la propia aplicación elimine la base al arrancar.
+Logística no borra la base al arrancar: los datos se conservan entre reinicios del servicio, tanto en Docker local como en Atlas. Como la base de Atlas es compartida por el equipo, no hay que vaciarla para hacer pruebas.
+
+Para empezar con una base vacía en local, se pueden borrar los datos a mano desde Compass o `mongosh` (`db.dropDatabase()` sobre `logistica-db`), o eliminar el volumen de Docker:
+
+```bash
+docker compose -f herramientas/docker-compose.yml down -v
+```
