@@ -72,5 +72,6 @@ start_service "servicio-donaciones"
 start_service "servicio-incentivos"
 start_service "servicio-notificaciones"
 start_service "servicio-logistica"
+start_service "servicio-iam"
 
 echo "✅ Despliegue local completado. Las terminales se abrirán en breve."

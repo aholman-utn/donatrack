@@ -1,8 +1,10 @@
 package com.tp.incentivos;
 
+import com.tp.commons.config.CommonsSecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
                 "com.tp.commons"
         }
 )
+@Import(CommonsSecurityConfig.class)
 public class IncentivosApplication {
 
     public static void main(String[] args) {

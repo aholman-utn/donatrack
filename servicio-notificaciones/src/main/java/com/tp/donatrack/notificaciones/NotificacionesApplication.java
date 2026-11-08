@@ -1,9 +1,10 @@
 package com.tp.donatrack.notificaciones;
 
+import com.tp.commons.config.CommonsSecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
                 "com.tp.commons"
         }
 )
+@Import(CommonsSecurityConfig.class)
 public class NotificacionesApplication {
     public static void main(String[] args) {
         SpringApplication.run(NotificacionesApplication.class, args);
@@ -21,6 +23,5 @@ public class NotificacionesApplication {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-
 }
 

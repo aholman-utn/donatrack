@@ -24,6 +24,7 @@
         <module>commons</module>
 		<module>servicio-logistica</module>
         <module>api-gateway</module>
+        <module>servicio-iam</module>
     </modules>
 
 	<properties>
