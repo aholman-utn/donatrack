@@ -89,7 +89,7 @@ class TrazabilidadServiceNotificacionesTest {
         segmento.transicionar(EstadoDonacionSegmentada.ASIGNACION_REALIZADA, "Sistema", "Asignada");
         segmento.setEntidadBeneficiariaAsignadaId(entidad.getDatosDeEntidad().getId());
 
-        lenient().when(donacionRepository.findAll()).thenReturn(List.of(donacion));
+        lenient().when(donacionRepository.findDonacionByDonacionesSegmentadaId(100L)).thenReturn(donacion);
         lenient().when(donacionRepository.findById(50L)).thenReturn(java.util.Optional.of(donacion));
         lenient().when(entidadBeneficiariaRepository.find(2L)).thenReturn(entidad);
         segmento.listarParaEntrega("Logística");

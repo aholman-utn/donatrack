@@ -34,6 +34,9 @@ public class MatchmakingService {
     private final NecesidadRepository necesidadRepository;
     private final ServicioMatchmaking servicioMatchmaking;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.tp.commons.services.notificador.NotificacionQueueClient notificaciones;
+
     public MatchmakingService(
             DonacionRepository donacionRepository,
             EntidadBeneficiariaRepository entidadBeneficiariaRepository,
@@ -92,6 +95,7 @@ public class MatchmakingService {
     /**
      * Asigna una donación segmentada a la entidad beneficiaria elegida del ranking.
      */
+    @org.springframework.transaction.annotation.Transactional
     public void asignarDonacion(Long donacionSegmentadaId, Long entidadBeneficiariaId) {
         DonacionSegmentada segmentada = donacionRepository.findSegmentadaById(donacionSegmentadaId);
         if (segmentada == null) {
@@ -119,6 +123,14 @@ public class MatchmakingService {
             donacionRepository.save(donacion);
         }
         necesidadRepository.saveAll(necesidades);
+        if (donacion != null && donacion.getDonante() != null && notificaciones != null) {
+            var persona = donacion.getDonante().getPersona();
+            if (persona.getContactoPredeterminado() != null) {
+                notificaciones.notificar(persona.getTipoNotificadorPreferido(), persona.getContactoPredeterminado(),
+                        "Tu donación fue asignada a " + entidad.getDatosDeEntidad().getRazonSocial() + ".",
+                        "Tu donación tiene destino", persona.getId());
+            }
+        }
     }
 
     private ResultadoMatchmakingDTO mapearResultado(DonacionSegmentada segmentada, ResultadoMatchmaking resultado) {

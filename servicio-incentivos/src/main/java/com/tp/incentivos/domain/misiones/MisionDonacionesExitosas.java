@@ -26,7 +26,7 @@ public class MisionDonacionesExitosas extends Mision {
 
     @Override
     public double calcularNuevoProgreso(EntregaDonacionDTO dto, IndicadoresDonanteDTO indicadores) {
-        return dto.getProgreso() + 1;
+        return indicadores.getCantidadDonacionesEntregadas();
     }
 
     @Override

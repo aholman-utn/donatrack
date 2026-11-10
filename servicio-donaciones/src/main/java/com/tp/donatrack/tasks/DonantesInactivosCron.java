@@ -6,6 +6,8 @@ import com.tp.donatrack.services.DonanteService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +26,15 @@ public class DonantesInactivosCron {
     }
 
     // Se ejecuta todos los días a las 8:00 AM
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "${donatrack.cron.donantes-inactivos:0 0 8 * * *}", zone = "America/Argentina/Buenos_Aires")
     public void enviarNotificacionDonantesInactivos() {
         logger.info("Iniciando procesamiento de cron para donantes inactivos...");
 
         List<DonanteInactivoDTO> donantesInactivos = donanteService.obtenerDonantesSinInteraccionMasDeDias(20);
 
         donantesInactivos.forEach(donante -> {
+            LocalDateTime fecha = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            if (!donanteService.reservarAvisoInactividad(donante, fecha)) return;
             try {
                 String asunto = "¡Te extrañamos en Donatrack!";
                 String mensaje = "Hace un tiempo que no registrás actividad. Tu ayuda es muy importante, ¡sumate con una nueva donación!";
@@ -42,9 +46,10 @@ public class DonantesInactivosCron {
                         asunto,
                         donante.getId()
                 );
-
+                if (!enviado) donanteService.liberarAvisoInactividad(donante.getId(), fecha);
             } catch (Exception e) {
-                System.err.println("Error al notificar al donante " + e.getMessage());
+                donanteService.liberarAvisoInactividad(donante.getId(), fecha);
+                logger.error("Error al notificar inactividad para el donante {}", donante.getId(), e);
             }
         });
         

@@ -6,7 +6,9 @@ import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
 import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
 
 import com.tp.donatrack.domain.donante.Donante;
-import com.tp.donatrack.domain.donante.Metrica;
+import com.tp.commons.config.ServiceToken;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 
 import com.tp.donatrack.repositories.DonanteRepository;
 
@@ -24,18 +26,21 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
     private final RestTemplate restTemplate;
     private final String incentivosUrl;
     private final DonanteRepository donanteRepository;
+    private final ServiceToken tokens;
     private static final Logger logger = LoggerFactory.getLogger(HttpDonacionEventPublisher.class);
 
     public HttpDonacionEventPublisher(
             RestTemplate restTemplate,
             @Value("${services.incentivos.url}") String incentivosUrl,
-            DonanteRepository donanteRepository) {
+            DonanteRepository donanteRepository, ServiceToken tokens) {
         this.restTemplate = restTemplate;
         this.incentivosUrl = incentivosUrl;
         this.donanteRepository = donanteRepository;
+        this.tokens = tokens;
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public void publicar(DonacionEntregadaEvent event) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("donacionSegmentadaId", event.dto().getDonacionSegmentadaId());
@@ -51,9 +56,11 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
 
             String url = incentivosUrl + "/entrega"; // mando la info de la donacion al servicio de incentivos
 
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(tokens.emitir("DONACIONES_INCENTIVOS"));
             var responseEntity = restTemplate.postForEntity(
                     url,
-                    requestBody,
+                    new HttpEntity<>(requestBody, headers),
                     EvaluacionMisionResponseDTO.class);
 
             if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
@@ -75,9 +82,8 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
 
                 // Registrar misión completada en métricas
                 if (response.isMisionCumplida()) {
-                    Metrica metricaDonante = donante.getPerfil().getMetricasPerfil();
-                    logger.info("Donante ganó mision: {}", event.dto().getUltimaMisionId());
-                    metricaDonante.incrementarMisionesCompletadas();
+                    var perfil = donante.getPerfil();
+                    perfil.setTotalMisionesCompletadas(perfil.getTotalMisionesCompletadas() + 1);
                 }
 
                 if (response.isSubioDeCategoria() && response.getNuevoNivel() != null) {

@@ -18,11 +18,27 @@ public class IncentivosController {
 
     private final IncentivosService service;
     private final ServicioRanking servicioRanking;
+    private final com.tp.incentivos.repositories.MisionRepository misiones;
 
-    public IncentivosController(IncentivosService service, ServicioRanking servicioRanking) {
+    public IncentivosController(IncentivosService service, ServicioRanking servicioRanking,
+            com.tp.incentivos.repositories.MisionRepository misiones) {
         this.service = service;
         this.servicioRanking = servicioRanking;
+        this.misiones = misiones;
     }
+
+    @GetMapping("/misiones")
+    public List<MisionCatalogo> catalogo() {
+        return com.tp.commons.domain.donantes.Nivel.values().stream()
+                .flatMap(nivel -> misiones.findByNivelOrderByOrdenAsc(nivel).stream())
+                .map(mision -> new MisionCatalogo(mision.getOrden(), mision.getNivel().getNombre(),
+                        mision.getTitulo(), mision.getDescripcion(), mision.getObjetivo(),
+                        mision instanceof com.tp.incentivos.domain.misiones.MisionDonacionesExitosas))
+                .toList();
+    }
+
+    public record MisionCatalogo(int orden, String nivel, String titulo, String descripcion, int objetivo,
+                                boolean progresoEnUnidades) {}
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleNotFound(IllegalArgumentException ex) {

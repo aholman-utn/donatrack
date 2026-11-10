@@ -56,6 +56,9 @@ public abstract class Persona {
     @Column(name = "fecha_ultima_interaccion")
     private LocalDateTime fechaUltimaInteraccion;
 
+    @Column(name = "fecha_aviso_inactividad")
+    private LocalDateTime fechaAvisoInactividad;
+
     @Column(name = "tipo_notificador")
     @Enumerated(EnumType.STRING)
     private TipoNotificador tipoNotificador;
@@ -181,7 +184,7 @@ public abstract class Persona {
     public String getContactoPredeterminado() {
         Map<String, String> pred = getMedioPredeterminado();
         if (pred == null || pred.isEmpty()) {
-            return null;
+            return getMedioDeContacto().getOrDefault("EMAIL", List.of()).stream().findFirst().orElse(null);
         }
         return pred.get("valor");
     }

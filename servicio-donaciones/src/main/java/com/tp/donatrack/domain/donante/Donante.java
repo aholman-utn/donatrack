@@ -29,6 +29,7 @@ public class Donante {
     @MapsId
     private Persona persona;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @Column(name = "password_hash")
     private String password;
 

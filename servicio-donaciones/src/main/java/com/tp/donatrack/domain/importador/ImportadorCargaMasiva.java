@@ -4,10 +4,12 @@ import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
 import com.tp.donatrack.repositories.DonanteRepository;
-import com.tp.donatrack.utils.security.CryptoUtils;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Locale;
+import java.util.Map;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,43 +21,36 @@ public class ImportadorCargaMasiva {
         this.donanteRepository=donanteRepo;
     }
 
+    @Transactional
     public List<Donante> iniciar_migracion(List<RegistroDonanteDTO> registros) {
         List<Donante> nuevosDonantes = new ArrayList<>();
 
         for (RegistroDonanteDTO registro : registros) {
 
-            Donante existe = donanteRepository.find(registro.getEmail());
+            String email = registro.getEmail().trim().toLowerCase(Locale.ROOT);
+            if (!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) {
+                throw new IllegalArgumentException("Correo inválido en el CSV.");
+            }
+            registro.setEmail(email);
+            registro.setTipoPersona(registro.getTipoPersona().toUpperCase(Locale.ROOT));
+            TipoPersona.valueOf(registro.getTipoPersona());
+            if (registro.getNombre().isBlank() || registro.getDocumento().isBlank()) {
+                throw new IllegalArgumentException("El nombre y el documento son obligatorios.");
+            }
+            List<Donante> coincidencias = donanteRepository.findByEmail(email);
+            if (coincidencias.size() > 1) {
+                throw new IllegalArgumentException("Hay registros duplicados para un correo del CSV.");
+            }
 
-            if (existe == null) {
-                Donante nuevo_donante = crearDonanteSegunTipoPersona(registro);
-                String password = generarPassword();
-                String password_hash = CryptoUtils.hashear(password);
-                nuevo_donante.setPassword(password_hash);
-                donanteRepository.create(nuevo_donante);
-                nuevo_donante.setPassword(password);
-                nuevosDonantes.add(nuevo_donante);
+            if (coincidencias.isEmpty()) {
+                Donante nuevo = crearDonanteSegunTipoPersona(registro);
+                nuevosDonantes.add(donanteRepository.create(nuevo));
             } else {
-                // Si ya EXISTE, aplicamos la lógica de negocio de actualización en memoria
-                actualizarCamposDonante(existe, registro);
+                actualizarCamposDonante(coincidencias.getFirst(), registro);
             }
         }
 
         return nuevosDonantes;
-    }
-
-    private String generarPassword() {
-        String[] palabras = {"luna", "rio", "mate", "sol", "verde", "auto", "nube", "casa", "mar", "flor"};
-        SecureRandom random = new SecureRandom();
-
-        String palabra = palabras[random.nextInt(palabras.length)];
-        int numero = random.nextInt(90) + 10; // 10 a 99
-
-        // opcional: primera letra mayúscula a veces
-        if (random.nextBoolean()) {
-            palabra = palabra.substring(0, 1).toUpperCase() + palabra.substring(1);
-        }
-
-        return palabra + numero;
     }
 
     private Donante crearDonanteSegunTipoPersona(RegistroDonanteDTO registro) {
@@ -72,13 +67,18 @@ public class ImportadorCargaMasiva {
         } else {
             PersonaJuridica pj = new PersonaJuridica();
             pj.setRazonSocial(registro.getNombre());
+            pj.setCuit(registro.getDocumento());
             pj.setTipo(detectarTipo(registro.getNombre()));
             pj.setRubro("Sin especificar");
             persona = pj;
         }
 
         persona.agregarMedioDeContacto("EMAIL", registro.getEmail());
-        persona.agregarMedioDeContacto("SMS", registro.getTelefono());
+        if (!registro.getTelefono().isBlank()) {
+            persona.agregarMedioDeContacto("SMS", registro.getTelefono());
+        }
+        persona.setMedioPredeterminado(Map.of("medio", "EMAIL", "valor", registro.getEmail()));
+        persona.setFechaUltimaInteraccion(LocalDateTime.now());
         donante.setPersona(persona);
 
         return donante;
@@ -87,62 +87,26 @@ public class ImportadorCargaMasiva {
     private void actualizarCamposDonante(Donante donante, RegistroDonanteDTO dto) {
         Persona personaActual = donante.getPersona();
         String tipoActual = personaActual instanceof PersonaHumana ? TipoPersona.HUMANA.name() : TipoPersona.JURIDICA.name();
-        boolean cambioTipoPersona = !tipoActual.equalsIgnoreCase(dto.getTipoPersona());
-
-        if (cambioTipoPersona) {
-            // Al cambiar el tipo de persona (humana <-> jurídica) cambia la subclase
-            // persistida. Con herencia JOINED no es posible mutar el tipo de una fila
-            // existente, por lo que se elimina el donante actual y se recrea con una
-            // nueva identidad asignada por la base.
-            Persona nuevaPersona;
-
-            if (dto.getTipoPersona().equalsIgnoreCase(TipoPersona.HUMANA.name())) {
-                String[] nombreSplit = dto.getNombre().split(" ", 2);
-                String nombrePersona = nombreSplit[0];
-                String apellido = nombreSplit.length > 1 ? nombreSplit[1] : "";
-                String documentoLimpio = dto.getDocumento().replaceAll("[^0-9]", "");
-
-                nuevaPersona = new PersonaHumana(nombrePersona, "Sin especificar", apellido, null, 0, documentoLimpio);
-            } else {
-                PersonaJuridica pj = new PersonaJuridica();
-                pj.setRazonSocial(dto.getNombre());
-                pj.setTipo(detectarTipo(dto.getNombre()));
-                pj.setRubro("Sin especificar");
-                nuevaPersona = pj;
-            }
-
-            nuevaPersona.setDireccion(personaActual.getDireccion());
-            nuevaPersona.setMedioPredeterminado(personaActual.getMedioPredeterminado());
-            nuevaPersona.setFechaUltimaInteraccion(personaActual.getFechaUltimaInteraccion());
-
-            nuevaPersona.agregarMedioDeContacto("EMAIL", dto.getEmail());
-            nuevaPersona.agregarMedioDeContacto("SMS", dto.getTelefono());
-
-            donanteRepository.delete(donante);
-            donanteRepository.flush();
-
-            Donante nuevoDonante = new Donante();
-            nuevoDonante.setPersona(nuevaPersona);
-            nuevoDonante.setPassword(donante.getPassword());
-            donanteRepository.save(nuevoDonante);
-            return;
-        } else {
-            // Mismo tipo de persona: actualizar campos individuales
-            if (personaActual instanceof PersonaHumana ph) {
-                String[] nombreSplit = dto.getNombre().split(" ", 2);
-                ph.setNombre(nombreSplit[0]);
-                ph.setApellido(nombreSplit.length > 1 ? nombreSplit[1] : "");
-                ph.setNroDocumento(dto.getDocumento().replaceAll("[^0-9]", ""));
-            } else if (personaActual instanceof PersonaJuridica pj) {
-                pj.setRazonSocial(dto.getNombre());
-                pj.setTipo(detectarTipo(dto.getNombre()));
-            }
-
-            personaActual.reemplazarMedioDeContacto("SMS", dto.getTelefono());
+        if (!tipoActual.equals(dto.getTipoPersona())) {
+            throw new IllegalArgumentException("El tipo de persona debe coincidir con el donante registrado.");
         }
-
+        if (personaActual instanceof PersonaHumana ph) {
+            String[] nombre = dto.getNombre().split(" ", 2);
+            ph.setNombre(nombre[0]);
+            ph.setApellido(nombre.length > 1 ? nombre[1] : "");
+            ph.setNroDocumento(dto.getDocumento().replaceAll("[^0-9]", ""));
+        } else if (personaActual instanceof PersonaJuridica pj) {
+            pj.setRazonSocial(dto.getNombre());
+            pj.setCuit(dto.getDocumento());
+            pj.setTipo(detectarTipo(dto.getNombre()));
+        }
+        if (!dto.getTelefono().isBlank()) {
+            personaActual.reemplazarMedioDeContacto("SMS", dto.getTelefono());
+            if (personaActual.getTipoNotificadorPreferido() == com.tp.commons.domain.notificador.TipoNotificador.SMS) {
+                personaActual.setMedioPredeterminado(Map.of("medio", "SMS", "valor", dto.getTelefono()));
+            }
+        }
         donanteRepository.update(donante);
-        System.out.println("El donante " + dto.getEmail() + " ya se encontraba registrado. Actualizado correctamente.");
     }
 
     private TipoOrganizacion detectarTipo(String razonSocial) {

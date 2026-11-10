@@ -4,7 +4,6 @@ import com.tp.donatrack.domain.donante.Donante;
 import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
 import com.tp.donatrack.repositories.DonanteRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
@@ -18,8 +17,7 @@ import java.util.List;
 
 /**
  * Pruebas de {@link ImportadorCargaMasiva}: alta de donantes nuevos y
- * actualización de existentes a partir de registros importados, incluyendo el
- * cambio de tipo de persona preservando su identificador.
+ * actualización de existentes a partir de registros importados.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -105,39 +103,20 @@ public class ImportadorCargaMasivaTest {
     }
 
     @Test
-    @DisplayName("Al importar un donante que cambió de tipo (humana → jurídica), debe reemplazar la persona por una del nuevo tipo")
-    public void actualizarDonanteConCambioDeTipo() {
-        PersonaHumana personaOriginal = new PersonaHumana("María", "Femenino", "González", null, 25, "99999999");
-        personaOriginal.agregarMedioDeContacto("EMAIL", "maria@mail.com");
-        personaOriginal.agregarMedioDeContacto("SMS", "5555-5555");
+    @DisplayName("Un cambio de tipo por CSV se rechaza y preserva la identidad del donante")
+    public void rechazarCambioDeTipo() {
+        PersonaHumana persona = new PersonaHumana("María", "Femenino", "González", null, 25, "99999999");
+        persona.agregarMedioDeContacto("EMAIL", "maria@mail.com");
+        Long id = donanteRepository.create(new Donante(persona)).getId();
 
-        Donante donanteExistente = new Donante();
-        donanteExistente.setPersona(personaOriginal);
-        donanteRepository.create(donanteExistente);
-
-        RegistroDonanteDTO registroActualizado = new RegistroDonanteDTO(
+        RegistroDonanteDTO registro = new RegistroDonanteDTO(
                 "JURIDICA", "CUIT", "30-12345678-0",
-                "María González S.R.L.", "maria@mail.com", "6666-6666"
-        );
+                "María González S.R.L.", "MARIA@mail.com", "6666-6666");
 
-        importador.iniciar_migracion(List.of(registroActualizado));
-
-        Donante donanteActualizado = donanteRepository.find("maria@mail.com");
-        Assertions.assertNotNull(donanteActualizado);
-        Assertions.assertInstanceOf(PersonaJuridica.class, donanteActualizado.getPersona(),
-                "El tipo debería haber cambiado a PersonaJuridica");
-
-        PersonaJuridica pj = (PersonaJuridica) donanteActualizado.getPersona();
-        Assertions.assertEquals("María González S.R.L.", pj.getRazonSocial());
-        Assertions.assertEquals(TipoOrganizacion.EMPRESA, pj.getTipo(), "Debería detectarse como EMPRESA por el S.R.L.");
-
-        Assertions.assertNotNull(donanteActualizado.getPersona().getId(),
-                "El donante recreado debe tener un identificador asignado");
-
-        List<String> telefonos = donanteActualizado.getPersona().getMedioDeContacto().get("SMS");
-        Assertions.assertEquals("6666-6666", telefonos.get(0));
-        List<String> emails = donanteActualizado.getPersona().getMedioDeContacto().get("EMAIL");
-        Assertions.assertTrue(emails.contains("maria@mail.com"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> importador.iniciar_migracion(List.of(registro)));
+        Donante original = donanteRepository.find("maria@mail.com");
+        Assertions.assertEquals(id, original.getId());
+        Assertions.assertInstanceOf(PersonaHumana.class, original.getPersona());
     }
 
     @Test

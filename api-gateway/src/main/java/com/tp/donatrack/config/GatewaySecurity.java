@@ -26,7 +26,20 @@ public class GatewaySecurity {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
-                        .anyExchange().authenticated()
+                        .pathMatchers("/donantes/identidad").denyAll()
+                        .pathMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
+                                "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
+                        .pathMatchers(HttpMethod.PUT, "/donantes/me/insignias").hasAuthority("SCOPE_DONANTE")
+                        .pathMatchers("/donantes/me/**").denyAll()
+                        .anyExchange().access((authentication, context) -> authentication
+                                .map(auth -> new org.springframework.security.authorization.AuthorizationDecision(
+                                        auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)
+                                                && auth.getAuthorities().stream().noneMatch(
+                                                authority -> authority.getAuthority().equals("SCOPE_DONANTE")
+                                                        || authority.getAuthority().equals("SCOPE_DONANTE_LOOKUP")
+                                                        || authority.getAuthority().equals("SCOPE_DONACIONES_INCENTIVOS")
+                                                        || authority.getAuthority().equals("SCOPE_INCENTIVOS_DONACIONES"))))
+                                .defaultIfEmpty(new org.springframework.security.authorization.AuthorizationDecision(false)))
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtDecoder(jwtDecoder())));
 

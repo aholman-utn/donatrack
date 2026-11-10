@@ -51,6 +51,7 @@ public class DonacionService {
      * Confirma la entrega de una donación segmentada específica.
      * Utiliza la entidad beneficiaria que fue asignada durante el matchmaking.
      */
+    @org.springframework.transaction.annotation.Transactional
     public void registrarEntrega(Long donacionSegmentadaId) {
         DonacionSegmentada segmentada = donacionRepository
                 .findSegmentadaById(donacionSegmentadaId);
@@ -73,7 +74,13 @@ public class DonacionService {
 
         this.donanteService.registrarEntregaEnPerfil(donanteId, segmentada);
 
-        if (eventPublisher != null) {
+        publicarIncentivosAlConfirmar(donante, segmentada);
+    }
+
+    void publicarIncentivosAlConfirmar(Donante donante, DonacionSegmentada segmentada) {
+        if (eventPublisher != null && donante != null
+                && donante.getPersona() instanceof com.tp.donatrack.domain.persona.PersonaHumana
+                && donante.getPerfil().getMisionActualId() != null) {
             DonacionEntregadaEventDTO donacionEntregada = new DonacionEntregadaEventDTO();
             donacionEntregada.setDonacionSegmentadaId(segmentada.getId());
             donacionEntregada.setProgreso(donante.getPerfil().getProgreso());
@@ -81,7 +88,18 @@ public class DonacionService {
             donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
             donacionEntregada.setCategoriaDonante(donante.getPerfil().getNivelDonante());
             donacionEntregada.setNombreDonante(donante.getNombreCompleto());
-            eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+            var evento = new DonacionEntregadaEvent(donacionEntregada);
+            if (org.springframework.transaction.support.TransactionSynchronizationManager.isSynchronizationActive()) {
+                org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                        new org.springframework.transaction.support.TransactionSynchronization() {
+                            @Override
+                            public void afterCommit() {
+                                eventPublisher.publicar(evento);
+                            }
+                        });
+            } else {
+                eventPublisher.publicar(evento);
+            }
         }
     }
 

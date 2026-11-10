@@ -16,7 +16,13 @@ public class DonacionesRestClient {
     @Value("${services.donaciones.url}")
     private String donacionesUrl;
 
-    public DonacionesRestClient() {}
+    @org.springframework.beans.factory.annotation.Autowired
+    void autenticar(com.tp.commons.config.ServiceToken tokens) {
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().setBearerAuth(tokens.emitir("INCENTIVOS_DONACIONES"));
+            return execution.execute(request, body);
+        });
+    }
 
     public IndicadoresDonanteDTO obtenerIndicadores(
             Long donanteId,

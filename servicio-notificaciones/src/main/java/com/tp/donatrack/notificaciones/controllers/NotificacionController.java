@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Comparator;
+import java.time.LocalDateTime;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.Map;
 
 @RestController
@@ -43,6 +47,18 @@ public class NotificacionController {
             ));
         }
     }
+
+    @GetMapping("/me")
+    public List<Aviso> avisosPropios(@AuthenticationPrincipal Jwt jwt) {
+        Long id = Long.valueOf(jwt.getClaimAsString("donante_id"));
+        return notificacionService.buscar(id).stream()
+                .sorted(Comparator.comparing(Notificacion::getFecha, Comparator.nullsFirst(Comparator.naturalOrder()))
+                        .reversed())
+                .map(n -> new Aviso(n.getId(), n.getAsunto(), n.getMensaje(), n.getFecha()))
+                .toList();
+    }
+
+    public record Aviso(Long id, String asunto, String mensaje, LocalDateTime fecha) {}
 
     @GetMapping("/")
     public List<Notificacion> buscarTodas() {

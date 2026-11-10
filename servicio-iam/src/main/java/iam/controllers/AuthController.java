@@ -2,6 +2,10 @@ package iam.controllers;
 
 import iam.domain.User;
 import iam.enums.AuthProvider;
+import iam.enums.Role;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.HttpClientErrorException;
+import java.util.Locale;
 import iam.repositories.UserRepository;
 import iam.services.JwtService;
 
@@ -29,6 +33,11 @@ public class AuthController {
     @Value("${google.client.id}")
     private String googleClientId;
 
+    private final RestClient donaciones;
+
+    @Value("${donaciones.base-url:http://localhost:8080}")
+    private String donacionesBaseUrl;
+
     public AuthController(
             JwtService jwtService,
             UserRepository userRepository,
@@ -37,6 +46,10 @@ public class AuthController {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3000);
+        factory.setReadTimeout(3000);
+        this.donaciones = RestClient.builder().requestFactory(factory).build();
     }
 
     @PostMapping("/login")
@@ -51,7 +64,7 @@ public class AuthController {
             }
 
             if (passwordEncoder.matches(request.password(), user.getPassword())) {
-                String token = jwtService.generarToken(user.getEmail());
+                String token = jwtService.generarToken(user.getEmail(), user.getRole(), null);
 
                 UserDTO userDTO = new UserDTO(
                         user.getId(),
@@ -84,54 +97,44 @@ public class AuthController {
 
             GoogleIdToken idToken = verifier.verify(idTokenString);
 
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String email = payload.getEmail();
-
-                Optional<User> userOpt = userRepository.findByEmail(email);
-
-                if (userOpt.isPresent()) {
-                    User user = userOpt.get();
-
-                    String googleName = (String) payload.get("name");
-                    String googlePicture = (String) payload.get("picture");
-
-                    boolean updated = false;
-
-                    if (user.getName() == null && googleName != null) {
-                        user.setName(googleName);
-                        updated = true;
-                    }
-
-                    if (user.getPicture() == null && googlePicture != null) {
-                        user.setPicture(googlePicture);
-                        updated = true;
-                    }
-
-                    if (updated) {
-                        userRepository.save(user);
-                    }
-
-                    String donatrackToken = jwtService.generarToken(user.getEmail());
-
-                    UserDTO userDTO = new UserDTO(
-                            user.getId(),
-                            user.getEmail(),
-                            user.getRole().name(),
-                            user.getName(),
-                            user.getPicture()
-                    );
-
-                    return ResponseEntity.ok(new AuthResponse(donatrackToken, userDTO));
-                } else {
-                    return ResponseEntity.status(403).body("Usuario no autorizado. Contacte al administrador.");
-                }
-            } else {
-                return ResponseEntity.status(401).body("Token de Google inválido");
+            if (idToken == null || !Boolean.TRUE.equals(idToken.getPayload().getEmailVerified())) {
+                return ResponseEntity.status(401).body("Google no pudo verificar el correo.");
             }
 
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail().trim().toLowerCase(Locale.ROOT);
+            User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+            Long donanteId = null;
+
+            if (user == null || user.getRole() == Role.DONANTE) {
+                try {
+                    donanteId = donaciones.get().uri(donacionesBaseUrl + "/donantes/identidad")
+                            .headers(headers -> headers.setBearerAuth(jwtService.tokenConsultaDonante(email)))
+                            .retrieve().body(Long.class);
+                } catch (HttpClientErrorException.NotFound e) {
+                    return ResponseEntity.status(403).body("Tu correo todavía no está registrado en DonaTrack.");
+                }
+                if (donanteId == null) {
+                    return ResponseEntity.status(503).body("No se pudo validar el registro del donante.");
+                }
+            }
+
+            if (user == null) {
+                user = User.builder().email(email).role(Role.DONANTE).provider(AuthProvider.GOOGLE).build();
+            }
+
+            if (user.getId() == null || user.getName() == null || user.getPicture() == null) {
+                if (user.getName() == null) user.setName((String) payload.get("name"));
+                if (user.getPicture() == null) user.setPicture((String) payload.get("picture"));
+                user = userRepository.save(user);
+            }
+
+            String token = jwtService.generarToken(user.getEmail(), user.getRole(), donanteId);
+            return ResponseEntity.ok(new AuthResponse(token,
+                    new UserDTO(user.getId(), user.getEmail(), user.getRole().name(), user.getName(), user.getPicture())));
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error validando token con Google: " + e.getMessage());
+            return ResponseEntity.status(500).body("No se pudo completar el ingreso con Google.");
         }
     }
 }

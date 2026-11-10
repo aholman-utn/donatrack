@@ -10,9 +10,14 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.io.IOException;
 
 @Component
 public class LectorCSV implements iLectorArchivo {
+
+    private static final Pattern COLUMNA = Pattern.compile(
+            "\\G(?:\"((?:[^\"]|\"\")*)\"|([^,\"]*))(?:,|$)");
 
     public List<RegistroDonanteDTO> leerArchivo(MultipartFile archivo) {
         if (archivo == null || archivo.isEmpty()) {
@@ -24,25 +29,39 @@ public class LectorCSV implements iLectorArchivo {
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(archivo.getInputStream(), StandardCharsets.UTF_8)
         )) {
-            br.readLine(); // Saltar cabecera
+            if (br.readLine() == null) {
+                throw new IllegalArgumentException("El CSV requiere una cabecera.");
+            }
+            int fila = 1;
             String linea;
 
             while ((linea = br.readLine()) != null) {
+                fila++;
                 if (linea.isBlank()) continue;
 
-                String[] partes = linea.split(",");
-                if (partes.length < 6) {
-                    throw new IllegalArgumentException("Línea inválida en el CSV: " + linea);
+                var matcher = COLUMNA.matcher(linea);
+                var columnas = new ArrayList<String>(6);
+                int fin = 0;
+                while (matcher.find()) {
+                    fin = matcher.end();
+                    String valor = matcher.group(1);
+                    columnas.add((valor == null ? matcher.group(2) : valor.replace("\"\"", "\"")).trim());
+                    if (fin == linea.length()) {
+                        if (linea.endsWith(",")) columnas.add("");
+                        break;
+                    }
                 }
-
-                // Guardamos los strings crudos en el DTO
-                registros.add(new RegistroDonanteDTO(
-                        partes[0].trim(), partes[1].trim(), partes[2].trim(),
-                        partes[3].trim(), partes[4].trim(), partes[5].trim()
-                ));
+                if (fin != linea.length() || columnas.size() != 6) {
+                    throw new IllegalArgumentException("La fila " + fila + " del CSV debe tener seis columnas.");
+                }
+                registros.add(new RegistroDonanteDTO(columnas.get(0), columnas.get(1), columnas.get(2),
+                        columnas.get(3), columnas.get(4), columnas.get(5)));
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Error técnico leyendo el archivo CSV: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("No se pudo leer el archivo CSV.", e);
+        }
+        if (registros.isEmpty()) {
+            throw new IllegalArgumentException("El CSV no contiene donantes.");
         }
 
         return registros;

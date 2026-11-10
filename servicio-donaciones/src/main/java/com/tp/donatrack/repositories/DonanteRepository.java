@@ -22,11 +22,30 @@ public interface DonanteRepository extends JpaRepository<Donante, Long> {
     @Query("SELECT d FROM Donante d JOIN d.persona p JOIN p.mediosDeContacto m WHERE m.valor = :valor")
     Optional<Donante> findByMedioDeContactoValor(@Param("valor") String valor);
 
+    @Query("SELECT DISTINCT d FROM Donante d JOIN d.persona p JOIN p.mediosDeContacto m "
+            + "WHERE m.tipoNotificador = com.tp.commons.domain.notificador.TipoNotificador.EMAIL AND LOWER(m.valor) = LOWER(:email)")
+    List<Donante> findByEmail(@Param("email") String email);
+
     /**
      * Devuelve los donantes ordenados por total de donaciones exitosas (ranking desnormalizado).
      */
     @Query("SELECT d FROM Donante d ORDER BY d.perfil.totalDonacionesExitosas DESC")
     List<Donante> findTopDonantesRanking();
+
+    @Query("SELECT COUNT(d) FROM Donante d WHERE d.perfil.totalMisionesCompletadas > :misiones "
+            + "OR (d.perfil.totalMisionesCompletadas = :misiones AND d.perfil.totalDonacionesExitosas > :entregas)")
+    long contarDonantesMejorPosicionados(@Param("misiones") int misiones, @Param("entregas") int entregas);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE Persona p SET p.fechaAvisoInactividad = :fecha WHERE p.id = :id "
+            + "AND p.fechaUltimaInteraccion = :actividad "
+            + "AND (p.fechaAvisoInactividad IS NULL OR p.fechaAvisoInactividad < :actividad)")
+    int reservarAvisoInactividad(@Param("id") Long id, @Param("actividad") java.time.LocalDateTime actividad,
+                                 @Param("fecha") java.time.LocalDateTime fecha);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE Persona p SET p.fechaAvisoInactividad = NULL WHERE p.id = :id AND p.fechaAvisoInactividad = :fecha")
+    void liberarAvisoInactividad(@Param("id") Long id, @Param("fecha") java.time.LocalDateTime fecha);
 
     /** Persiste el donante. */
     default Donante create(Donante donante) {

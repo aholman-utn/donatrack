@@ -72,18 +72,7 @@ public class DonanteController {
     @PostMapping(DonanteRoutes.HUMANO)
     public ResponseEntity<Donante> crearHumano(
             @Valid @RequestBody CrearPersonaHumanaRequest request) {
-        Donante donante = donanteService.registrar(request.toDomain());
-        Persona persona = donante.getPersona();
-        boolean enviada = notificacionQueueClient.notificar(
-                persona.getTipoNotificadorPreferido(),
-                persona.getContactoPredeterminado(),
-                "Gracias por registrarte como donante.",
-                "¡Bienvenido a Donatrack!",
-                persona.getId()
-        );
-        if (!enviada) {
-            System.err.println("La notificación de bienvenida no pudo enviarse.");
-        }
+        Donante donante = donanteService.registrarConAcceso(request.toDomain());
         return ResponseEntity.status(HttpStatus.CREATED).body(donante);
     }
 
@@ -92,20 +81,7 @@ public class DonanteController {
     public ResponseEntity<Donante> crearJuridico(
             @Valid @RequestBody CrearPersonaJuridicaRequest request) {
 
-        Donante donante = donanteService.registrar(request.toDomain());
-        Persona persona = donante.getPersona();
-        System.err.println("Persona: "+persona.getId());
-        boolean enviada = notificacionQueueClient.notificar(
-                persona.getTipoNotificadorPreferido(),
-                persona.getContactoPredeterminado(),
-                "Gracias por registrarte como donante.",
-                "¡Bienvenido a Donatrack!",
-                persona.getId()
-        );
-        if (!enviada) {
-            System.err.println("La notificación de bienvenida no pudo enviarse.");
-        }
-
+        Donante donante = donanteService.registrarConAcceso(request.toDomain());
         return ResponseEntity.status(HttpStatus.CREATED).body(donante);
     }
 
@@ -173,22 +149,14 @@ public class DonanteController {
     public ResponseEntity<NotificacionRequestDTO> obtenerContactoParaNotificacion(@PathVariable Long id) {
         Donante donante = donanteService.buscarDonantePorId(id);
 
-        if (donante == null || donante.getPersona() == null || donante.getPersona().getMedioPredeterminado() == null) {
+        if (donante == null || donante.getPersona() == null || donante.getPersona().getContactoPredeterminado() == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Map<String, String> mapaMedio = donante.getPersona().getMedioPredeterminado();
-        String tipoString = mapaMedio.get("medio");
-        String valor = mapaMedio.get("valor");
-
-        if (tipoString == null || valor == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
+        Persona persona = donante.getPersona();
         NotificacionRequestDTO responseDTO = new NotificacionRequestDTO();
-
-        responseDTO.setMedio(TipoNotificador.valueOf(tipoString.toUpperCase()));
-        responseDTO.setDestinatario(valor);
+        responseDTO.setMedio(persona.getTipoNotificadorPreferido());
+        responseDTO.setDestinatario(persona.getContactoPredeterminado());
         responseDTO.setIdPersona(donante.getPersona().getId());
 
         responseDTO.setMensaje(null);
