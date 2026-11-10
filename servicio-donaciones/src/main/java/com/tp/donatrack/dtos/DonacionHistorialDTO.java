@@ -18,6 +18,7 @@ import java.util.List;
 public class DonacionHistorialDTO {
     private Long id;
     private String descripcion;
+    private String donanteNombre;
     private Date fechaIngreso;
     private EstadoDonacion estado;
     private List<DonacionSegmentadaHistorialDTO> donacionesSegmentadas;

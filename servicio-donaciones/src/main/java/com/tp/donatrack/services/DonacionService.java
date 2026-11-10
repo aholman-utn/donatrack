@@ -31,7 +31,11 @@ public class DonacionService {
         this.eventPublisher = eventPublisher;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Donacion registrarDonacion(CrearDonacionRequest request) {
+        if (request.getDonanteId() == null || request.getDonanteId() <= 0) {
+            throw new IllegalArgumentException("Seleccioná un donante registrado.");
+        }
         Donante donante = donanteService.buscarDonantePorId(request.getDonanteId());
         if (donante == null) {
             throw new IllegalArgumentException("No se encontró el donante con ID: " + request.getDonanteId());
@@ -168,6 +172,7 @@ public class DonacionService {
                         .categoria(ds.getCategoriaBien() != null ? ds.getCategoriaBien().name()
                                 : (ds.getSubCategoria() != null && ds.getSubCategoria().getCategoria() != null ? ds.getSubCategoria().getCategoria().name() : null))
                         .cantidad(ds.getCantidad())
+                        .unidad(ds.getSubCategoria() == null ? null : ds.getSubCategoria().getUnidad())
                         .estado(ds.getEstado())
                         .entidadBeneficiariaAsignadaId(ds.getEntidadBeneficiariaAsignadaId())
                         .entidadBeneficiariaNombre(ds.getEntidadBeneficiariaNombre())
@@ -176,6 +181,7 @@ public class DonacionService {
 
         return DonacionHistorialDTO.builder()
                 .id(donacion.getId())
+                .donanteNombre(donacion.getDonante() == null ? null : donacion.getDonante().getNombreCompleto())
                 .descripcion(donacion.getDescripcion())
                 .fechaIngreso(donacion.getFechaIngreso())
                 .estado(donacion.getEstado())

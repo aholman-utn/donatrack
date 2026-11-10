@@ -26,7 +26,7 @@ public class GatewaySecurity {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
-                        .pathMatchers("/donantes/identidad").denyAll()
+                        .pathMatchers("/donantes/identidad", "/donantes/registro-publico").denyAll()
                         .pathMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
                         .pathMatchers(HttpMethod.PUT, "/donantes/me/insignias").hasAuthority("SCOPE_DONANTE")
@@ -37,6 +37,7 @@ public class GatewaySecurity {
                                                 && auth.getAuthorities().stream().noneMatch(
                                                 authority -> authority.getAuthority().equals("SCOPE_DONANTE")
                                                         || authority.getAuthority().equals("SCOPE_DONANTE_LOOKUP")
+                                                        || authority.getAuthority().equals("SCOPE_DONANTE_REGISTRATION")
                                                         || authority.getAuthority().equals("SCOPE_DONACIONES_INCENTIVOS")
                                                         || authority.getAuthority().equals("SCOPE_INCENTIVOS_DONACIONES"))))
                                 .defaultIfEmpty(new org.springframework.security.authorization.AuthorizationDecision(false)))

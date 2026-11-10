@@ -1,6 +1,7 @@
 package com.tp.donatrack.repositories;
 
 import com.tp.donatrack.domain.donante.Donante;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,6 +26,21 @@ public interface DonanteRepository extends JpaRepository<Donante, Long> {
     @Query("SELECT DISTINCT d FROM Donante d JOIN d.persona p JOIN p.mediosDeContacto m "
             + "WHERE m.tipoNotificador = com.tp.commons.domain.notificador.TipoNotificador.EMAIL AND LOWER(m.valor) = LOWER(:email)")
     List<Donante> findByEmail(@Param("email") String email);
+
+    @Query("""
+            SELECT DISTINCT d FROM Donante d JOIN d.persona p JOIN p.mediosDeContacto m
+            WHERE m.tipoNotificador = com.tp.commons.domain.notificador.TipoNotificador.EMAIL
+                AND LOCATE(LOWER(:fragmento), LOWER(m.valor)) > 0
+            ORDER BY d.id
+            """)
+    List<Donante> findByEmailFragment(@Param("fragmento") String fragmento, Pageable pagina);
+
+    @Query("""
+            SELECT d FROM Donante d JOIN TREAT(d.persona AS PersonaHumana) p
+            WHERE LOCATE(:dni, REPLACE(REPLACE(REPLACE(p.nroDocumento, '.', ''), ' ', ''), '-', '')) > 0
+            ORDER BY d.id
+            """)
+    List<Donante> findByDniFragment(@Param("dni") String dni, Pageable pagina);
 
     /**
      * Devuelve los donantes ordenados por total de donaciones exitosas (ranking desnormalizado).

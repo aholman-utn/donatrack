@@ -67,8 +67,8 @@ public class DonacionController {
         try {
             Donacion creada = donacionService.registrarDonacion(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(creada);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al crear donación: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

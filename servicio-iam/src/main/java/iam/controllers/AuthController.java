@@ -1,5 +1,6 @@
 package iam.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import iam.domain.User;
 import iam.enums.AuthProvider;
 import iam.enums.Role;
@@ -18,9 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -137,11 +140,69 @@ public class AuthController {
             return ResponseEntity.status(500).body("No se pudo completar el ingreso con Google.");
         }
     }
+
+    @PostMapping("/social/google/registro-donante")
+    public ResponseEntity<?> registrarDonanteConGoogle(@RequestBody GoogleDonorRegistrationRequest request) {
+        if (request.token() == null || request.token().isBlank() || request.tipo() == null || request.datos() == null) {
+            return ResponseEntity.badRequest().body("Completá los datos del registro y continuá con Google.");
+        }
+
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(request.token());
+            if (idToken == null || !Boolean.TRUE.equals(idToken.getPayload().getEmailVerified())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google no pudo verificar el correo.");
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail().trim().toLowerCase(Locale.ROOT);
+            User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+            if (user != null && user.getRole() != Role.DONANTE) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Este correo ya pertenece a otra cuenta de DonaTrack. Iniciá sesión.");
+            }
+
+            Long donanteId;
+            try {
+                donanteId = donaciones.post()
+                        .uri(donacionesBaseUrl + "/donantes/registro-publico")
+                        .headers(headers -> headers.setBearerAuth(jwtService.tokenRegistroDonante(email)))
+                        .body(Map.of("tipo", request.tipo(), "datos", request.datos()))
+                        .retrieve()
+                        .body(Long.class);
+            } catch (HttpClientErrorException error) {
+                return ResponseEntity.status(error.getStatusCode()).body(error.getResponseBodyAsString());
+            }
+            if (donanteId == null) {
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("No se pudo confirmar el registro del donante.");
+            }
+
+            if (user == null) {
+                user = User.builder().email(email).role(Role.DONANTE).provider(AuthProvider.GOOGLE).build();
+            }
+            if (user.getName() == null) user.setName((String) payload.get("name"));
+            if (user.getPicture() == null) user.setPicture((String) payload.get("picture"));
+            user = userRepository.save(user);
+
+            String token = jwtService.generarToken(user.getEmail(), user.getRole(), donanteId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token,
+                    new UserDTO(user.getId(), user.getEmail(), user.getRole().name(), user.getName(), user.getPicture())));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No se pudo completar el registro con Google.");
+        }
+    }
 }
 
 record LoginRequest(String email, String password) {}
 
 record GoogleLoginRequest(String token) {}
+
+record GoogleDonorRegistrationRequest(String token, String tipo, JsonNode datos) {}
 
 record UserDTO(Long id, String email, String role, String name, String picture) {}
 

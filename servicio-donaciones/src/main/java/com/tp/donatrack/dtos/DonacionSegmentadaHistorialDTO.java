@@ -1,6 +1,7 @@
 package com.tp.donatrack.dtos;
 
 import com.tp.donatrack.domain.donacion.EstadoDonacionSegmentada;
+import com.tp.commons.domain.donaciones.Unidad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class DonacionSegmentadaHistorialDTO {
     private String subCategoria;
     private String categoria;
     private int cantidad;
+    private Unidad unidad;
     private EstadoDonacionSegmentada estado;
     private Long entidadBeneficiariaAsignadaId;
     private String entidadBeneficiariaNombre;

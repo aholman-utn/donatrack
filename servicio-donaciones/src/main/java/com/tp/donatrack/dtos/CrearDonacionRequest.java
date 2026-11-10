@@ -18,29 +18,32 @@ public class CrearDonacionRequest {
 
     public List<Bien> toDomainBienes() {
         List<Bien> domainBienes = new ArrayList<>();
+        if (bienes == null || bienes.isEmpty()) {
+            throw new IllegalArgumentException("Agregá al menos un bien.");
+        }
         for (BienRequest br : bienes) {
+            if (br == null || br.getSubCategoria() == null) {
+                throw new IllegalArgumentException("Cada bien debe tener una subcategoría.");
+            }
+            if (br.getCantidad() < 1 || br.getCantidad() > 10_000 - domainBienes.size()) {
+                throw new IllegalArgumentException("La donación admite entre 1 y 10.000 bienes.");
+            }
+            var subCategoria = br.getSubCategoria();
             SubCategoria sub = new SubCategoria(
-                br.getSubCategoria().getCategoria(),
-                br.getSubCategoria().getDescripcion(),
-                br.getSubCategoria().getUnidad()
+                subCategoria.getCategoria(),
+                subCategoria.getDescripcion(),
+                subCategoria.getUnidad()
             );
 
-            if ("PERECEDERO".equalsIgnoreCase(br.getTipo())) {
-                domainBienes.add(new BienPerecedero(
-                    br.getNombre(),
-                    br.getDescripcion(),
-                    br.getFoto(),
-                    sub,
-                    br.getFechaVencimiento()
-                ));
-            } else if ("DURADERO".equalsIgnoreCase(br.getTipo())) {
-                domainBienes.add(new BienDuradero(
-                    br.getNombre(),
-                    br.getDescripcion(),
-                    br.getFoto(),
-                    sub,
-                    br.getEstadoBien()
-                ));
+            boolean perecedero = "PERECEDERO".equalsIgnoreCase(br.getTipo());
+            if (!perecedero && !"DURADERO".equalsIgnoreCase(br.getTipo())) {
+                throw new IllegalArgumentException("El tipo de bien debe ser PERECEDERO o DURADERO.");
+            }
+            for (int i = 0; i < br.getCantidad(); i++) {
+                Bien bien = perecedero
+                    ? new BienPerecedero(br.getNombre(), br.getDescripcion(), br.getFoto(), sub, br.getFechaVencimiento())
+                    : new BienDuradero(br.getNombre(), br.getDescripcion(), br.getFoto(), sub, br.getEstadoBien());
+                domainBienes.add(bien);
             }
         }
         return domainBienes;
@@ -50,6 +53,7 @@ public class CrearDonacionRequest {
     @Setter
     public static class BienRequest {
         private String tipo; // "PERECEDERO" or "DURADERO"
+        private int cantidad = 1;
         private String nombre;
         private String descripcion;
         private String foto;

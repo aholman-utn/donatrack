@@ -24,6 +24,10 @@ public class JwtService {
         return firmar(email, "DONANTE_LOOKUP", null, 30_000);
     }
 
+    public String tokenRegistroDonante(String email) {
+        return firmar(email, "DONANTE_REGISTRATION", null, 30_000);
+    }
+
     private String firmar(String email, String scope, Long donanteId, long duracion) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         Date ahora = new Date();

@@ -1,5 +1,6 @@
 package com.tp.commons.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,8 +33,10 @@ public class CommonsSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/donantes/identidad").hasAuthority("SCOPE_DONANTE_LOOKUP")
+                        .requestMatchers(HttpMethod.POST, "/donantes/registro-publico").hasAuthority("SCOPE_DONANTE_REGISTRATION")
                         .requestMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
                         .requestMatchers(HttpMethod.PUT, "/donantes/me/insignias").hasAuthority("SCOPE_DONANTE")
@@ -43,6 +46,10 @@ public class CommonsSecurityConfig {
                         .requestMatchers("/api/users/supervisores").hasAuthority("SCOPE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/incentivos/entrega")
                                 .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR", "SCOPE_DONACIONES_INCENTIVOS")
+                        .requestMatchers(HttpMethod.GET, "/donantes/buscar", "/donantes/dni")
+                                .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR")
+                        .requestMatchers(HttpMethod.POST, "/donaciones")
+                                .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR")
                         .requestMatchers(HttpMethod.GET, "/donantes", "/donantes/*/contacto-notificacion",
                                 "/donantes/ids-mision-actual", "/donantes/*/fecha-ultima-donacion",
                                 "/donaciones-segmentadas/indicadores/**")
@@ -51,6 +58,7 @@ public class CommonsSecurityConfig {
                                 .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR", "SCOPE_INCENTIVOS_DONACIONES")
                         .anyRequest().access(allOf(AuthenticatedAuthorizationManager.authenticated(),
                                 not(hasAnyAuthority("SCOPE_DONANTE", "SCOPE_DONANTE_LOOKUP",
+                                        "SCOPE_DONANTE_REGISTRATION",
                                         "SCOPE_DONACIONES_INCENTIVOS", "SCOPE_INCENTIVOS_DONACIONES"))))
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())));

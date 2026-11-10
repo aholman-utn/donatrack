@@ -19,6 +19,7 @@ import com.tp.donatrack.repositories.DonanteRepository;
 import com.tp.donatrack.dtos.*;
 import com.tp.commons.dtos.incentivos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
@@ -77,6 +78,37 @@ public class DonanteService {
         return donante;
     }
 
+    public synchronized Donante registrarPublicoVerificado(Persona persona, String emailVerificado) {
+        String email = emailVerificado == null ? "" : emailVerificado.trim().toLowerCase(Locale.ROOT);
+        String emailDeclarado = persona.getMedioDeContacto() == null ? "" : persona.getMedioDeContacto()
+                .getOrDefault("EMAIL", List.of()).stream().findFirst().orElse("").trim().toLowerCase(Locale.ROOT);
+        if (!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Ingresá un correo válido.");
+        }
+        if (!email.equals(emailDeclarado)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "El correo del formulario debe coincidir con el correo verificado por Google.");
+        }
+
+        List<Donante> existentes = donanteRepository.findByEmail(email);
+        if (!existentes.isEmpty()) {
+            if (existentes.size() != 1) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.CONFLICT, "El correo está asociado a más de un donante.");
+            }
+            return existentes.getFirst();
+        }
+
+        persona.setId(null);
+        persona.reemplazarMedioDeContacto("EMAIL", email);
+        if (persona.getMedioPredeterminado() == null || persona.getTipoNotificadorPreferido() == TipoNotificador.EMAIL) {
+            persona.setMedioPredeterminado(Map.of("medio", "EMAIL", "valor", email));
+        }
+        persona.setFechaUltimaInteraccion(LocalDateTime.now());
+        return registrar(persona);
+    }
+
     @org.springframework.beans.factory.annotation.Value("${donatrack.frontend-url:http://localhost:5173}")
     private String frontendUrl;
 
@@ -109,6 +141,16 @@ public class DonanteService {
 
     public Donante buscarDonante(String email) {
         return this.donanteRepository.find(email);
+    }
+
+    private static final PageRequest RESULTADOS_BUSQUEDA = PageRequest.of(0, 20);
+
+    public List<Donante> buscarPorCorreo(String email) {
+        return donanteRepository.findByEmailFragment(email, RESULTADOS_BUSQUEDA);
+    }
+
+    public List<Donante> buscarPorDni(String dni) {
+        return donanteRepository.findByDniFragment(dni, RESULTADOS_BUSQUEDA);
     }
 
     public Donante buscarDonantePorId(Long id) {

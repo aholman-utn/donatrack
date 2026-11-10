@@ -4,6 +4,7 @@ import com.tp.commons.domain.notificador.TipoNotificador;
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import com.tp.commons.services.notificador.NotificacionQueueClient;
 import com.tp.donatrack.domain.persona.Persona;
+import com.tp.donatrack.domain.persona.PersonaHumana;
 import com.tp.donatrack.dtos.ImportacionResponseDTO;
 import com.tp.donatrack.dtos.CrearPersonaHumanaRequest;
 import com.tp.donatrack.dtos.CrearPersonaJuridicaRequest;
@@ -51,6 +52,41 @@ public class DonanteController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(donante);
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<DonanteEncontrado>> buscarPorCorreo(@RequestParam String email) {
+        String correo = email.strip();
+        if (!correo.matches("\\S{3,254}")) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(donanteService.buscarPorCorreo(correo).stream()
+                .map(DonanteEncontrado::desde).toList());
+    }
+
+    @GetMapping("/dni")
+    public ResponseEntity<List<DonanteEncontrado>> buscarPorDni(@RequestParam String dni) {
+        String numero = dni.replaceAll("[.\\s-]", "");
+        if (!numero.matches("[0-9]{3,8}")) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(donanteService.buscarPorDni(numero).stream()
+                .map(DonanteEncontrado::desde).toList());
+    }
+
+    public record DonanteEncontrado(Long id, String nombre, String email, String dni) {
+        static DonanteEncontrado desde(Donante donante) {
+            Persona persona = donante.getPersona();
+            String email = persona.getMediosDeContacto().stream()
+                    .filter(contacto -> contacto.getTipoNotificador() == TipoNotificador.EMAIL)
+                    .filter(contacto -> contacto.getValor() != null && !contacto.getValor().isBlank())
+                    .sorted(java.util.Comparator.comparing(contacto -> !contacto.isEsPredeterminado()))
+                    .map(contacto -> contacto.getValor())
+                    .findFirst()
+                    .orElse(null);
+            String dni = persona instanceof PersonaHumana humana ? humana.getNroDocumento() : null;
+            return new DonanteEncontrado(donante.getId(), donante.getNombreCompleto(), email, dni);
+        }
     }
 
     // POST http://localhost:8080/donantes/humano → crear donante humano
