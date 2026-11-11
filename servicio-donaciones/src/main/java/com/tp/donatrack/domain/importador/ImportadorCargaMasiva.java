@@ -6,6 +6,7 @@ import com.tp.donatrack.domain.persona.*;
 import com.tp.donatrack.dtos.input.importacionCSV.RegistroDonanteDTO;
 import com.tp.donatrack.repositories.DonanteRepository;
 import com.tp.donatrack.utils.security.CryptoUtils;
+import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class ImportadorCargaMasiva {
 
     @Autowired(required = false)
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired(required = false)
+    private EntityManager entityManager;
 
     private record PasswordPar(String plain, String hash) {}
     private record DonanteExistenteInfo(Long idDonante, String tipoPersona) {}
@@ -91,6 +95,13 @@ public class ImportadorCargaMasiva {
     private List<Donante> iniciarMigracionBatchJdbc(List<RegistroDonanteDTO> registros) {
         long startMs = System.currentTimeMillis();
 
+        // Sincronizar cambios pendientes del contexto de persistencia JPA antes de consultar por JDBC
+        if (entityManager != null) {
+            entityManager.flush();
+        } else {
+            donanteRepository.flush();
+        }
+
         // 1. Deduplicar registros dentro del propio CSV por email en O(N) (conservando la última aparición)
         Map<String, RegistroDonanteDTO> registrosPorEmail = new LinkedHashMap<>(registros.size());
         for (RegistroDonanteDTO reg : registros) {
@@ -135,12 +146,14 @@ public class ImportadorCargaMasiva {
         logger.info("Carga masiva CSV: {} registros únicos ({} nuevos para insertar, {} existentes para actualizar).",
                 registrosPorEmail.size(), paraInsertar.size(), paraActualizar.size());
 
+        List<Donante> nuevosDonantes = new ArrayList<>(paraInsertar.size());
+
         // 4. Procesar ALTAS masivas en bloques (multi-row INSERT)
         if (!paraInsertar.isEmpty()) {
             List<PasswordPar> poolPasswords = obtenerPoolPasswords();
             for (int i = 0; i < paraInsertar.size(); i += BATCH_SIZE) {
                 List<RegistroDonanteDTO> lote = paraInsertar.subList(i, Math.min(i + BATCH_SIZE, paraInsertar.size()));
-                insertarLoteJdbc(lote, poolPasswords);
+                insertarLoteJdbc(lote, poolPasswords, nuevosDonantes);
             }
         }
 
@@ -152,14 +165,20 @@ public class ImportadorCargaMasiva {
             }
         }
 
+        // Limpiar la caché de primer nivel de Hibernate para que las lecturas posteriores reflejen los cambios JDBC
+        if (entityManager != null) {
+            entityManager.flush();
+            entityManager.clear();
+        }
+
         long elapsedMs = System.currentTimeMillis() - startMs;
         logger.info("Carga masiva CSV completada en {} ms ({} insertados, {} actualizados).",
                 elapsedMs, paraInsertar.size(), paraActualizar.size());
 
-        return new ArrayList<>();
+        return nuevosDonantes;
     }
 
-    private void insertarLoteJdbc(List<RegistroDonanteDTO> lote, List<PasswordPar> poolPasswords) {
+    private void insertarLoteJdbc(List<RegistroDonanteDTO> lote, List<PasswordPar> poolPasswords, List<Donante> nuevosDonantes) {
         int n = lote.size();
         // 1. Insertar las N filas en `personas` en una sola sentencia multi-row y recuperar los IDs autogenerados
         StringBuilder sqlPersonas = new StringBuilder(
@@ -221,6 +240,12 @@ public class ImportadorCargaMasiva {
             if (reg.getTelefono() != null && !reg.getTelefono().isBlank()) {
                 batchMedios.add(new Object[]{idPersona, "SMS", reg.getTelefono().trim(), false});
             }
+
+            Donante nuevoDonante = crearDonanteSegunTipoPersona(reg);
+            nuevoDonante.getPersona().setId(idPersona);
+            nuevoDonante.setId(idPersona);
+            nuevoDonante.setPassword(pw.plain());
+            nuevosDonantes.add(nuevoDonante);
         }
 
         if (!batchHumanas.isEmpty()) {
