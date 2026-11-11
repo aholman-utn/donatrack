@@ -9,6 +9,9 @@ import com.tp.donatrack.domain.donante.PerfilDonante;
 import com.tp.donatrack.domain.donante.Donante;
 
 import com.tp.donatrack.domain.persona.Persona;
+import com.tp.donatrack.domain.persona.PersonaHumana;
+import com.tp.donatrack.domain.persona.PersonaJuridica;
+import com.tp.donatrack.domain.persona.MedioDeContacto;
 
 import com.tp.donatrack.domain.importador.ImportadorCargaMasiva;
 import com.tp.donatrack.domain.lectoresDeArchivos.iLectorArchivo;
@@ -49,23 +52,105 @@ public class DonanteService {
         this.lectoresDeArchivos = lectores;
     }
 
-    // CREATE
+    // CREATE (o UPDATE si ya existe por email, según consigna del TP pág. 13)
     public Donante registrar(Persona persona) {
+        String email = null;
+        if (persona.getMediosDeContacto() != null) {
+            email = persona.getMediosDeContacto().stream()
+                    .filter(m -> m.getTipoNotificador() == TipoNotificador.EMAIL)
+                    .map(MedioDeContacto::getValor)
+                    .filter(v -> v != null && v.contains("@"))
+                    .findFirst()
+                    .orElse(null);
+        }
+        if (email == null && persona.getMedioPredeterminado() != null) {
+            String medio = persona.getMedioPredeterminado().get("medio");
+            if ("EMAIL".equalsIgnoreCase(medio)) {
+                email = persona.getMedioPredeterminado().get("valor");
+            }
+        }
+        if (email == null) {
+            String contacto = persona.getContactoPredeterminado();
+            if (contacto != null && contacto.contains("@")) {
+                email = contacto;
+            }
+        }
+
+        if (email != null && !email.isBlank()) {
+            Donante existente = buscarDonante(email.trim());
+            if (existente != null) {
+                logger.info("Donante con email '{}' ya se encuentra registrado. Actualizando sus datos conforme a consigna TP.", email);
+                return actualizar(email.trim(), persona);
+            }
+        }
+
         Donante donante = new Donante(persona);
         return donanteRepository.create(donante);
     }
 
     // READ
     public List<Donante> listarTodos() {
-        return donanteRepository.findAll();
+        return donanteRepository.findAllWithDetails();
     }
 
-    // UPDATE TODO: aca actualizo la persona completa, el problema es que en un
-    // futuro esto me va a cambiar el ID
+    // UPDATE: actualiza los datos de la persona manteniendo la entidad administrada para evitar inconsistencias
     public Donante actualizar(String email, Persona personaActualizada) {
         Donante donante = buscarDonante(email);
-        donante.setPersona(personaActualizada);
-        return donanteRepository.create(donante);
+        if (donante == null) {
+            throw new RuntimeException("Donante no encontrado para actualizar con email: " + email);
+        }
+        Persona personaActual = donante.getPersona();
+        if (personaActual == null) {
+            donante.setPersona(personaActualizada);
+            return donanteRepository.save(donante);
+        }
+
+        // Si son del mismo tipo concreto, actualizamos los campos sobre la entidad existente
+        if (personaActual instanceof PersonaHumana ph && personaActualizada instanceof PersonaHumana nuevaPh) {
+            ph.setNombre(nuevaPh.getNombre());
+            ph.setApellido(nuevaPh.getApellido());
+            ph.setGenero(nuevaPh.getGenero());
+            ph.setFechaNacimiento(nuevaPh.getFechaNacimiento());
+            ph.setEdad(nuevaPh.getEdad());
+            ph.setNroDocumento(nuevaPh.getNroDocumento());
+            if (nuevaPh.getDireccion() != null) {
+                ph.setDireccion(nuevaPh.getDireccion());
+            }
+            if (nuevaPh.getMediosDeContacto() != null && !nuevaPh.getMediosDeContacto().isEmpty()) {
+                ph.getMediosDeContacto().clear();
+                ph.getMediosDeContacto().addAll(nuevaPh.getMediosDeContacto());
+            }
+            if (nuevaPh.getMedioPredeterminado() != null) {
+                ph.setMedioPredeterminado(nuevaPh.getMedioPredeterminado());
+            }
+            return donanteRepository.save(donante);
+        } else if (personaActual instanceof PersonaJuridica pj && personaActualizada instanceof PersonaJuridica nuevaPj) {
+            pj.setRazonSocial(nuevaPj.getRazonSocial());
+            pj.setTipo(nuevaPj.getTipo());
+            pj.setRubro(nuevaPj.getRubro());
+            if (nuevaPj.getDireccion() != null) {
+                pj.setDireccion(nuevaPj.getDireccion());
+            }
+            if (nuevaPj.getMediosDeContacto() != null && !nuevaPj.getMediosDeContacto().isEmpty()) {
+                pj.getMediosDeContacto().clear();
+                pj.getMediosDeContacto().addAll(nuevaPj.getMediosDeContacto());
+            }
+            if (nuevaPj.getMedioPredeterminado() != null) {
+                pj.setMedioPredeterminado(nuevaPj.getMedioPredeterminado());
+            }
+            if (nuevaPj.getPersonasRepresentantes() != null) {
+                pj.getPersonasRepresentantes().clear();
+                pj.getPersonasRepresentantes().addAll(nuevaPj.getPersonasRepresentantes());
+            }
+            return donanteRepository.save(donante);
+        } else {
+            // Si cambia de tipo (humana <-> jurídica), recreamos respetando la identidad
+            donanteRepository.delete(donante);
+            donanteRepository.flush();
+            Donante nuevo = new Donante(personaActualizada);
+            nuevo.setPassword(donante.getPassword());
+            return donanteRepository.save(nuevo);
+        }
     }
 
     // DELETE
@@ -102,20 +187,30 @@ public class DonanteService {
             // 4. Capa de Negocio: Procesamos las reglas de negocio sobre esos objetos
             List<Donante> nuevos_donantes = importadorCargaMasiva.iniciar_migracion(registros);
 
-            for (Donante donante : nuevos_donantes) {
-                Persona persona = donante.getPersona();
-                String email = persona.getMedioDeContacto().get("email").getFirst();
-                notificacionQueueClient.notificar(
-                        TipoNotificador.EMAIL,
-                        email,
-                        "Gracias por sumarte como donante...",
-                        "¡Bienvenido a Donatrack!",
-                        persona.getId());
+            // Solo enviamos notificaciones individuales por cola para lotes pequeños (<= 50)
+            // para no bloquear importaciones masivas de miles de registros.
+            if (nuevos_donantes.size() <= 50) {
+                for (Donante donante : nuevos_donantes) {
+                    Persona persona = donante.getPersona();
+                    List<String> emails = persona.getMedioDeContacto().getOrDefault(
+                            "EMAIL",
+                            persona.getMedioDeContacto().get("email")
+                    );
+                    if (emails != null && !emails.isEmpty()) {
+                        notificacionQueueClient.notificar(
+                                TipoNotificador.EMAIL,
+                                emails.getFirst(),
+                                "Gracias por sumarte como donante...",
+                                "¡Bienvenido a Donatrack!",
+                                persona.getId());
+                    }
+                }
             }
-            // 5. Respuesta de la aplicación
+            // 5. Respuesta de la aplicación (sin recargar los 20.000 registros en cada lote;
+            // el cliente refresca el padrón una única vez al finalizar)
             String mensaje = "Importados " + registros.size() + " registros exitosamente";
             ImportacionResponseDTO response = new ImportacionResponseDTO(true, mensaje);
-            response.setData(this.donanteRepository.findAll());
+            response.setData(Collections.emptyList());
             return response;
 
         } catch (Exception e) {
@@ -126,7 +221,7 @@ public class DonanteService {
     public List<DonanteInactivoDTO> obtenerDonantesSinInteraccionMasDeDias(int dias) {
         LocalDateTime fechaLimite = LocalDateTime.now().minusDays(dias);
 
-        return donanteRepository.findAll().stream()
+        return donanteRepository.findDonantesInactivos(fechaLimite).stream()
                 .filter(donante -> donante.getPersona() != null &&
                         donante.getPersona().getMedioPredeterminado() != null &&
                         !donante.getPersona().getMedioPredeterminado().isEmpty() &&

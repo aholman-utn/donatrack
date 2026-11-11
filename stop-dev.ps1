@@ -8,10 +8,10 @@ Write-Host "========================================================" -Foregroun
 Write-Host "       🛑 DETENIENDO ENTORNO COMPLETO DONATRACK 🛑       " -ForegroundColor Yellow
 Write-Host "========================================================" -ForegroundColor Yellow
 
-# 1. Matar procesos en los puertos 8080 a 8083
-$puertos = @(8080, 8081, 8082, 8083)
+# 1. Matar procesos en los puertos 8080 a 8085
+$puertos = @(8080, 8081, 8082, 8083, 8084, 8085)
 
-Write-Host "`n[1/2] Liberando puertos de microservicios (8080, 8081, 8082, 8083)..." -ForegroundColor Yellow
+Write-Host "`n[1/2] Liberando puertos de microservicios y gateway (8080 - 8085)..." -ForegroundColor Yellow
 
 foreach ($puerto in $puertos) {
     $connections = Get-NetTCPConnection -LocalPort $puerto -State Listen -ErrorAction SilentlyContinue

@@ -1,5 +1,6 @@
 package com.tp.donatrack.dtos;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.tp.donatrack.domain.ubicacion.Ciudad;
 import com.tp.donatrack.domain.ubicacion.Direccion;
 import com.tp.donatrack.domain.ubicacion.Pais;
@@ -10,13 +11,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DireccionRequest {
+    @JsonAlias({"calle", "calle1"})
     private String calle1;
+
     private String calle2;
     private int altura;
     private boolean sinAltura;
     private int piso;
     private int cuerpo;
+
+    @JsonAlias({"depto", "departamento"})
     private String departamento;
+
     private String ciudadNombre;
     private String provinciaNombre;
     private String paisNombre;

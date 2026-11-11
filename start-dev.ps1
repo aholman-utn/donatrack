@@ -1,4 +1,4 @@
-# ====================================================================
+﻿# ====================================================================
 # DonaTrack - Script de Inicio del Entorno de Desarrollo Completo
 # ====================================================================
 Set-Location -LiteralPath $PSScriptRoot
@@ -17,10 +17,12 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         docker compose -f herramientas/docker-compose.yml up -d
         if ($LASTEXITCODE -ne 0) { throw "Docker Compose fallo." }
         Write-Host "  ✅ Contenedores Docker iniciados correctamente." -ForegroundColor Green
-    } catch {
+    }
+    catch {
         throw "No se pudo iniciar Docker Compose. Verifica Docker Desktop."
     }
-} else {
+}
+else {
     throw "Docker no esta instalado o no se encuentra en PATH."
 }
 
@@ -40,7 +42,9 @@ $servicios = @(
     @{ Nombre = "servicio-donaciones"; Puerto = "8080"; Color = "Green" },
     @{ Nombre = "servicio-incentivos"; Puerto = "8081"; Color = "Magenta" },
     @{ Nombre = "servicio-notificaciones"; Puerto = "8082"; Color = "Cyan" },
-    @{ Nombre = "servicio-logistica"; Puerto = "8083"; Color = "Yellow" }
+    @{ Nombre = "servicio-logistica"; Puerto = "8083"; Color = "Yellow" },
+    @{ Nombre = "api-gateway"; Puerto = "8084"; Color = "Blue" },
+    @{ Nombre = "servicio-iam"; Puerto = "8085"; Color = "Red" }
 )
 
 $currentDir = $PSScriptRoot.Replace("'", "''")
@@ -59,10 +63,12 @@ Write-Host "`n========================================================" -Foregro
 Write-Host "  Procesos lanzados; espera el arranque de cada servicio." -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
 Write-Host "Puertos configurados:" -ForegroundColor White
+Write-Host "  - Servicio IAM (Auth):     http://localhost:8085" -ForegroundColor White
 Write-Host "  - Servicio Donaciones:     http://localhost:8080" -ForegroundColor White
 Write-Host "  - Servicio Incentivos:     http://localhost:8081" -ForegroundColor White
 Write-Host "  - Servicio Notificaciones: http://localhost:8082" -ForegroundColor White
 Write-Host "  - Servicio Logística:      http://localhost:8083" -ForegroundColor White
+Write-Host "  - API Gateway:             http://localhost:8084" -ForegroundColor White
 Write-Host "  - RabbitMQ Management:     http://localhost:15672 (guest/guest)" -ForegroundColor White
 Write-Host "  - n8n Webhook / Workflows: http://localhost:5678" -ForegroundColor White
 Write-Host "`nYa podés probar la colección de Postman en 'herramientas/DonaTrack.postman_collection.json'." -ForegroundColor Cyan

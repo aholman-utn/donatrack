@@ -78,4 +78,20 @@ public class Direccion {
 
         return sb.toString();
     }
+
+    public String getCalle() {
+        return calle1;
+    }
+
+    public void setCalle(String calle) {
+        this.calle1 = calle;
+    }
+
+    public String getDepto() {
+        return departamento;
+    }
+
+    public void setDepto(String depto) {
+        this.departamento = depto;
+    }
 }

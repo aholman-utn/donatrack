@@ -23,9 +23,7 @@ public class UserController {
 
     @GetMapping("/supervisores")
     public ResponseEntity<List<UserDTO>> getSupervisores() {
-        List<User> supervisores = userRepository.findAll().stream()
-                .filter(u -> u.getRole() == Role.SUPERVISOR)
-                .collect(Collectors.toList());
+        List<User> supervisores = userRepository.findByRole(Role.SUPERVISOR);
 
         List<UserDTO> response = supervisores.stream()
                 .map(u -> new UserDTO(u.getId(), u.getEmail(), u.getRole().name(), u.getName(), u.getPicture()))

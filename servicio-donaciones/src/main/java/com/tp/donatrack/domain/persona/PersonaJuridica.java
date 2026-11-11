@@ -11,6 +11,8 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,7 @@ public class PersonaJuridica extends Persona {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
     @JoinColumn(name = "id_persona_juridica")
+    @Fetch(FetchMode.SUBSELECT)
     private List<PersonaRepresentante> personasRepresentantes;
 
     public PersonaJuridica(){
