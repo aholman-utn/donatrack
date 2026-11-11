@@ -48,6 +48,18 @@ public class Direccion {
     @JoinColumn(name = "id_ciudad")
     private Ciudad ciudad;
 
+    /** Coordenadas para el mapa de entregas. Opcionales: las direcciones viejas no las tienen. */
+    @Column(name = "latitud")
+    private Double latitud;
+
+    @Column(name = "longitud")
+    private Double longitud;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public boolean tieneCoordenadas() {
+        return latitud != null && longitud != null;
+    }
+
     public String getDireccion() {
         if (calle1 == null || calle1.trim().isEmpty()) {
             return "";

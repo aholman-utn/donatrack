@@ -21,6 +21,9 @@ public interface EntidadBeneficiariaRepository extends JpaRepository<EntidadBene
     /** Devuelve las entidades ordenadas por total de donaciones recibidas (prioridad a sub-atendidos). */
     List<EntidadBeneficiaria> findAllByOrderByTotalDonacionesRecibidasAsc();
 
+    /** Busca por id de la persona jurídica, que es lo que guarda DonacionSegmentada.entidadBeneficiariaAsignadaId. */
+    List<EntidadBeneficiaria> findAllByDatosDeEntidadIdIn(java.util.Collection<Long> personaJuridicaIds);
+
     /** Persiste la entidad beneficiaria. */
     default EntidadBeneficiaria create(EntidadBeneficiaria entidad) {
         return save(entidad);

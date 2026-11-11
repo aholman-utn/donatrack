@@ -26,6 +26,7 @@ public class GatewaySecurity {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/publico/**").permitAll()
                         .pathMatchers("/donantes/identidad", "/donantes/registro-publico").denyAll()
                         .pathMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
