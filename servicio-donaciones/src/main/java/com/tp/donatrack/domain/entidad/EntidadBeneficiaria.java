@@ -37,6 +37,9 @@ public class EntidadBeneficiaria {
     @JoinColumn(name = "id_persona_juridica")
     private PersonaJuridica datosDeEntidad;
 
+    @Column(name = "email_acceso", unique = true)
+    private String emailAcceso;
+
     @Column(name = "total_donaciones_recibidas")
     private int totalDonacionesRecibidas = 0;
 

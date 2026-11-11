@@ -12,6 +12,12 @@ import java.util.List;
 @Repository
 public interface EntidadBeneficiariaRepository extends JpaRepository<EntidadBeneficiaria, Long> {
 
+    boolean existsByDatosDeEntidadCuit(String cuit);
+    java.util.Optional<EntidadBeneficiaria> findByEmailAccesoIgnoreCase(String email);
+
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT e FROM EntidadBeneficiaria e JOIN e.datosDeEntidad p JOIN p.mediosDeContacto m WHERE m.tipoNotificador = com.tp.commons.domain.notificador.TipoNotificador.EMAIL AND lower(m.valor) = lower(:email)")
+    List<EntidadBeneficiaria> findByCorreoContacto(@org.springframework.data.repository.query.Param("email") String email);
+
     /** Devuelve las entidades ordenadas por total de donaciones recibidas (prioridad a sub-atendidos). */
     List<EntidadBeneficiaria> findAllByOrderByTotalDonacionesRecibidasAsc();
 

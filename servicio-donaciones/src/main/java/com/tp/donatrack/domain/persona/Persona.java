@@ -21,8 +21,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,11 +51,13 @@ public abstract class Persona {
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_persona")
-    @Fetch(FetchMode.SUBSELECT)
     private List<MedioDeContacto> mediosDeContacto = new ArrayList<>();
 
     @Column(name = "fecha_ultima_interaccion")
     private LocalDateTime fechaUltimaInteraccion;
+
+    @Column(name = "fecha_aviso_inactividad")
+    private LocalDateTime fechaAvisoInactividad;
 
     @Column(name = "tipo_notificador")
     @Enumerated(EnumType.STRING)
@@ -184,7 +184,7 @@ public abstract class Persona {
     public String getContactoPredeterminado() {
         Map<String, String> pred = getMedioPredeterminado();
         if (pred == null || pred.isEmpty()) {
-            return null;
+            return getMedioDeContacto().getOrDefault("EMAIL", List.of()).stream().findFirst().orElse(null);
         }
         return pred.get("valor");
     }

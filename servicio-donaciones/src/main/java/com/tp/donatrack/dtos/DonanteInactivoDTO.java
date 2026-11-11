@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class DonanteInactivoDTO {
     private Long id;
+    private java.time.LocalDateTime ultimaInteraccion;
     private String contacto;
     private TipoNotificador tipoNotificadorPreferido;
 }

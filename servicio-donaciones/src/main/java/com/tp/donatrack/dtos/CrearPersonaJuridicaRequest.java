@@ -23,6 +23,7 @@ public class CrearPersonaJuridicaRequest {
     private TipoOrganizacion tipo;
 
     private String rubro;
+    private String cuit;
     private List<RepresentanteRequest> representantes;
     private DireccionRequest direccion;
     private List<ContactoValorRequest> mediosDeContacto;
@@ -34,6 +35,7 @@ public class CrearPersonaJuridicaRequest {
         p.setRazonSocial(razonSocial);
         p.setTipo(tipo);
         p.setRubro(rubro);
+        p.setCuit(cuit);
         p.setMedioPredeterminado(medioPredeterminado);
 
         if (direccion != null)

@@ -3,5 +3,6 @@ package iam.enums;
 public enum Role {
     ADMIN,
     SUPERVISOR,
-    DONANTE
+    DONANTE,
+    ENTIDAD_BENEFICIARIA
 }
