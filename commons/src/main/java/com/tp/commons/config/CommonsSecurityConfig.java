@@ -35,6 +35,7 @@ public class CommonsSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/publico/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/donantes/identidad").hasAuthority("SCOPE_DONANTE_LOOKUP")
                         .requestMatchers(HttpMethod.GET, "/entidadBeneficiaria/identidad").hasAuthority("SCOPE_ENTIDAD_REGISTRATION")
                         .requestMatchers(HttpMethod.POST, "/entidadBeneficiaria/registro-publico").hasAuthority("SCOPE_ENTIDAD_REGISTRATION")

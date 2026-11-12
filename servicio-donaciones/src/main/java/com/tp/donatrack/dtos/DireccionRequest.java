@@ -27,8 +27,13 @@ public class DireccionRequest {
     private String provinciaNombre;
     private String paisNombre;
 
+    private Double latitud;
+    private Double longitud;
+
     public Direccion toDomain() {
         Direccion d = new Direccion();
+        d.setLatitud(latitud);
+        d.setLongitud(longitud);
         d.setCalle1(calle1);
         d.setCalle2(calle2);
         d.setAltura(altura);

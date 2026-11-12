@@ -117,4 +117,9 @@ public class EntidadBeneficiariaService {
         return entidadBeneficiariaRepository.findAllById(ids);
     }
 
+    /** Entidades por id de su persona jurídica (el id que guardan las donaciones segmentadas). */
+    public List<EntidadBeneficiaria> listarPorPersonaJuridicaIds(Collection<Long> personaJuridicaIds) {
+        return entidadBeneficiariaRepository.findAllByDatosDeEntidadIdIn(personaJuridicaIds);
+    }
+
 }
