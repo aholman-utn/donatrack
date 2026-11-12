@@ -32,6 +32,10 @@ public class GatewaySecurity {
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
                         .pathMatchers(HttpMethod.PUT, "/donantes/me/insignias").hasAuthority("SCOPE_DONANTE")
                         .pathMatchers("/donantes/me/**").denyAll()
+                        .pathMatchers(HttpMethod.GET, "/entidades/me/**").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
+                        .pathMatchers(HttpMethod.POST, "/entidades/me/donaciones/*/segmentos/*/recepcion",
+                                "/entidades/me/donaciones/*/segmentos/*/no-recibida").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
+                        .pathMatchers("/entidades/me/**").denyAll()
                         .anyExchange().access((authentication, context) -> authentication
                                 .map(auth -> new org.springframework.security.authorization.AuthorizationDecision(
                                         auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)

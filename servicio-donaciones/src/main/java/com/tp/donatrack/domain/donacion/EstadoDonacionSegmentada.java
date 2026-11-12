@@ -9,6 +9,7 @@ import com.tp.donatrack.domain.donacion.estado.EnTraslado;
 import com.tp.donatrack.domain.donacion.estado.EntregaFallida;
 import com.tp.donatrack.domain.donacion.estado.Entregada;
 import com.tp.donatrack.domain.donacion.estado.ListaParaEntregar;
+import com.tp.donatrack.domain.donacion.estado.NoRecibida;
 import com.tp.donatrack.domain.donacion.estado.Vencida;
 import com.tp.donatrack.domain.donacion.exception.TransicionNoPermitidaException;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
@@ -25,6 +26,7 @@ public abstract class EstadoDonacionSegmentada {
     public static final EstadoDonacionSegmentada ENTREGADA = new Entregada();
     public static final EstadoDonacionSegmentada ENTREGA_FALLIDA = new EntregaFallida();
     public static final EstadoDonacionSegmentada VENCIDA = new Vencida();
+    public static final EstadoDonacionSegmentada NO_RECIBIDA = new NoRecibida();
 
 
     @JsonValue
@@ -44,6 +46,7 @@ public abstract class EstadoDonacionSegmentada {
             case "ENTREGADA" -> ENTREGADA;
             case "ENTREGA_FALLIDA" -> ENTREGA_FALLIDA;
             case "VENCIDA" -> VENCIDA;
+            case "NO_RECIBIDA" -> NO_RECIBIDA;
             default -> throw new IllegalArgumentException("Estado de donación segmentada desconocido: " + nombre);
         };
     }
@@ -103,6 +106,10 @@ public abstract class EstadoDonacionSegmentada {
 
     public void registrarEntregaFallida(DonacionSegmentada donacion, String actor, String justificacion) {
         throw new TransicionNoPermitidaException(getNombre(), "registrarEntregaFallida");
+    }
+
+    public void reportarNoRecibida(DonacionSegmentada donacion, String actor, String motivo) {
+        throw new TransicionNoPermitidaException(getNombre(), "reportarNoRecibida");
     }
 
     public void marcarVencida(DonacionSegmentada donacion, String actor) {

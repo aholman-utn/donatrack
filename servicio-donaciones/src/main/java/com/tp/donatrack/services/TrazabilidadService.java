@@ -20,6 +20,7 @@ import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,10 @@ public class TrazabilidadService {
     private final ComprobanteRepository comprobanteRepository;
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
     private final NotificacionQueueClient notificacionRestClient;
+
+    /** URL pública del servicio de donaciones para armar el link al comprobante. */
+    @Value("${donatrack.comprobantes.base-url:http://localhost:8080}")
+    private String comprobantesBaseUrl = "http://localhost:8080";
 
     public TrazabilidadService(
             DonacionRepository donacionRepository,
@@ -349,7 +354,7 @@ public class TrazabilidadService {
                 ? segmentada.getSubCategoria().getDescripcion()
                 : "donación";
 
-        String urlComprobante = "http://localhost:8080/api/comprobantes/" + comprobanteId;
+        String urlComprobante = comprobantesBaseUrl + "/api/comprobantes/" + comprobanteId;
 
         if (donacion.getDonante() != null) {
             Donante donante = donacion.getDonante();
@@ -381,6 +386,71 @@ public class TrazabilidadService {
 
                     enviarNotificacionSegura(medioEntidad, contactoEntidad, mensaje, asunto, entidad.getDatosDeEntidad().getId());
                 }
+            }
+        }
+    }
+
+    /**
+     * La entidad informa que no recibió una donación en traslado. Queda en NO_RECIBIDA
+     * para que administración revise el caso, y se avisa al donante.
+     */
+    public TrazaSegmentoDTO reportarNoRecibida(Long idDonacion, Long idSegmento, String actor, String motivo) {
+        Donacion donacion = buscarDonacionPorId(idDonacion);
+        DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.NO_RECIBIDA)) {
+            throw new IllegalArgumentException("Solo se puede informar como no recibida una donación en traslado.");
+        }
+        segmentada.reportarNoRecibida(actor, motivo);
+        donacionRepository.save(donacion);
+
+        if (donacion.getDonante() != null) {
+            Donante donante = donacion.getDonante();
+            String contacto = donante.getPersona().getContactoPredeterminado();
+            if (contacto != null) {
+                String categoria = segmentada.getSubCategoria() != null
+                        ? segmentada.getSubCategoria().getDescripcion() : "donación";
+                String mensaje = String.format(
+                        "Hola %s, la entidad informó que todavía no recibió tu donación de %s. Administración está revisando el caso.",
+                        donante.getNombreCompleto(), categoria);
+                enviarNotificacionSegura(donante.getPersona().getTipoNotificadorPreferido(), contacto, mensaje,
+                        "Estamos revisando la entrega de tu donación", donante.getPersona().getId());
+            }
+        }
+        return TrazaSegmentoDTO.builder().id(idSegmento).eventos(segmentada.getHistorial()).build();
+    }
+
+    /**
+     * Notifica al donante y a la entidad beneficiaria que la donación fue asignada.
+     * Invocado desde MatchmakingService cuando administración confirma la entidad.
+     */
+    public void notificarAsignacion(Donacion donacion, DonacionSegmentada segmentada, EntidadBeneficiaria entidad) {
+        String categoria = segmentada.getSubCategoria() != null
+                ? segmentada.getSubCategoria().getDescripcion()
+                : "donación";
+        String razonSocial = entidad.getDatosDeEntidad() != null
+                ? entidad.getDatosDeEntidad().getRazonSocial()
+                : "una entidad beneficiaria";
+
+        if (donacion != null && donacion.getDonante() != null) {
+            Donante donante = donacion.getDonante();
+            String contacto = donante.getPersona().getContactoPredeterminado();
+            if (contacto != null) {
+                String mensaje = String.format(
+                        "Hola %s, tu donación de %s fue asignada a %s. Te avisaremos cuando salga hacia su destino.",
+                        donante.getNombreCompleto(), categoria, razonSocial);
+                enviarNotificacionSegura(donante.getPersona().getTipoNotificadorPreferido(), contacto, mensaje,
+                        "Tu donación ya tiene destino", donante.getPersona().getId());
+            }
+        }
+
+        if (entidad.getDatosDeEntidad() != null) {
+            String contactoEntidad = entidad.getDatosDeEntidad().getContactoPredeterminado();
+            if (contactoEntidad != null) {
+                String mensaje = String.format(
+                        "Se asignó a %s una donación de %s (%d unidades). Podés seguir su estado en DonaTrack, sección Donaciones recibidas.",
+                        razonSocial, categoria, segmentada.getCantidad());
+                enviarNotificacionSegura(entidad.getDatosDeEntidad().getTipoNotificadorPreferido(), contactoEntidad,
+                        mensaje, "Tu entidad recibió una donación", entidad.getDatosDeEntidad().getId());
             }
         }
     }

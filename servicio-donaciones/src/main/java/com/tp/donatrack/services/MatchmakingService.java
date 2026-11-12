@@ -33,11 +33,14 @@ public class MatchmakingService {
     private final EntidadBeneficiariaRepository entidadBeneficiariaRepository;
     private final NecesidadRepository necesidadRepository;
     private final ServicioMatchmaking servicioMatchmaking;
+    private final TrazabilidadService trazabilidadService;
 
     public MatchmakingService(
             DonacionRepository donacionRepository,
             EntidadBeneficiariaRepository entidadBeneficiariaRepository,
-            NecesidadRepository necesidadRepository) {
+            NecesidadRepository necesidadRepository,
+            TrazabilidadService trazabilidadService) {
+        this.trazabilidadService = trazabilidadService;
         this.donacionRepository = donacionRepository;
         this.entidadBeneficiariaRepository = entidadBeneficiariaRepository;
         this.necesidadRepository = necesidadRepository;
@@ -119,6 +122,8 @@ public class MatchmakingService {
             donacionRepository.save(donacion);
         }
         necesidadRepository.saveAll(necesidades);
+
+        trazabilidadService.notificarAsignacion(donacion, segmentada, entidad);
     }
 
     private ResultadoMatchmakingDTO mapearResultado(DonacionSegmentada segmentada, ResultadoMatchmaking resultado) {
@@ -138,7 +143,8 @@ public class MatchmakingService {
     private List<EntidadRankingDTO> mapearEntidades(List<EntidadBeneficiaria> entidades) {
         return entidades.stream()
                 .map(e -> EntidadRankingDTO.builder()
-                        .id(e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getId() : null)
+                        // Id de la entidad (no de la persona jurídica): es el que espera asignarDonacion.
+                        .id(e.getIdEntidadBeneficiaria())
                         .razonSocial(
                                 e.getDatosDeEntidad() != null ? e.getDatosDeEntidad().getRazonSocial() : "Sin nombre")
                         .cantNecesidadesActivas(e.getCantNececidadesActivas())

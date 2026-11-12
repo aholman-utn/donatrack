@@ -10,8 +10,10 @@ public class RepresentanteRequest {
     private String nombre;
     private String apellido;
     private int nroDocumento;
+    private String email;
 
     public PersonaRepresentante toDomain() {
-        return new PersonaRepresentante(nombre, apellido, nroDocumento);
+        return new PersonaRepresentante(nombre, apellido, nroDocumento,
+                email == null || email.isBlank() ? null : email.trim());
     }
 }

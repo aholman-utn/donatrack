@@ -41,6 +41,12 @@ public class CommonsSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/entidadBeneficiaria/registro-publico").hasAuthority("SCOPE_ENTIDAD_REGISTRATION")
                         .requestMatchers(HttpMethod.GET, "/api/necesidades/me", "/api/necesidades/me/**").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
                         .requestMatchers(HttpMethod.POST, "/api/necesidades/me").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
+                        .requestMatchers(HttpMethod.GET, "/entidades/me/**").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
+                        .requestMatchers(HttpMethod.POST, "/entidades/me/donaciones/*/segmentos/*/recepcion",
+                                "/entidades/me/donaciones/*/segmentos/*/no-recibida").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
+                        .requestMatchers("/entidades/me/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/notificaciones/personas/*")
+                                .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR", "SCOPE_DONACIONES_NOTIFICACIONES")
                         .requestMatchers(HttpMethod.POST, "/donantes/registro-publico").hasAuthority("SCOPE_DONANTE_REGISTRATION")
                         .requestMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
@@ -64,7 +70,8 @@ public class CommonsSecurityConfig {
                         .anyRequest().access(allOf(AuthenticatedAuthorizationManager.authenticated(),
                                 not(hasAnyAuthority("SCOPE_DONANTE", "SCOPE_DONANTE_LOOKUP",
                                         "SCOPE_DONANTE_REGISTRATION", "SCOPE_ENTIDAD_REGISTRATION", "SCOPE_ENTIDAD_BENEFICIARIA",
-                                        "SCOPE_DONACIONES_INCENTIVOS", "SCOPE_INCENTIVOS_DONACIONES"))))
+                                        "SCOPE_DONACIONES_INCENTIVOS", "SCOPE_INCENTIVOS_DONACIONES",
+                                        "SCOPE_DONACIONES_NOTIFICACIONES"))))
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())));
 
