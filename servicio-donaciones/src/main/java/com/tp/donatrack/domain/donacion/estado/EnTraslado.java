@@ -24,7 +24,13 @@ public class EnTraslado extends EstadoDonacionSegmentada {
     public boolean puedeTransicionarA(EstadoDonacionSegmentada nuevo) {
         if (nuevo == null) return false;
         String n = nuevo.getNombre();
-        return "ENTREGADA".equals(n) || "ENTREGA_FALLIDA".equals(n);
+        return "ENTREGADA".equals(n) || "ENTREGA_FALLIDA".equals(n) || "NO_RECIBIDA".equals(n);
+    }
+
+    @Override
+    public void reportarNoRecibida(DonacionSegmentada donacion, String actor, String motivo) {
+        donacion.transicionar(new NoRecibida(), actor,
+                "La entidad informó que no recibió la entrega: " + motivo);
     }
 
     @Override

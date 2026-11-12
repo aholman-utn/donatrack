@@ -24,6 +24,13 @@ public class NecesidadRecurrente extends NecesidadMaterial {
     @Column(name = "dias")
     private int dias;
 
+    /**
+     * La columna existe en la base compartida como NOT NULL sin default; si no se
+     * mapea, el insert de toda necesidad recurrente falla.
+     */
+    @Column(name = "renovacion_procesada", nullable = false)
+    private boolean renovacionProcesada = false;
+
     protected NecesidadRecurrente() {
         super();
     }

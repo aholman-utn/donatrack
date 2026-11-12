@@ -146,6 +146,10 @@ public class DonacionSegmentada {
         this.estado.registrarEntregaFallida(this, actor, justificacion);
     }
 
+    public void reportarNoRecibida(String actor, String motivo) {
+        this.estado.reportarNoRecibida(this, actor, motivo);
+    }
+
     public void marcarVencida(String actor) {
         this.estado.marcarVencida(this, actor);
     }

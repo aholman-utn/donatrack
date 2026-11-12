@@ -22,6 +22,13 @@ public interface DonacionRepository extends JpaRepository<Donacion, Long> {
     @Query("SELECT d FROM Donacion d WHERE d.donante.id = :donanteId")
     List<Donacion> findByDonanteId(@Param("donanteId") Long donanteId);
 
+    /**
+     * Devuelve las donaciones que tienen al menos un segmento asignado a la entidad.
+     * El id es el de la persona jurídica (lo que guarda entidadBeneficiariaAsignadaId).
+     */
+    @Query("SELECT DISTINCT d FROM Donacion d JOIN d.donacionesSegmentadas s WHERE s.entidadBeneficiariaAsignadaId = :personaJuridicaId")
+    List<Donacion> findConSegmentosAsignadosA(@Param("personaJuridicaId") Long personaJuridicaId);
+
     /** Devuelve las donaciones según su estado desnormalizado (ej. PENDIENTE / ADJUDICADA). */
     List<Donacion> findByEstado(EstadoDonacion estado);
 

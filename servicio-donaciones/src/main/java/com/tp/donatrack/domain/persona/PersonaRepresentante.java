@@ -29,6 +29,9 @@ public class PersonaRepresentante {
     @Column(name = "nro_documento")
     private int nroDocumento;
 
+    @Column(name = "email")
+    private String email;
+
     public PersonaRepresentante() {
     }
 
@@ -36,5 +39,10 @@ public class PersonaRepresentante {
         this.nombre = nombre;
         this.apellido = apellido;
         this.nroDocumento = nroDocumento;
+    }
+
+    public PersonaRepresentante(String nombre, String apellido, int nroDocumento, String email) {
+        this(nombre, apellido, nroDocumento);
+        this.email = email;
     }
 }
