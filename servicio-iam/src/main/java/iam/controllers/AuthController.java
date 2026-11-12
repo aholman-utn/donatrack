@@ -117,8 +117,8 @@ public class AuthController {
     }
 
     private synchronized ResponseEntity<?> registrarLocal(String email, String password, Role role, String tipo, JsonNode datos) {
-        if (password == null || password.length() < 15 || password.getBytes(StandardCharsets.UTF_8).length > 72) {
-            return ResponseEntity.badRequest().body("La contraseña debe tener al menos 15 caracteres y hasta 72 bytes.");
+        if (password == null || password.length() < 8 || password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            return ResponseEntity.badRequest().body("La contraseña debe tener al menos 8 caracteres y hasta 72 bytes.");
         }
         User user = userRepository.findByEmailIgnoreCase(email).orElse(null);
         if (user != null && (user.getRole() != role || user.getProvider() != AuthProvider.LOCAL ||

@@ -6,7 +6,10 @@ import com.tp.donatrack.services.NecesidadService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,7 +24,15 @@ public class NecesidadController {
     }
 
     @PostMapping
-    public ResponseEntity<NecesidadResponseDTO> crearNecesidad(@Valid @RequestBody CrearNecesidadDTO dto) {
+    public ResponseEntity<NecesidadResponseDTO> crearNecesidad(@Valid @RequestBody CrearNecesidadDTO dto,
+            @AuthenticationPrincipal Jwt jwt) {
+        if ("ENTIDAD_BENEFICIARIA".equals(jwt.getClaimAsString("scope"))) {
+            try {
+                dto.setEntidadBeneficiariaId(Long.valueOf(jwt.getClaimAsString("entidad_beneficiaria_id")));
+            } catch (NumberFormatException ex) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La cuenta no tiene entidad asociada.");
+            }
+        }
         NecesidadResponseDTO response = necesidadService.crearNecesidad(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

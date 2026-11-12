@@ -47,6 +47,8 @@ public class CommonsSecurityConfig {
                         .requestMatchers("/entidades/me/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/notificaciones/personas/*")
                                 .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR", "SCOPE_DONACIONES_NOTIFICACIONES")
+                        .requestMatchers(HttpMethod.POST, "/api/necesidades")
+                                .hasAnyAuthority("SCOPE_ENTIDAD_BENEFICIARIA", "SCOPE_ADMIN", "SCOPE_SUPERVISOR")
                         .requestMatchers(HttpMethod.POST, "/donantes/registro-publico").hasAuthority("SCOPE_DONANTE_REGISTRATION")
                         .requestMatchers(HttpMethod.GET, "/donantes/me/**", "/incentivos/misiones",
                                 "/api/notificaciones/me").hasAuthority("SCOPE_DONANTE")
