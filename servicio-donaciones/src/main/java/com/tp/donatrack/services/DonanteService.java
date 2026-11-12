@@ -20,6 +20,7 @@ import com.tp.donatrack.dtos.*;
 import com.tp.commons.dtos.incentivos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
@@ -120,7 +121,9 @@ public class DonanteService {
 
     // READ
     public List<Donante> listarTodos() {
-        return donanteRepository.findAll();
+        // Limita la consulta en la base de datos para no cargar toda la tabla.
+        return donanteRepository.findAll(PageRequest.of(0, 100, Sort.by("id")))
+                .getContent();
     }
 
     // UPDATE TODO: aca actualizo la persona completa, el problema es que en un
