@@ -47,3 +47,60 @@ services:
         value: 8082
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+
+  - type: web
+    name: donatrack-iam
+    runtime: docker
+    dockerfilePath: ./Dockerfile.iam
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8085
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Mismo secreto que el resto de los servicios (firma de JWT).
+      - key: JWT_SECRET
+        sync: false
+      # Credenciales de la base iam (no se versionan).
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_DDL_AUTO
+        sync: false
+      # OAuth de Google y URL interna de donaciones en Render.
+      - key: CLIENT_ID_GOOGLE
+        sync: false
+      - key: DONACIONES_URL
+        sync: false
+
+  - type: web
+    name: donatrack-gateway
+    runtime: docker
+    dockerfilePath: ./Dockerfile.apigateway
+    branch: main
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8084
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        sync: false
+      # URLs internas de los demás servicios en Render.
+      - key: IAM_URL
+        sync: false
+      - key: DONACIONES_URL
+        sync: false
+      - key: INCENTIVOS_URL
+        sync: false
+      - key: NOTIFICACIONES_URL
+        sync: false
+      - key: LOGISTICA_URL
+        sync: false
+      # Origen del front en Vercel (coma-separado si hay varios).
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
