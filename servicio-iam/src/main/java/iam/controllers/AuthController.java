@@ -52,8 +52,8 @@ public class AuthController {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(3000);
-        factory.setReadTimeout(3000);
+        factory.setConnectTimeout(10000);
+        factory.setReadTimeout(30000);
         this.donaciones = RestClient.builder().requestFactory(factory).build();
     }
 
