@@ -55,6 +55,7 @@ public class LogisticaEventListener {
 
     private void procesarInicioRuta(EventoLogisticaDTO evento) {
         DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
+        if (segmentada != null && segmentada.getRutaLogisticaId() != null) return;
         if (segmentada != null) {
             if (List.of(EstadoDonacionSegmentada.EN_PLANIFICACION, EstadoDonacionSegmentada.EN_DEPOSITO)
                     .contains(segmentada.getEstado())
@@ -79,6 +80,7 @@ public class LogisticaEventListener {
 
     private void procesarEntregaFallida(EventoLogisticaDTO evento) {
         DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
+        if (segmentada != null && segmentada.getRutaLogisticaId() != null) return;
         if (segmentada != null) {
             if (EstadoDonacionSegmentada.EN_TRASLADO.equals(segmentada.getEstado())) {
                 String motivo = evento.getDetalles() != null ? evento.getDetalles() : "Entrega fallida reportada por logística";
@@ -99,6 +101,7 @@ public class LogisticaEventListener {
     private void procesarEntregaExitosa(EventoLogisticaDTO evento) {
         DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
 
+        if (segmentada != null && segmentada.getRutaLogisticaId() != null) return;
         if (segmentada != null) {
             if (EstadoDonacionSegmentada.EN_TRASLADO.equals(segmentada.getEstado())) {
                 Donacion donacionPadre = donacionRepository.findDonacionByDonacionesSegmentadaId(segmentada.getId());
@@ -124,6 +127,7 @@ public class LogisticaEventListener {
 
     private void procesarLlegadaADestino(EventoLogisticaDTO evento) {
         DonacionSegmentada segmentada = donacionSegmentadaRepository.findById(evento.getDonacionSegmentadaId()).orElse(null);
+        if (segmentada != null && segmentada.getRutaLogisticaId() != null) return;
         if (segmentada != null) {
             segmentada.registrarLlegadaADestino("Sistema (RabbitMQ Listener)");
             logger.info("Donación segmentada ID {} marcada como en destino (esperando confirmación)", segmentada.getId());

@@ -73,6 +73,15 @@ public class DonacionSegmentada {
     @Column(name = "entidad_beneficiaria_nombre")
     private String entidadBeneficiariaNombre;
 
+    private String rutaLogisticaId;
+    private java.time.LocalDateTime llegadaLogistica;
+
+    public void validarFlujoAnterior() {
+        if (rutaLogisticaId != null) {
+            throw new IllegalArgumentException("Este segmento se gestiona desde el panel de Logística y el portal de la entidad.");
+        }
+    }
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_comprobante")
     private ComprobanteRecepcionDonacion comprobanteRecepcionDonacion;

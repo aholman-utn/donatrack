@@ -8,6 +8,7 @@ import com.tp.donatrack.domain.donacion.FotoRecepcion;
 import com.tp.donatrack.domain.entidad.EntidadBeneficiaria;
 import com.tp.donatrack.domain.trazabilidad.EventoTrazabilidad;
 import com.tp.donatrack.repositories.DonacionRepository;
+import com.tp.donatrack.repositories.DonacionSegmentadaRepository;
 import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import com.tp.donatrack.repositories.FotoRecepcionRepository;
 import com.tp.donatrack.services.TrazabilidadService;
@@ -46,12 +47,15 @@ public class PortalEntidadController {
 
     private final EntidadBeneficiariaRepository entidades;
     private final DonacionRepository donaciones;
+    private final DonacionSegmentadaRepository segmentos;
     private final FotoRecepcionRepository fotos;
     private final TrazabilidadService trazabilidad;
     private final NotificacionesRestClient notificaciones;
 
     public PortalEntidadController(EntidadBeneficiariaRepository entidades, DonacionRepository donaciones,
-            FotoRecepcionRepository fotos, TrazabilidadService trazabilidad, NotificacionesRestClient notificaciones) {
+            FotoRecepcionRepository fotos, TrazabilidadService trazabilidad, NotificacionesRestClient notificaciones,
+            DonacionSegmentadaRepository segmentos) {
+        this.segmentos = segmentos;
         this.notificaciones = notificaciones;
         this.entidades = entidades;
         this.donaciones = donaciones;
@@ -103,6 +107,7 @@ public class PortalEntidadController {
         if (!EstadoDonacionSegmentada.EN_TRASLADO.equals(segmento.getEstado())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo se puede confirmar una donación que está en camino.");
         }
+        validarLlegada(segmento);
         List<MultipartFile> validas = archivos == null ? List.of()
                 : archivos.stream().filter(f -> f != null && !f.isEmpty()).toList();
         if (validas.size() > MAX_FOTOS) {
@@ -124,7 +129,7 @@ public class PortalEntidadController {
         }
         String detalle = "Recepción confirmada por " + entidad.getDatosDeEntidad().getRazonSocial()
                 + (nuevas.isEmpty() ? "" : " con " + nuevas.size() + (nuevas.size() == 1 ? " foto" : " fotos"));
-        var traza = trazabilidad.recepcionarEntrega(idDonacion, idSegmento, LocalDateTime.now(), detalle);
+        var traza = trazabilidad.confirmarRecepcion(segmento, LocalDateTime.now(), detalle);
         fotos.saveAll(nuevas);
         return traza;
     }
@@ -145,19 +150,40 @@ public class PortalEntidadController {
         if (!EstadoDonacionSegmentada.EN_TRASLADO.equals(segmento.getEstado())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo se puede informar una donación que está en camino.");
         }
+        validarLlegada(segmento);
         return trazabilidad.reportarNoRecibida(idDonacion, idSegmento,
                 entidad.getDatosDeEntidad().getRazonSocial(), motivo);
     }
 
     @GetMapping("/avisos")
-    public List<NotificacionesRestClient.Aviso> avisos(@AuthenticationPrincipal Jwt jwt) {
+    @Transactional(readOnly = true)
+    public List<AvisoEntidad> avisos(@AuthenticationPrincipal Jwt jwt) {
         EntidadBeneficiaria entidad = titular(jwt);
-        try {
-            return notificaciones.avisosDe(entidad.getDatosDeEntidad().getId());
-        } catch (RestClientException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "No se pudieron cargar los avisos.");
+        Long personaId = entidad.getDatosDeEntidad().getId();
+        List<AvisoEntidad> resultado = new ArrayList<>();
+        for (Donacion donacion : donaciones.findConSegmentosAsignadosA(personaId)) {
+            for (DonacionSegmentada segmento : donacion.getDonacionesSegmentadas()) {
+                if (personaId.equals(segmento.getEntidadBeneficiariaAsignadaId()) && segmento.getLlegadaLogistica() != null) {
+                    resultado.add(new AvisoEntidad(-segmento.getId(), "Una donación llegó a tu entidad",
+                            "Revisá el segmento #" + segmento.getId() + " en Donaciones recibidas.",
+                            segmento.getLlegadaLogistica(), segmento.getId()));
+                }
+            }
         }
+        try {
+            notificaciones.avisosDe(personaId).stream()
+                    .map(a -> new AvisoEntidad(a.id(), a.asunto(), a.mensaje(), a.fecha(), null))
+                    .forEach(resultado::add);
+        } catch (RestClientException e) {
+            if (resultado.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "No se pudieron cargar los avisos.");
+            }
+        }
+        resultado.sort(Comparator.comparing(AvisoEntidad::fecha, Comparator.nullsFirst(Comparator.naturalOrder())).reversed());
+        return resultado;
     }
+
+    public record AvisoEntidad(Long id, String asunto, String mensaje, LocalDateTime fecha, Long segmentoId) {}
 
     @GetMapping("/fotos/{idFoto}")
     @Transactional(readOnly = true)
@@ -179,6 +205,7 @@ public class PortalEntidadController {
     }
 
     private DonacionSegmentada segmentoPropio(EntidadBeneficiaria entidad, Long idDonacion, Long idSegmento) {
+        segmentos.bloquear(idSegmento).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Donacion donacion = donaciones.findById(idDonacion)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return donacion.getDonacionesSegmentadas().stream()
@@ -186,6 +213,12 @@ public class PortalEntidadController {
                         && entidad.getDatosDeEntidad().getId().equals(s.getEntidadBeneficiariaAsignadaId()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private void validarLlegada(DonacionSegmentada segmento) {
+        if (segmento.getRutaLogisticaId() != null && segmento.getLlegadaLogistica() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La llegada todavía no fue registrada.");
+        }
     }
 
     private Segmento segmento(DonacionSegmentada s, List<Long> idsFotos) {
@@ -200,12 +233,12 @@ public class PortalEntidadController {
                         .map(e -> new Evento(e.getEstadoNuevo().getNombre(), e.getFecha(), e.getDescripcion())).toList(),
                 comprobante == null ? null : new Comprobante(comprobante.getId(), comprobante.getFechaEntrega(),
                         comprobante.getDetallesLogistica()),
-                idsFotos);
+                idsFotos, s.getRutaLogisticaId() == null || s.getLlegadaLogistica() != null);
     }
 
     public record DonacionRecibida(Long id, String descripcion, Date fechaIngreso, String donante, List<Segmento> segmentos) {}
     public record Segmento(Long id, String estado, String categoria, String subcategoria, int cantidad, String unidad,
-                           List<Evento> eventos, Comprobante comprobante, List<Long> fotos) {}
+                           List<Evento> eventos, Comprobante comprobante, List<Long> fotos, boolean puedeConfirmarRecepcion) {}
     public record Evento(String estado, LocalDateTime fecha, String descripcion) {}
     public record Comprobante(String id, LocalDateTime fechaEntrega, String detalles) {}
 }

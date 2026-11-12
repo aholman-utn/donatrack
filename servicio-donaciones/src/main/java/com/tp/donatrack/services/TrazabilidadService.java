@@ -108,6 +108,7 @@ public class TrazabilidadService {
             Long idSegmento,
             CrearEventoRequest request) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), request.getNuevoEstado())) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -130,6 +131,7 @@ public class TrazabilidadService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
 
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.LISTA_PARA_ENTREGAR)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -148,6 +150,7 @@ public class TrazabilidadService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
 
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_PLANIFICACION)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -165,6 +168,7 @@ public class TrazabilidadService {
                 .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.EN_TRASLADO)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -183,6 +187,7 @@ public class TrazabilidadService {
                 .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGA_FALLIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -200,6 +205,7 @@ public class TrazabilidadService {
                 .filter(p -> p.getId() != null && p.getId().equals(idSegmento))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el segmento: " + idSegmento));
+        segmentada.validarFlujoAnterior();
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.VENCIDA)) {
             throw new IllegalArgumentException("No es posible realizar esta transicion");
         }
@@ -217,14 +223,18 @@ public class TrazabilidadService {
      */
     public TrazaSegmentoDTO recepcionarEntrega(Long idDonacion, Long idSegmento, LocalDateTime fechaEntrega, String detallesLogistica) {
         DonacionSegmentada segmentada = buscarDonacionSegmentadaPorId(idDonacion, idSegmento);
+        segmentada.validarFlujoAnterior();
+        return confirmarRecepcion(segmentada, fechaEntrega, detallesLogistica);
+    }
 
+    public TrazaSegmentoDTO confirmarRecepcion(DonacionSegmentada segmentada, LocalDateTime fechaEntrega, String detallesLogistica) {
         if (!segmentada.transicionPosible(segmentada.getEstado(), EstadoDonacionSegmentada.ENTREGADA)) {
             throw new IllegalArgumentException("No es posible recepcionar esta donación en su estado actual: " + segmentada.getEstado());
         }
         segmentada.confirmarEntrega(segmentada.getEntidadBeneficiariaAsignadaId());
 
         Donacion donacion = buscarDonacionPorDonacionSegmentada(segmentada);
-        EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(segmentada.getEntidadBeneficiariaAsignadaId());
+        EntidadBeneficiaria entidad = entidadAsignada(segmentada);
 
         ComprobanteRecepcionDonacion comprobante = ComprobanteRecepcionDonacion.builder()
                 .donacionSegmentadaId(segmentada.getId())
@@ -250,7 +260,7 @@ public class TrazabilidadService {
         }
 
         return TrazaSegmentoDTO.builder()
-                .id(idSegmento)
+                .id(segmentada.getId())
                 .eventos(segmentada.getHistorial())
                 .build();
     }
@@ -372,7 +382,7 @@ public class TrazabilidadService {
             }
         }
         if (segmentada.getEntidadBeneficiariaAsignadaId() != null) {
-            EntidadBeneficiaria entidad = entidadBeneficiariaRepository.find(segmentada.getEntidadBeneficiariaAsignadaId());
+            EntidadBeneficiaria entidad = entidadAsignada(segmentada);
             if (entidad != null && entidad.getDatosDeEntidad() != null) {
                 String contactoEntidad = entidad.getDatosDeEntidad().getContactoPredeterminado();
                 TipoNotificador medioEntidad = entidad.getDatosDeEntidad().getTipoNotificadorPreferido();
@@ -388,6 +398,13 @@ public class TrazabilidadService {
                 }
             }
         }
+    }
+
+    private EntidadBeneficiaria entidadAsignada(DonacionSegmentada segmento) {
+        Long id = segmento.getEntidadBeneficiariaAsignadaId();
+        if (id == null) return null;
+        if (segmento.getRutaLogisticaId() == null) return entidadBeneficiariaRepository.find(id);
+        return entidadBeneficiariaRepository.findAllByDatosDeEntidadIdIn(List.of(id)).stream().findFirst().orElse(null);
     }
 
     /**

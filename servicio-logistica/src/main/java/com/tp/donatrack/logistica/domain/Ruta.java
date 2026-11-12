@@ -22,6 +22,13 @@ public class Ruta {
 
     private String choferId;
 
+    private List<Long> segmentosPanel;
+    private boolean panelListo;
+
+    public static boolean esDelPanel(String id) {
+        return id != null && id.startsWith("panel-");
+    }
+
     @Builder.Default
     private List<Parada> paradas = new ArrayList<>();
 

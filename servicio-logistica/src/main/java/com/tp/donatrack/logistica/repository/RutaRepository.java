@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RutaRepository extends MongoRepository<Ruta, String> {
+    java.util.List<Ruta> findByPanelListoTrueOrderByFechaCreacionDesc();
 }

@@ -10,6 +10,13 @@ import java.util.List;
 
 @Repository
 public interface DonacionSegmentadaRepository extends JpaRepository<DonacionSegmentada, Long> {
+    List<DonacionSegmentada> findByEstadoAndRutaLogisticaIdIsNullOrderByIdAsc(EstadoDonacionSegmentada estado);
+    List<DonacionSegmentada> findByRutaLogisticaIdIn(java.util.Collection<String> rutas);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select s from DonacionSegmentada s where s.id = :id")
+    java.util.Optional<DonacionSegmentada> bloquear(Long id);
+
     List<DonacionSegmentada> findByDonanteIdAndEstado(Long donanteId, EstadoDonacionSegmentada estado);
 
     List<DonacionSegmentada> findByDonanteIdAndCategoriaBien(Long donanteId, CategoriaBien categoriaBien);

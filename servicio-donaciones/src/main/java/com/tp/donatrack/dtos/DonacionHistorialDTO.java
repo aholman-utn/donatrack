@@ -17,6 +17,8 @@ import java.util.List;
 @Builder
 public class DonacionHistorialDTO {
     private Long id;
+    private Long donanteId;
+    private String donanteNombre;
     private String descripcion;
     private Date fechaIngreso;
     private EstadoDonacion estado;

@@ -64,6 +64,7 @@ public class DonacionService {
                     "La donación segmentada no tiene una entidad beneficiaria asignada. Ejecute el matchmaking primero.");
         }
 
+        segmentada.validarFlujoAnterior();
         Long donanteId = segmentada.getDonanteId();
 
         Donante donante = this.donanteService.buscarDonantePorId(donanteId);
@@ -90,6 +91,7 @@ public class DonacionService {
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
+        segmentada.validarFlujoAnterior();
         segmentada.registrarEntregaFallida("Sistema",
                 motivo != null ? motivo : "Entrega fallida reportada por logística");
     }
@@ -131,6 +133,7 @@ public class DonacionService {
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }
+        donacion.getDonacionesSegmentadas().forEach(DonacionSegmentada::validarFlujoAnterior);
         donacionRepository.delete(donacion);
     }
 
@@ -158,6 +161,8 @@ public class DonacionService {
 
         return DonacionHistorialDTO.builder()
                 .id(donacion.getId())
+                .donanteId(donacion.getDonante() == null ? null : donacion.getDonante().getId())
+                .donanteNombre(donacion.getDonante() == null ? null : donacion.getDonante().getNombreCompleto())
                 .descripcion(donacion.getDescripcion())
                 .fechaIngreso(donacion.getFechaIngreso())
                 .estado(donacion.getEstado())

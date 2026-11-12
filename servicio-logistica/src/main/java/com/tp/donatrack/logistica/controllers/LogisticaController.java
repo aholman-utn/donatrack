@@ -6,7 +6,9 @@ import com.tp.donatrack.logistica.domain.Chofer;
 import com.tp.donatrack.logistica.domain.Envio;
 import com.tp.donatrack.logistica.domain.Ruta;
 import com.tp.donatrack.logistica.services.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,6 +56,8 @@ public class LogisticaController {
 
     @PostMapping("/envios")
     public ResponseEntity<Envio> registrarEnvio(@RequestBody Envio envio) {
+        validarFlujoAnterior(envio.getId());
+        validarFlujoAnterior(envio.getRutaId());
         return ResponseEntity.ok(enviosService.registrarEnvio(envio));
     }
 
@@ -72,6 +76,13 @@ public class LogisticaController {
 
     @PostMapping("/rutas")
     public ResponseEntity<Ruta> registrarRuta(@RequestBody Ruta ruta) {
+        validarFlujoAnterior(ruta.getId());
+        if (ruta.getSegmentosPanel() != null || ruta.isPanelListo()) throw conflictoFlujo();
+        if (ruta.getParadas() != null) {
+            ruta.getParadas().forEach(parada -> {
+                if (parada.getEnviosIds() != null) parada.getEnviosIds().forEach(this::validarFlujoAnterior);
+            });
+        }
         return ResponseEntity.ok(rutaService.registrarRuta(ruta));
     }
 
@@ -82,18 +93,21 @@ public class LogisticaController {
 
     @PostMapping("/rutas/{id}/iniciar")
     public ResponseEntity<Void> iniciarRuta(@PathVariable("id") String id) {
+        validarFlujoAnterior(id);
         rutaService.iniciarRuta(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/llegada")
     public ResponseEntity<Void> registrarLlegada(@PathVariable("id") String id) {
+        validarFlujoAnterior(id);
         enviosService.registrarLlegadaADestino(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/recibir")
     public ResponseEntity<Void> recibirEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
+        validarFlujoAnterior(id);
         String detalles = (body != null) ? body.get("detalles") : null;
         enviosService.registrarEntregaExitosa(id, detalles);
         return ResponseEntity.ok().build();
@@ -101,8 +115,15 @@ public class LogisticaController {
 
     @PostMapping("/envios/{id}/fallar")
     public ResponseEntity<Void> fallarEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
+        validarFlujoAnterior(id);
         String motivo = (body != null) ? body.get("motivo") : null;
         enviosService.registrarEntregaFallida(id, motivo);
         return ResponseEntity.ok().build();
+    }
+    private void validarFlujoAnterior(String id) {
+        if (Ruta.esDelPanel(id)) throw conflictoFlujo();
+    }
+    private ResponseStatusException conflictoFlujo() {
+        return new ResponseStatusException(HttpStatus.CONFLICT, "Este recorrido se gestiona desde el panel de Logística.");
     }
 }

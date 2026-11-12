@@ -56,7 +56,9 @@ public class CommonsSecurityConfig {
                         .requestMatchers("/donantes/me/**").denyAll()
                         .requestMatchers(HttpMethod.POST, "/donantes/humano", "/donantes/juridico",
                                 "/donantes/importar").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR")
-                        .requestMatchers("/api/users/supervisores").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers("/api/users/supervisores", "/api/users/administradores-logistica").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers("/api/logistica/panel/**").hasAuthority("SCOPE_ADMIN_LOGISTICA")
+                        .requestMatchers("/interno/logistica/**").hasAuthority("SCOPE_LOGISTICA_DONACIONES")
                         .requestMatchers(HttpMethod.POST, "/incentivos/entrega")
                                 .hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR", "SCOPE_DONACIONES_INCENTIVOS")
                         .requestMatchers(HttpMethod.GET, "/donantes/buscar", "/donantes/dni")
@@ -73,7 +75,7 @@ public class CommonsSecurityConfig {
                                 not(hasAnyAuthority("SCOPE_DONANTE", "SCOPE_DONANTE_LOOKUP",
                                         "SCOPE_DONANTE_REGISTRATION", "SCOPE_ENTIDAD_REGISTRATION", "SCOPE_ENTIDAD_BENEFICIARIA",
                                         "SCOPE_DONACIONES_INCENTIVOS", "SCOPE_INCENTIVOS_DONACIONES",
-                                        "SCOPE_DONACIONES_NOTIFICACIONES"))))
+                                        "SCOPE_DONACIONES_NOTIFICACIONES", "SCOPE_ADMIN_LOGISTICA", "SCOPE_LOGISTICA_DONACIONES"))))
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())));
 
