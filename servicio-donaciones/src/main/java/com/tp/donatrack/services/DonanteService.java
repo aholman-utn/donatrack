@@ -18,6 +18,7 @@ import com.tp.donatrack.repositories.DonanteRepository;
 
 import com.tp.donatrack.dtos.*;
 import com.tp.commons.dtos.incentivos.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@Transactional
 public class DonanteService {
     private final DonanteRepository donanteRepository;
     private final NotificacionQueueClient notificacionQueueClient;
