@@ -31,7 +31,13 @@ public class EntidadBeneficiariaService {
 
     // CREATE
     public EntidadBeneficiaria registrar(PersonaJuridica personaJuridica) {
+        return registrar(personaJuridica, null);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public EntidadBeneficiaria registrar(PersonaJuridica personaJuridica, String emailAcceso) {
         EntidadBeneficiaria entidadBeneficiaria = new EntidadBeneficiaria(personaJuridica);
+        entidadBeneficiaria.setEmailAcceso(emailAcceso);
         return entidadBeneficiariaRepository.create(entidadBeneficiaria);
     }
 

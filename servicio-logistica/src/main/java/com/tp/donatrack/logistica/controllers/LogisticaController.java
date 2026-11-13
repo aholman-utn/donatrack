@@ -36,6 +36,13 @@ public class LogisticaController {
 
     @PostMapping("/camiones")
     public ResponseEntity<Camion> registrarCamion(@RequestBody Camion camion) {
+        camion.setId(null);
+        camion.setPatente(texto(camion.getPatente(), "patente").toUpperCase(java.util.Locale.ROOT));
+        camion.setMarca(texto(camion.getMarca(), "marca"));
+        camion.setModelo(texto(camion.getModelo(), "modelo"));
+        if (!positivo(camion.getCapacidadCarga()) || !positivo(camion.getVolumen()) || !positivo(camion.getAltura())) {
+            throw invalido("La capacidad, el volumen y la altura deben ser mayores que cero.");
+        }
         return ResponseEntity.ok(camionService.registrarCamion(camion));
     }
 
@@ -46,6 +53,11 @@ public class LogisticaController {
 
     @PostMapping("/choferes")
     public ResponseEntity<Chofer> registrarChofer(@RequestBody Chofer chofer) {
+        chofer.setId(null);
+        chofer.setNombre(texto(chofer.getNombre(), "nombre"));
+        chofer.setApellido(texto(chofer.getApellido(), "apellido"));
+        chofer.setDni(texto(chofer.getDni(), "DNI"));
+        if (!chofer.getDni().matches("[0-9]{7,8}")) throw invalido("Ingresá un DNI de 7 u 8 dígitos.");
         return ResponseEntity.ok(choferService.registrarChofer(chofer));
     }
 
@@ -125,5 +137,18 @@ public class LogisticaController {
     }
     private ResponseStatusException conflictoFlujo() {
         return new ResponseStatusException(HttpStatus.CONFLICT, "Este recorrido se gestiona desde el panel de Logística.");
+    }
+
+    private String texto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) throw invalido("Completá el campo " + campo + ".");
+        return valor.trim();
+    }
+
+    private boolean positivo(double valor) {
+        return Double.isFinite(valor) && valor > 0;
+    }
+
+    private ResponseStatusException invalido(String detalle) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, detalle);
     }
 }

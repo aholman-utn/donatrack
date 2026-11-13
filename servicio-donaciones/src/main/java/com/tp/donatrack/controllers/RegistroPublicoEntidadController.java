@@ -5,6 +5,7 @@ import com.tp.donatrack.repositories.EntidadBeneficiariaRepository;
 import com.tp.donatrack.services.EntidadBeneficiariaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,10 @@ public class RegistroPublicoEntidadController {
         var vinculada = repository.findByEmailAccesoIgnoreCase(jwt.getSubject());
         if (vinculada.isPresent()) return vinculada.get().getIdEntidadBeneficiaria();
         var existentes = repository.findByCorreoContacto(jwt.getSubject());
-        if (!existentes.isEmpty()) throw new ResponseStatusException(HttpStatus.CONFLICT);
+        if (!existentes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "El correo ya figura como contacto de una entidad. Pedí a administración que revise el acceso.");
+        }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
@@ -46,8 +50,11 @@ public class RegistroPublicoEntidadController {
         }
         var persona = request.toDomain();
         persona.setId(null);
-        var entidad = service.registrar(persona);
-        entidad.setEmailAcceso(email);
-        return repository.save(entidad).getIdEntidadBeneficiaria();
+        return service.registrar(persona, email).getIdEntidadBeneficiaria();
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> error(ResponseStatusException error) {
+        return ResponseEntity.status(error.getStatusCode()).body(error.getReason());
     }
 }

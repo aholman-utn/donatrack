@@ -2,8 +2,6 @@ package com.tp.donatrack.logistica.controllers;
 
 import com.tp.commons.dtos.logistica.SegmentoLogistico;
 import com.tp.donatrack.logistica.clients.DonacionesPanelClient;
-import com.tp.donatrack.logistica.domain.Camion;
-import com.tp.donatrack.logistica.domain.Chofer;
 import com.tp.donatrack.logistica.domain.Envio;
 import com.tp.donatrack.logistica.domain.EstadoEnvio;
 import com.tp.donatrack.logistica.domain.Parada;
@@ -41,40 +39,6 @@ public class PanelLogisticaController {
         this.camiones = camiones;
         this.choferes = choferes;
         this.donaciones = donaciones;
-    }
-
-    @GetMapping("/camiones")
-    public List<Camion> camiones() {
-        return camiones.listarCamiones();
-    }
-
-    @PostMapping("/camiones")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Camion crearCamion(@RequestBody Camion camion) {
-        camion.setId(null);
-        camion.setPatente(texto(camion.getPatente(), "patente").toUpperCase(java.util.Locale.ROOT));
-        camion.setMarca(texto(camion.getMarca(), "marca"));
-        camion.setModelo(texto(camion.getModelo(), "modelo"));
-        if (!positivo(camion.getCapacidadCarga()) || !positivo(camion.getVolumen()) || !positivo(camion.getAltura())) {
-            throw invalido("La capacidad, el volumen y la altura deben ser mayores que cero.");
-        }
-        return camiones.registrarCamion(camion);
-    }
-
-    @GetMapping("/choferes")
-    public List<Chofer> choferes() {
-        return choferes.listarChoferes();
-    }
-
-    @PostMapping("/choferes")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Chofer crearChofer(@RequestBody Chofer chofer) {
-        chofer.setId(null);
-        chofer.setNombre(texto(chofer.getNombre(), "nombre"));
-        chofer.setApellido(texto(chofer.getApellido(), "apellido"));
-        chofer.setDni(texto(chofer.getDni(), "DNI"));
-        if (!chofer.getDni().matches("[0-9]{7,8}")) throw invalido("Ingresá un DNI de 7 u 8 dígitos.");
-        return choferes.registrarChofer(chofer);
     }
 
     @GetMapping("/segmentos")
@@ -179,15 +143,6 @@ public class PanelLogisticaController {
     private Ruta rutaLista(String id) {
         return rutas.findById(id).filter(Ruta::isPanelListo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró la ruta."));
-    }
-
-    private String texto(String valor, String campo) {
-        if (valor == null || valor.isBlank()) throw invalido("Completá el campo " + campo + ".");
-        return valor.trim();
-    }
-
-    private boolean positivo(double valor) {
-        return Double.isFinite(valor) && valor > 0;
     }
 
     private ResponseStatusException invalido(String detalle) {

@@ -37,6 +37,8 @@ public class GatewaySecurity {
                                 "/entidades/me/donaciones/*/segmentos/*/no-recibida").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
                         .pathMatchers("/entidades/me/**").denyAll()
                         .pathMatchers("/api/users/administradores-logistica").hasAuthority("SCOPE_ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
+                        .pathMatchers(HttpMethod.POST, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
                         .pathMatchers("/api/logistica/panel/**").hasAuthority("SCOPE_ADMIN_LOGISTICA")
                         .anyExchange().access((authentication, context) -> authentication
                                 .map(auth -> new org.springframework.security.authorization.AuthorizationDecision(

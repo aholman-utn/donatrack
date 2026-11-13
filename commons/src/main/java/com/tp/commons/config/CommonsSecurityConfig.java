@@ -57,6 +57,8 @@ public class CommonsSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/donantes/humano", "/donantes/juridico",
                                 "/donantes/importar").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_SUPERVISOR")
                         .requestMatchers("/api/users/supervisores", "/api/users/administradores-logistica").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
+                        .requestMatchers(HttpMethod.POST, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
                         .requestMatchers("/api/logistica/panel/**").hasAuthority("SCOPE_ADMIN_LOGISTICA")
                         .requestMatchers("/interno/logistica/**").hasAuthority("SCOPE_LOGISTICA_DONACIONES")
                         .requestMatchers(HttpMethod.POST, "/incentivos/entrega")

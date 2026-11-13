@@ -13,6 +13,7 @@ public interface DonacionSegmentadaRepository extends JpaRepository<DonacionSegm
     @org.springframework.data.jpa.repository.Query("""
             select s.id from DonacionSegmentada s where s.estado = :estado
                 and s.comprobanteRecepcionDonacion is not null and s.donanteId is not null
+                and s.rutaLogisticaId is not null
                 and (s.incentivosProcesados is null or s.incentivosProcesados = false)
             order by s.comprobanteRecepcionDonacion.fechaEntrega, s.id
             """)
