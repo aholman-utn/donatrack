@@ -23,6 +23,11 @@ services:
         sync: false
       - key: DB_DDL_AUTO
         sync: false
+      # URL de notificaciones (avisos de la entidad) y del propio servicio (links a comprobantes).
+      - key: SERVICES_NOTIFICACIONES_URL
+        sync: false
+      - key: DONATRACK_COMPROBANTES_BASE_URL
+        sync: false
 
   - type: web
     name: donatrack-incentivos
