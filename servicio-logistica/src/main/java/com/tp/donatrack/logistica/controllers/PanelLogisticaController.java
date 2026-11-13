@@ -84,11 +84,27 @@ public class PanelLogisticaController {
 
     @GetMapping("/rutas")
     public List<Recorrido> recorridos() {
+        return recorridos(false);
+    }
+
+    @GetMapping("/rutas/historial")
+    public List<Recorrido> historial() {
+        return recorridos(true);
+    }
+
+    private List<Recorrido> recorridos(boolean completadas) {
         List<Ruta> lista = rutas.findByPanelListoTrueOrderByFechaCreacionDesc();
         if (lista.isEmpty()) return List.of();
         var estados = donaciones.estados(lista.stream().map(Ruta::getId).toList()).stream()
                 .collect(Collectors.groupingBy(SegmentoLogistico::rutaId));
-        return lista.stream().map(ruta -> new Recorrido(ruta, estados.getOrDefault(ruta.getId(), List.of()))).toList();
+        return lista.stream().map(ruta -> new Recorrido(ruta, estados.getOrDefault(ruta.getId(), List.of())))
+                .filter(recorrido -> esCompletada(recorrido) == completadas).toList();
+    }
+
+    private boolean esCompletada(Recorrido recorrido) {
+        return recorrido.ruta().getSegmentosPanel() != null && !recorrido.ruta().getSegmentosPanel().isEmpty()
+                && recorrido.ruta().getSegmentosPanel().stream().allMatch(id -> recorrido.segmentos().stream()
+                .anyMatch(segmento -> segmento.id().equals(id) && "ENTREGADA".equals(segmento.estado())));
     }
 
     @PostMapping("/rutas")
