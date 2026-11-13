@@ -63,6 +63,10 @@ public interface DonanteRepository extends JpaRepository<Donante, Long> {
     @Query("UPDATE Persona p SET p.fechaAvisoInactividad = NULL WHERE p.id = :id AND p.fechaAvisoInactividad = :fecha")
     void liberarAvisoInactividad(@Param("id") Long id, @Param("fecha") java.time.LocalDateTime fecha);
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select d from Donante d where d.id = :id")
+    Optional<Donante> bloquear(Long id);
+
     /** Persiste el donante. */
     default Donante create(Donante donante) {
         return save(donante);

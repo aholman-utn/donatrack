@@ -1,17 +1,17 @@
 package com.tp.donatrack.services;
 
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
+import com.tp.commons.config.ServiceToken;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 
 import com.tp.donatrack.domain.donacion.DonacionEntregadaEvent;
 import com.tp.donatrack.domain.donacion.DonacionEventPublisher;
 
 import com.tp.donatrack.domain.donante.Donante;
-import com.tp.donatrack.domain.donante.Metrica;
 
 import com.tp.donatrack.repositories.DonanteRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -24,15 +24,16 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
     private final RestTemplate restTemplate;
     private final String incentivosUrl;
     private final DonanteRepository donanteRepository;
-    private static final Logger logger = LoggerFactory.getLogger(HttpDonacionEventPublisher.class);
+    private final ServiceToken serviceToken;
 
     public HttpDonacionEventPublisher(
             RestTemplate restTemplate,
             @Value("${services.incentivos.url}") String incentivosUrl,
-            DonanteRepository donanteRepository) {
+            DonanteRepository donanteRepository, ServiceToken serviceToken) {
         this.restTemplate = restTemplate;
         this.incentivosUrl = incentivosUrl;
         this.donanteRepository = donanteRepository;
+        this.serviceToken = serviceToken;
     }
 
     @Override
@@ -45,61 +46,46 @@ public class HttpDonacionEventPublisher implements DonacionEventPublisher {
         requestBody.put("categoriaDonante", event.dto().getCategoriaDonante());
         requestBody.put("nombreDonante", event.dto().getNombreDonante());
 
-        try {
-            // Log para ver qué estamos enviando
-            logger.debug("Enviando request a Incentivos: {}", requestBody);
+        aplicarEvaluacion(event, evaluar(requestBody));
+    }
 
-            String url = incentivosUrl + "/entrega"; // mando la info de la donacion al servicio de incentivos
+    public void evaluarEntrega(Donante donante, Long segmentoId) {
+        var perfil = donante.getPerfil();
+        if (perfil.getMisionActualId() == null) return;
+        var dto = new com.tp.donatrack.dtos.DonacionEntregadaEventDTO();
+        dto.setDonacionSegmentadaId(segmentoId);
+        dto.setDonanteId(donante.getId());
+        dto.setProgreso(perfil.getProgreso() == null ? 0.0 : perfil.getProgreso());
+        dto.setUltimaMisionId(perfil.getMisionActualId());
+        dto.setCategoriaDonante(perfil.getNivelDonante());
+        dto.setNombreDonante(donante.getNombreCompleto());
+        publicar(new DonacionEntregadaEvent(dto));
+    }
 
-            var responseEntity = restTemplate.postForEntity(
-                    url,
-                    requestBody,
-                    EvaluacionMisionResponseDTO.class);
+    private EvaluacionMisionResponseDTO evaluar(Map<String, Object> requestBody) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(serviceToken.emitir("DONACIONES_INCENTIVOS"));
+        var respuesta = restTemplate.postForEntity(incentivosUrl + "/entrega",
+                new HttpEntity<>(requestBody, headers), EvaluacionMisionResponseDTO.class);
+        if (respuesta.getBody() == null) throw new IllegalStateException("Incentivos devolvió una respuesta vacía");
+        return respuesta.getBody();
+    }
 
-            if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                EvaluacionMisionResponseDTO response = responseEntity.getBody();
-                logger.info("Respuesta exitosa de Incentivos. Progreso: {}, Misión Cumplida: {}",
-                        response.getNuevoProgreso(), response.isMisionCumplida());
-
-                Donante donante = donanteRepository.findByIdOrNull(event.dto().getDonanteId());
-
-                if (donante == null) {
-                    logger.error("Error: Donante con ID {} no encontrado en memoria.", event.dto().getDonanteId());
-                    return;
-                }
-
-                if (response.getInsigniaGanada() != null) {
-                    logger.info("Donante ganó insignia: {}", response.getInsigniaGanada().getTitulo());
-                    donante.getPerfil().getInsigniasGanadas().add(response.getInsigniaGanada().getTitulo());
-                }
-
-                // Registrar misión completada en métricas
-                if (response.isMisionCumplida()) {
-                    Metrica metricaDonante = donante.getPerfil().getMetricasPerfil();
-                    logger.info("Donante ganó mision: {}", event.dto().getUltimaMisionId());
-                    metricaDonante.incrementarMisionesCompletadas();
-                }
-
-                if (response.isSubioDeCategoria() && response.getNuevoNivel() != null) {
-                    logger.info("Donante subió de nivel: {}", response.getNuevoNivel());
-                    donante.getPerfil().setNivelDonante(response.getNuevoNivel());
-                }
-
-                donante.getPerfil().setProgreso(response.getNuevoProgreso());
-
-                donante.getPerfil().setMisionActualId(response.getSiguienteMisionId());
-
-                this.donanteRepository.update(donante);
-                logger.info("Donante ID {} actualizado correctamente en memoria.", donante.getPersona().getId());
-
-            } else {
-                logger.warn("Respuesta de Incentivos no exitosa. Status: {}. Body es null? {}",
-                        responseEntity.getStatusCode(),
-                        (responseEntity.getBody() == null));
-            }
-
-        } catch (Exception e) {
-            logger.error("Error al conectarse con Incentivos: {}", e.getMessage(), e);
+    private void aplicarEvaluacion(DonacionEntregadaEvent evento, EvaluacionMisionResponseDTO respuesta) {
+        Donante donante = donanteRepository.findByIdOrNull(evento.dto().getDonanteId());
+        if (donante == null) throw new IllegalStateException("No se encontró el donante de la entrega");
+        var perfil = donante.getPerfil();
+        if (respuesta.getInsigniaGanada() != null) {
+            perfil.getInsigniasGanadas().add(respuesta.getInsigniaGanada().getTitulo());
         }
+        if (respuesta.isMisionCumplida()) {
+            perfil.setTotalMisionesCompletadas(perfil.getTotalMisionesCompletadas() + 1);
+        }
+        if (respuesta.isSubioDeCategoria() && respuesta.getNuevoNivel() != null) {
+            perfil.setNivelDonante(respuesta.getNuevoNivel());
+        }
+        perfil.setProgreso(respuesta.getNuevoProgreso());
+        perfil.setMisionActualId(respuesta.getSiguienteMisionId());
+        donanteRepository.update(donante);
     }
 }

@@ -10,6 +10,14 @@ import java.util.List;
 
 @Repository
 public interface DonacionSegmentadaRepository extends JpaRepository<DonacionSegmentada, Long> {
+    @org.springframework.data.jpa.repository.Query("""
+            select s.id from DonacionSegmentada s where s.estado = :estado
+                and s.comprobanteRecepcionDonacion is not null and s.donanteId is not null
+                and (s.incentivosProcesados is null or s.incentivosProcesados = false)
+            order by s.comprobanteRecepcionDonacion.fechaEntrega, s.id
+            """)
+    List<Long> buscarEntregasPendientes(EstadoDonacionSegmentada estado, org.springframework.data.domain.Pageable pagina);
+
     List<DonacionSegmentada> findByEstadoAndRutaLogisticaIdIsNullOrderByIdAsc(EstadoDonacionSegmentada estado);
     List<DonacionSegmentada> findByRutaLogisticaIdIn(java.util.Collection<String> rutas);
 

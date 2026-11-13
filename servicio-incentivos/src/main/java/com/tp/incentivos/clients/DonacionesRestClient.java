@@ -1,6 +1,10 @@
 package com.tp.incentivos.clients;
 
 import com.tp.commons.dtos.incentivos.IndicadoresDonanteDTO;
+import com.tp.commons.config.ServiceToken;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import com.tp.commons.dtos.notificador.NotificacionRequestDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +20,17 @@ public class DonacionesRestClient {
     @Value("${services.donaciones.url}")
     private String donacionesUrl;
 
-    public DonacionesRestClient() {}
+    private final ServiceToken serviceToken;
+
+    public DonacionesRestClient(ServiceToken serviceToken) {
+        this.serviceToken = serviceToken;
+    }
+
+    private HttpEntity<Void> autenticacion() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(serviceToken.emitir("INCENTIVOS_DONACIONES"));
+        return new HttpEntity<>(headers);
+    }
 
     public IndicadoresDonanteDTO obtenerIndicadores(
             Long donanteId,
@@ -30,7 +44,7 @@ public class DonacionesRestClient {
                 .buildAndExpand(donacionSegmentadaId)
                 .toUriString();
 
-        return restTemplate.getForObject(url, IndicadoresDonanteDTO.class);
+        return restTemplate.exchange(url, HttpMethod.GET, autenticacion(), IndicadoresDonanteDTO.class).getBody();
     }
 
     public List<java.util.Map<String, Object>> obtenerTodosDonantes() {
@@ -38,7 +52,7 @@ public class DonacionesRestClient {
                 .path("/donantes")
                 .build()
                 .toUriString();
-        java.util.Map<String, Object>[] array = restTemplate.getForObject(url, java.util.Map[].class);
+        java.util.Map<String, Object>[] array = restTemplate.exchange(url, HttpMethod.GET, autenticacion(), java.util.Map[].class).getBody();
         if (array == null) {
             return List.of();
         }
@@ -52,7 +66,7 @@ public class DonacionesRestClient {
                 .buildAndExpand(donanteId)
                 .toUriString();
 
-            return restTemplate.getForObject(url, NotificacionRequestDTO.class);
+            return restTemplate.exchange(url, HttpMethod.GET, autenticacion(), NotificacionRequestDTO.class).getBody();
 
         } catch (Exception e) {
             return null;
@@ -65,8 +79,7 @@ public class DonacionesRestClient {
                 .build()
                 .toUriString();
 
-        com.tp.commons.dtos.incentivos.DonanteRachaDTO[] array = restTemplate.getForObject(
-                url, com.tp.commons.dtos.incentivos.DonanteRachaDTO[].class);
+        com.tp.commons.dtos.incentivos.DonanteRachaDTO[] array = restTemplate.exchange(url, HttpMethod.GET, autenticacion(), com.tp.commons.dtos.incentivos.DonanteRachaDTO[].class).getBody();
 
         if (array == null) {
             return List.of();
@@ -81,7 +94,7 @@ public class DonacionesRestClient {
                 .toUriString();
 
         try {
-            java.util.Map<String, String> response = restTemplate.getForObject(url, java.util.Map.class);
+            java.util.Map<String, String> response = restTemplate.exchange(url, HttpMethod.GET, autenticacion(), java.util.Map.class).getBody();
             if (response != null && response.get("fechaUltimaDonacion") != null) {
                 return java.time.LocalDate.parse(response.get("fechaUltimaDonacion"));
             }
@@ -97,6 +110,6 @@ public class DonacionesRestClient {
                 .buildAndExpand(donanteId)
                 .toUriString();
 
-        restTemplate.put(url, null);
+        restTemplate.exchange(url, HttpMethod.PUT, autenticacion(), Void.class);
     }
 }

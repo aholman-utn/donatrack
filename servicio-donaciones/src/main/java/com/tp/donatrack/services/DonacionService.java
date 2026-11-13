@@ -82,7 +82,12 @@ public class DonacionService {
             donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
             donacionEntregada.setCategoriaDonante(donante.getPerfil().getNivelDonante());
             donacionEntregada.setNombreDonante(donante.getNombreCompleto());
-            eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+            try {
+                eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+            } catch (RuntimeException error) {
+                org.slf4j.LoggerFactory.getLogger(DonacionService.class)
+                        .warn("No se pudo evaluar la entrega del segmento {}", segmentada.getId(), error);
+            }
         }
     }
 

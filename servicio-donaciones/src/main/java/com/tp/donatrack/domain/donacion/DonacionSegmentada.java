@@ -73,6 +73,7 @@ public class DonacionSegmentada {
     @Column(name = "entidad_beneficiaria_nombre")
     private String entidadBeneficiariaNombre;
 
+    private Boolean incentivosProcesados;
     private String rutaLogisticaId;
     private java.time.LocalDateTime llegadaLogistica;
 
