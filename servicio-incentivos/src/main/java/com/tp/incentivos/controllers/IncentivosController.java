@@ -1,6 +1,9 @@
 package com.tp.incentivos.controllers;
 
 import com.tp.commons.dtos.incentivos.EvaluacionMisionResponseDTO;
+import com.tp.commons.domain.donantes.Nivel;
+import com.tp.incentivos.domain.misiones.MisionDonacionesExitosas;
+import com.tp.incentivos.repositories.MisionRepository;
 import com.tp.incentivos.dtos.EntregaDonacionDTO;
 import com.tp.incentivos.dtos.RankingItemDTO;
 import com.tp.incentivos.services.IncentivosService;
@@ -18,11 +21,26 @@ public class IncentivosController {
 
     private final IncentivosService service;
     private final ServicioRanking servicioRanking;
+    private final MisionRepository misiones;
 
-    public IncentivosController(IncentivosService service, ServicioRanking servicioRanking) {
+    public IncentivosController(IncentivosService service, ServicioRanking servicioRanking, MisionRepository misiones) {
         this.service = service;
         this.servicioRanking = servicioRanking;
+        this.misiones = misiones;
     }
+
+    @GetMapping("/misiones")
+    public List<MisionCatalogo> catalogo() {
+        return Nivel.values().stream()
+                .flatMap(nivel -> misiones.findByNivelOrderByOrdenAsc(nivel).stream())
+                .map(mision -> new MisionCatalogo(mision.getOrden(), mision.getNivel().getNombre(),
+                        mision.getTitulo(), mision.getDescripcion(), mision.getObjetivo(),
+                        mision instanceof MisionDonacionesExitosas))
+                .toList();
+    }
+
+    public record MisionCatalogo(int orden, String nivel, String titulo, String descripcion,
+                                 int objetivo, boolean progresoEnUnidades) {}
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleNotFound(IllegalArgumentException ex) {
