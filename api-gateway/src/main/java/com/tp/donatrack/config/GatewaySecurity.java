@@ -36,6 +36,10 @@ public class GatewaySecurity {
                         .pathMatchers(HttpMethod.POST, "/entidades/me/donaciones/*/segmentos/*/recepcion",
                                 "/entidades/me/donaciones/*/segmentos/*/no-recibida").hasAuthority("SCOPE_ENTIDAD_BENEFICIARIA")
                         .pathMatchers("/entidades/me/**").denyAll()
+                        .pathMatchers("/api/users/administradores-logistica").hasAuthority("SCOPE_ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
+                        .pathMatchers(HttpMethod.POST, "/api/logistica/camiones", "/api/logistica/choferes").hasAuthority("SCOPE_ADMIN_LOGISTICA")
+                        .pathMatchers("/api/logistica/panel/**").hasAuthority("SCOPE_ADMIN_LOGISTICA")
                         .anyExchange().access((authentication, context) -> authentication
                                 .map(auth -> new org.springframework.security.authorization.AuthorizationDecision(
                                         auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)
@@ -44,7 +48,9 @@ public class GatewaySecurity {
                                                         || authority.getAuthority().equals("SCOPE_DONANTE_LOOKUP")
                                                         || authority.getAuthority().equals("SCOPE_DONANTE_REGISTRATION")
                                                         || authority.getAuthority().equals("SCOPE_DONACIONES_INCENTIVOS")
-                                                        || authority.getAuthority().equals("SCOPE_INCENTIVOS_DONACIONES"))))
+                                                        || authority.getAuthority().equals("SCOPE_INCENTIVOS_DONACIONES")
+                                                        || authority.getAuthority().equals("SCOPE_ADMIN_LOGISTICA")
+                                                        || authority.getAuthority().equals("SCOPE_LOGISTICA_DONACIONES"))))
                                 .defaultIfEmpty(new org.springframework.security.authorization.AuthorizationDecision(false)))
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtDecoder(jwtDecoder())));

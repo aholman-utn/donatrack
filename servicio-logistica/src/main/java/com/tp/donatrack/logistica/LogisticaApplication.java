@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 import com.tp.commons.config.RabbitMQCommonsConfig;
 
 @SpringBootApplication
-@Import({ RabbitMQCommonsConfig.class, CommonsSecurityConfig.class })
+@Import({ RabbitMQCommonsConfig.class, CommonsSecurityConfig.class, com.tp.commons.config.ServiceToken.class })
 public class LogisticaApplication {
 
     public static void main(String[] args) {

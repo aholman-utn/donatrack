@@ -6,7 +6,9 @@ import com.tp.donatrack.logistica.domain.Chofer;
 import com.tp.donatrack.logistica.domain.Envio;
 import com.tp.donatrack.logistica.domain.Ruta;
 import com.tp.donatrack.logistica.services.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +36,13 @@ public class LogisticaController {
 
     @PostMapping("/camiones")
     public ResponseEntity<Camion> registrarCamion(@RequestBody Camion camion) {
+        camion.setId(null);
+        camion.setPatente(texto(camion.getPatente(), "patente").toUpperCase(java.util.Locale.ROOT));
+        camion.setMarca(texto(camion.getMarca(), "marca"));
+        camion.setModelo(texto(camion.getModelo(), "modelo"));
+        if (!positivo(camion.getCapacidadCarga()) || !positivo(camion.getVolumen()) || !positivo(camion.getAltura())) {
+            throw invalido("La capacidad, el volumen y la altura deben ser mayores que cero.");
+        }
         return ResponseEntity.ok(camionService.registrarCamion(camion));
     }
 
@@ -44,6 +53,11 @@ public class LogisticaController {
 
     @PostMapping("/choferes")
     public ResponseEntity<Chofer> registrarChofer(@RequestBody Chofer chofer) {
+        chofer.setId(null);
+        chofer.setNombre(texto(chofer.getNombre(), "nombre"));
+        chofer.setApellido(texto(chofer.getApellido(), "apellido"));
+        chofer.setDni(texto(chofer.getDni(), "DNI"));
+        if (!chofer.getDni().matches("[0-9]{7,8}")) throw invalido("Ingresá un DNI de 7 u 8 dígitos.");
         return ResponseEntity.ok(choferService.registrarChofer(chofer));
     }
 
@@ -54,6 +68,8 @@ public class LogisticaController {
 
     @PostMapping("/envios")
     public ResponseEntity<Envio> registrarEnvio(@RequestBody Envio envio) {
+        validarFlujoAnterior(envio.getId());
+        validarFlujoAnterior(envio.getRutaId());
         return ResponseEntity.ok(enviosService.registrarEnvio(envio));
     }
 
@@ -72,6 +88,13 @@ public class LogisticaController {
 
     @PostMapping("/rutas")
     public ResponseEntity<Ruta> registrarRuta(@RequestBody Ruta ruta) {
+        validarFlujoAnterior(ruta.getId());
+        if (ruta.getSegmentosPanel() != null || ruta.isPanelListo()) throw conflictoFlujo();
+        if (ruta.getParadas() != null) {
+            ruta.getParadas().forEach(parada -> {
+                if (parada.getEnviosIds() != null) parada.getEnviosIds().forEach(this::validarFlujoAnterior);
+            });
+        }
         return ResponseEntity.ok(rutaService.registrarRuta(ruta));
     }
 
@@ -82,18 +105,21 @@ public class LogisticaController {
 
     @PostMapping("/rutas/{id}/iniciar")
     public ResponseEntity<Void> iniciarRuta(@PathVariable("id") String id) {
+        validarFlujoAnterior(id);
         rutaService.iniciarRuta(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/llegada")
     public ResponseEntity<Void> registrarLlegada(@PathVariable("id") String id) {
+        validarFlujoAnterior(id);
         enviosService.registrarLlegadaADestino(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/envios/{id}/recibir")
     public ResponseEntity<Void> recibirEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
+        validarFlujoAnterior(id);
         String detalles = (body != null) ? body.get("detalles") : null;
         enviosService.registrarEntregaExitosa(id, detalles);
         return ResponseEntity.ok().build();
@@ -101,8 +127,28 @@ public class LogisticaController {
 
     @PostMapping("/envios/{id}/fallar")
     public ResponseEntity<Void> fallarEnvio(@PathVariable("id") String id, @RequestBody(required = false) Map<String, String> body) {
+        validarFlujoAnterior(id);
         String motivo = (body != null) ? body.get("motivo") : null;
         enviosService.registrarEntregaFallida(id, motivo);
         return ResponseEntity.ok().build();
+    }
+    private void validarFlujoAnterior(String id) {
+        if (Ruta.esDelPanel(id)) throw conflictoFlujo();
+    }
+    private ResponseStatusException conflictoFlujo() {
+        return new ResponseStatusException(HttpStatus.CONFLICT, "Este recorrido se gestiona desde el panel de Logística.");
+    }
+
+    private String texto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) throw invalido("Completá el campo " + campo + ".");
+        return valor.trim();
+    }
+
+    private boolean positivo(double valor) {
+        return Double.isFinite(valor) && valor > 0;
+    }
+
+    private ResponseStatusException invalido(String detalle) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, detalle);
     }
 }

@@ -30,6 +30,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -59,7 +60,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        Optional<User> userOpt = userRepository.findByEmail(request.email());
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(request.email() == null ? "" : request.email().trim());
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -128,14 +129,8 @@ public class AuthController {
         if (user != null && (user.getDonanteId() != null || user.getEntidadBeneficiariaId() != null)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya tiene una cuenta.");
         }
-        if (user == null && role == Role.ENTIDAD_BENEFICIARIA) {
-            try {
-                donaciones.get().uri(donacionesBaseUrl + "/entidadBeneficiaria/identidad")
-                        .headers(h -> h.setBearerAuth(jwtService.tokenRegistroEntidad(email))).retrieve().body(Long.class);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya existe una entidad con ese correo.");
-            } catch (HttpClientErrorException.NotFound ignored) { }
-        }
-        if (user == null && role == Role.DONANTE) {
+        if (role == Role.ENTIDAD_BENEFICIARIA) return registrarEntidadLocal(email, password, datos, user);
+        if (user == null) {
             try {
                 donaciones.get().uri(donacionesBaseUrl + "/donantes/identidad")
                         .headers(h -> h.setBearerAuth(jwtService.tokenConsultaDonante(email))).retrieve().body(Long.class);
@@ -152,28 +147,16 @@ public class AuthController {
         }
         try {
             Long perfilId;
-            if (role == Role.DONANTE) {
-
-                if (user.getId() != null) {
-                    try {
-                        perfilId = donaciones.get().uri(donacionesBaseUrl + "/donantes/identidad")
-                                .headers(h -> h.setBearerAuth(jwtService.tokenConsultaDonante(email))).retrieve().body(Long.class);
-                    } catch (HttpClientErrorException.NotFound ignored) { perfilId = null; }
-                } else perfilId = null;
-                if (perfilId == null) perfilId = donaciones.post().uri(donacionesBaseUrl + "/donantes/registro-publico")
-                        .headers(h -> h.setBearerAuth(jwtService.tokenRegistroDonante(email)))
-                        .body(Map.of("tipo", tipo, "datos", datos)).retrieve().body(Long.class);
-                user.setDonanteId(perfilId);
-            } else {
-                try {
-                    perfilId = donaciones.get().uri(donacionesBaseUrl + "/entidadBeneficiaria/identidad")
-                            .headers(h -> h.setBearerAuth(jwtService.tokenRegistroEntidad(email))).retrieve().body(Long.class);
-                } catch (HttpClientErrorException.NotFound ignored) { perfilId = null; }
-                if (perfilId == null) perfilId = donaciones.post().uri(donacionesBaseUrl + "/entidadBeneficiaria/registro-publico")
-                        .headers(h -> h.setBearerAuth(jwtService.tokenRegistroEntidad(email)))
-                        .body(datos).retrieve().body(Long.class);
-                user.setEntidadBeneficiariaId(perfilId);
+            try {
+                perfilId = donaciones.get().uri(donacionesBaseUrl + "/donantes/identidad")
+                        .headers(h -> h.setBearerAuth(jwtService.tokenConsultaDonante(email))).retrieve().body(Long.class);
+            } catch (HttpClientErrorException.NotFound ignored) {
+                perfilId = null;
             }
+            if (perfilId == null) perfilId = donaciones.post().uri(donacionesBaseUrl + "/donantes/registro-publico")
+                    .headers(h -> h.setBearerAuth(jwtService.tokenRegistroDonante(email)))
+                    .body(Map.of("tipo", tipo, "datos", datos)).retrieve().body(Long.class);
+            user.setDonanteId(perfilId);
             if (perfilId == null) return ResponseEntity.status(503).body("No se pudo completar el registro.");
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("email", email));
@@ -181,6 +164,53 @@ public class AuthController {
             return ResponseEntity.status(error.getStatusCode()).body(error.getResponseBodyAsString());
         } catch (Exception error) {
             return ResponseEntity.status(503).body("No se pudo completar el registro. Intentá nuevamente.");
+        }
+    }
+
+    private ResponseEntity<?> registrarEntidadLocal(String email, String password, JsonNode datos, User user) {
+        String etapa = "consultar identidad en Donaciones";
+        try {
+            Long entidadId;
+            try {
+                entidadId = donaciones.get().uri(donacionesBaseUrl + "/entidadBeneficiaria/identidad")
+                        .headers(h -> h.setBearerAuth(jwtService.tokenRegistroEntidad(email))).retrieve().body(Long.class);
+            } catch (HttpClientErrorException.NotFound ignored) {
+                entidadId = null;
+            }
+            if (user == null && entidadId != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya existe una entidad con ese correo.");
+            }
+            if (user == null) {
+                etapa = "guardar cuenta pendiente en IAM";
+                try {
+                    user = userRepository.saveAndFlush(User.builder().email(email).password(passwordEncoder.encode(password))
+                            .role(Role.ENTIDAD_BENEFICIARIA).provider(AuthProvider.LOCAL).build());
+                } catch (DataIntegrityViolationException duplicate) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya tiene una cuenta.");
+                }
+            }
+            if (entidadId == null) {
+                etapa = "crear entidad en Donaciones";
+                entidadId = donaciones.post().uri(donacionesBaseUrl + "/entidadBeneficiaria/registro-publico")
+                        .headers(h -> h.setBearerAuth(jwtService.tokenRegistroEntidad(email)))
+                        .body(datos).retrieve().body(Long.class);
+            }
+            if (entidadId == null) throw new IllegalStateException("Donaciones no devolvió el ID de la entidad");
+            etapa = "vincular entidad en IAM";
+            user.setEntidadBeneficiariaId(entidadId);
+            userRepository.saveAndFlush(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("email", email));
+        } catch (HttpClientErrorException error) {
+            logger.warn("Alta de entidad: etapa '{}', Donaciones respondió {}", etapa, error.getStatusCode().value());
+            String motivo = error.getResponseBodyAsString();
+            if (motivo.isBlank() && error.getStatusCode().value() == 409) {
+                motivo = "Ya existe una entidad con ese correo o CUIT. Pedí a administración que revise el acceso.";
+            }
+            return ResponseEntity.status(error.getStatusCode()).body(motivo);
+        } catch (RuntimeException error) {
+            logger.warn("Alta de entidad: falló la etapa '{}' ({})", etapa, error.getClass().getSimpleName());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body("No se pudo completar el registro. Reintentá con el mismo correo y contraseña.");
         }
     }
 

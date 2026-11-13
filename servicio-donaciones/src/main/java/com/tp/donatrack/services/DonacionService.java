@@ -64,6 +64,7 @@ public class DonacionService {
                     "La donación segmentada no tiene una entidad beneficiaria asignada. Ejecute el matchmaking primero.");
         }
 
+        segmentada.validarFlujoAnterior();
         Long donanteId = segmentada.getDonanteId();
 
         Donante donante = this.donanteService.buscarDonantePorId(donanteId);
@@ -81,7 +82,12 @@ public class DonacionService {
             donacionEntregada.setUltimaMisionId(donante.getPerfil().getMisionActualId());
             donacionEntregada.setCategoriaDonante(donante.getPerfil().getNivelDonante());
             donacionEntregada.setNombreDonante(donante.getNombreCompleto());
-            eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+            try {
+                eventPublisher.publicar(new DonacionEntregadaEvent(donacionEntregada));
+            } catch (RuntimeException error) {
+                org.slf4j.LoggerFactory.getLogger(DonacionService.class)
+                        .warn("No se pudo evaluar la entrega del segmento {}", segmentada.getId(), error);
+            }
         }
     }
 
@@ -90,6 +96,7 @@ public class DonacionService {
         if (segmentada == null) {
             throw new IllegalArgumentException("No se encontró la donación segmentada con ID: " + donacionSegmentadaId);
         }
+        segmentada.validarFlujoAnterior();
         segmentada.registrarEntregaFallida("Sistema",
                 motivo != null ? motivo : "Entrega fallida reportada por logística");
     }
@@ -131,6 +138,7 @@ public class DonacionService {
         if (donacion == null) {
             throw new IllegalArgumentException("No se encontró la donación con ID: " + id);
         }
+        donacion.getDonacionesSegmentadas().forEach(DonacionSegmentada::validarFlujoAnterior);
         donacionRepository.delete(donacion);
     }
 
@@ -158,6 +166,8 @@ public class DonacionService {
 
         return DonacionHistorialDTO.builder()
                 .id(donacion.getId())
+                .donanteId(donacion.getDonante() == null ? null : donacion.getDonante().getId())
+                .donanteNombre(donacion.getDonante() == null ? null : donacion.getDonante().getNombreCompleto())
                 .descripcion(donacion.getDescripcion())
                 .fechaIngreso(donacion.getFechaIngreso())
                 .estado(donacion.getEstado())

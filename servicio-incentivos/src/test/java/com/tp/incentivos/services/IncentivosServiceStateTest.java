@@ -85,7 +85,7 @@ public class IncentivosServiceStateTest {
                 }
         );
 
-        DonacionesRestClient donacionesStub = new DonacionesRestClient() {
+        DonacionesRestClient donacionesStub = new DonacionesRestClient(null) {
             @Override
             public IndicadoresDonanteDTO obtenerIndicadores(Long donanteId, Long donacionSegmentadaId, List<String> indicadores) {
                 return IndicadoresDonanteDTO.builder()

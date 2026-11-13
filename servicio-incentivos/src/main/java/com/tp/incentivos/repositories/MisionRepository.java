@@ -21,11 +21,8 @@ public interface MisionRepository extends JpaRepository<Mision, Long> {
         if (misionId == null) {
             return Optional.empty();
         }
-        Optional<Mision> porId = findByNivelAndId(nivel, misionId);
-        if (porId.isPresent()) {
-            return porId;
-        }
-        return findByNivelAndOrden(nivel, misionId.intValue());
+        return findByNivelAndOrden(nivel, misionId.intValue())
+                .or(() -> findByNivelAndId(nivel, misionId));
     }
 
     default Optional<Mision> findSiguiente(Nivel nivel, Long misionActualId) {
